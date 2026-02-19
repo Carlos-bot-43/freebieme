@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { getCities, getAvailableCities, getCityDealCount } from '../../../lib/data';
+import { distanceMiles } from '../../../lib/types';
 import CityDealsClient from './CityDealsClient';
 
 interface PageProps {
@@ -58,5 +59,18 @@ export default async function CityDealsPage({ params }: PageProps) {
   const available = new Set(getAvailableCities());
   const availableCities = cities.filter((c) => available.has(c.slug));
 
-  return <CityDealsClient cityConfig={cityConfig} allCities={availableCities} />;
+  // Compute nearby cities (closest 4, excluding current)
+  const nearbyCities = [...availableCities]
+    .filter((c) => c.slug !== cityConfig.slug)
+    .map((c) => ({
+      ...c,
+      distFromCurrent: distanceMiles(
+        cityConfig.center.lat, cityConfig.center.lng,
+        c.center.lat, c.center.lng
+      ),
+    }))
+    .sort((a, b) => a.distFromCurrent - b.distFromCurrent)
+    .slice(0, 4);
+
+  return <CityDealsClient cityConfig={cityConfig} allCities={availableCities} nearbyCities={nearbyCities} />;
 }

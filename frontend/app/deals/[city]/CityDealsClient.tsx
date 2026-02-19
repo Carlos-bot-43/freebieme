@@ -8,9 +8,14 @@ import FilterBar, { Filters } from '../../../components/FilterBar';
 import DealList from '../../../components/DealList';
 import { DealListSkeleton } from '../../../components/DealSkeleton';
 
+interface NearbyCity extends CityConfig {
+  distFromCurrent: number;
+}
+
 interface CityDealsClientProps {
   cityConfig: CityConfig;
   allCities: CityConfig[];
+  nearbyCities?: NearbyCity[];
 }
 
 const DEFAULT_FILTERS: Filters = {
@@ -52,7 +57,7 @@ function findNearestCity(lat: number, lng: number, cities: CityConfig[]): { city
   return { city: nearest, dist: minDist };
 }
 
-export default function CityDealsClient({ cityConfig, allCities }: CityDealsClientProps) {
+export default function CityDealsClient({ cityConfig, allCities, nearbyCities = [] }: CityDealsClientProps) {
   const router = useRouter();
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
   const [userLat, setUserLat] = useState<number | undefined>();
@@ -314,6 +319,26 @@ export default function CityDealsClient({ cityConfig, allCities }: CityDealsClie
                     );
                   })}
                 </div>
+              {/* Nearby cities */}
+              {nearbyCities.length > 0 && (
+                <div className="mt-4 bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+                  <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">
+                    Nearby Cities
+                  </h3>
+                  {nearbyCities.map((nearby) => (
+                    <button
+                      key={nearby.slug}
+                      onClick={() => router.push(`/deals/${nearby.slug}`)}
+                      className="w-full flex items-center justify-between py-1.5 text-sm hover:text-blue-600 transition-colors"
+                    >
+                      <span className="text-gray-700">{nearby.name}</span>
+                      <span className="text-gray-400 text-xs">
+                        {Math.round(nearby.distFromCurrent)} mi
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
               </div>
             </div>
 
