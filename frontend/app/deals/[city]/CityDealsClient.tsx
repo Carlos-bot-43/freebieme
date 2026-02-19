@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, FormEvent } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { CityConfig, CityDeals } from '../../../lib/types';
+import { CityConfig, CityDeals, distanceMiles } from '../../../lib/types';
 import FilterBar, { Filters } from '../../../components/FilterBar';
 import DealList from '../../../components/DealList';
 
@@ -20,12 +20,50 @@ const DEFAULT_FILTERS: Filters = {
   search: '',
 };
 
+async function geocodeQuery(query: string): Promise<{ lat: number; lng: number; display: string } | null> {
+  try {
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&countrycodes=us&format=json&limit=1`;
+    const res = await fetch(url, {
+      headers: { 'Accept-Language': 'en', 'User-Agent': 'FreebieMe/1.0' },
+    });
+    const data = await res.json();
+    if (!data.length) return null;
+    return {
+      lat: parseFloat(data[0].lat),
+      lng: parseFloat(data[0].lon),
+      display: data[0].display_name.split(',').slice(0, 2).join(', '),
+    };
+  } catch {
+    return null;
+  }
+}
+
+function findNearestCity(lat: number, lng: number, cities: CityConfig[]): { city: CityConfig; dist: number } {
+  let nearest = cities[0];
+  let minDist = Infinity;
+  for (const city of cities) {
+    const dist = distanceMiles(lat, lng, city.center.lat, city.center.lng);
+    if (dist < minDist) {
+      minDist = dist;
+      nearest = city;
+    }
+  }
+  return { city: nearest, dist: minDist };
+}
+
 export default function CityDealsClient({ cityConfig, allCities }: CityDealsClientProps) {
   const router = useRouter();
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
   const [userLat, setUserLat] = useState<number | undefined>();
   const [userLng, setUserLng] = useState<number | undefined>();
   const [locationStatus, setLocationStatus] = useState<'idle' | 'detecting' | 'found' | 'error'>('idle');
+  const [locationLabel, setLocationLabel] = useState<string>('');
+  const [suggestedCity, setSuggestedCity] = useState<CityConfig | null>(null);
+
+  // Location search state
+  const [locationSearch, setLocationSearch] = useState('');
+  const [locationSearching, setLocationSearching] = useState(false);
+  const [locationSearchError, setLocationSearchError] = useState('');
 
   // Deal data fetched client-side from public/data/deals/ (CDN, no serverless needed)
   const [cityDeals, setCityDeals] = useState<CityDeals | null>(null);
@@ -57,9 +95,18 @@ export default function CityDealsClient({ cityConfig, allCities }: CityDealsClie
       setLocationStatus('detecting');
       navigator.geolocation.getCurrentPosition(
         (pos) => {
-          setUserLat(pos.coords.latitude);
-          setUserLng(pos.coords.longitude);
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          setUserLat(lat);
+          setUserLng(lng);
           setLocationStatus('found');
+          setLocationLabel('GPS');
+
+          // Check if user is closer to a different city
+          const { city: nearest } = findNearestCity(lat, lng, allCities);
+          if (nearest.slug !== cityConfig.slug) {
+            setSuggestedCity(nearest);
+          }
         },
         () => setLocationStatus('error'),
         { timeout: 8000, maximumAge: 300000 }
@@ -67,43 +114,96 @@ export default function CityDealsClient({ cityConfig, allCities }: CityDealsClie
     } else {
       setLocationStatus('error');
     }
-  }, []);
+  }, [cityConfig.slug, allCities]);
 
   const handleCityChange = (slug: string) => {
     router.push(`/deals/${slug}`);
+  };
+
+  const handleLocationSearch = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!locationSearch.trim()) return;
+
+    setLocationSearching(true);
+    setLocationSearchError('');
+    setSuggestedCity(null);
+
+    const result = await geocodeQuery(locationSearch.trim());
+    if (!result) {
+      setLocationSearchError(`Could not find "${locationSearch}". Try a different query.`);
+      setLocationSearching(false);
+      return;
+    }
+
+    setUserLat(result.lat);
+    setUserLng(result.lng);
+    setLocationStatus('found');
+    setLocationLabel(locationSearch.trim());
+    setLocationSearching(false);
+
+    // Check if closer to different city
+    const { city: nearest } = findNearestCity(result.lat, result.lng, allCities);
+    if (nearest.slug !== cityConfig.slug) {
+      setSuggestedCity(nearest);
+    }
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center gap-4">
-          <Link href="/" className="text-2xl font-bold text-gray-900 hover:text-blue-700 transition-colors">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3 flex-wrap">
+          <Link href="/" className="text-xl font-bold text-gray-900 hover:text-blue-700 transition-colors whitespace-nowrap">
             🍔 FreebieMe
           </Link>
+
+          {/* Location search in header */}
+          <form onSubmit={handleLocationSearch} className="flex gap-1.5 flex-1 min-w-48 max-w-xs">
+            <input
+              type="text"
+              value={locationSearch}
+              onChange={(e) => setLocationSearch(e.target.value)}
+              placeholder="ZIP code or city..."
+              className="flex-1 px-3 py-1.5 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-0"
+            />
+            <button
+              type="submit"
+              disabled={locationSearching}
+              className="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 whitespace-nowrap"
+            >
+              {locationSearching ? '...' : '📍 Go'}
+            </button>
+          </form>
+
           <div className="flex-1" />
+
           <select
             value={cityConfig.slug}
             onChange={(e) => handleCityChange(e.target.value)}
             className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            {allCities.sort((a, b) => a.name.localeCompare(b.name)).map((city) => (
+            {[...allCities].sort((a, b) => a.name.localeCompare(b.name)).map((city) => (
               <option key={city.slug} value={city.slug}>
                 {city.name}
               </option>
             ))}
           </select>
           {locationStatus === 'found' && (
-            <span className="text-xs text-green-600 flex items-center gap-1">
-              📍 Location active
+            <span className="text-xs text-green-600 flex items-center gap-1 whitespace-nowrap">
+              📍 {locationLabel || 'Location active'}
             </span>
           )}
         </div>
+        {locationSearchError && (
+          <div className="max-w-6xl mx-auto px-4 pb-2">
+            <p className="text-xs text-red-500">{locationSearchError}</p>
+          </div>
+        )}
       </div>
 
       <div className="max-w-6xl mx-auto px-4 py-6">
         {/* Page header */}
-        <div className="mb-6">
+        <div className="mb-4">
           <h1 className="text-2xl font-bold text-gray-900">
             Free Food Deals in {cityConfig.display}
           </h1>
@@ -114,11 +214,28 @@ export default function CityDealsClient({ cityConfig, allCities }: CityDealsClie
                 Updated {cityDeals && new Date(cityDeals.updated_at).toLocaleDateString('en-US', {
                   month: 'short', day: 'numeric', year: 'numeric',
                 })}
-                {locationStatus === 'found' && userLat && userLng && <> • Sorted by distance</>}
+                {locationStatus === 'found' && locationLabel && (
+                  <> • Showing deals nearest to <strong>{locationLabel}</strong></>
+                )}
               </>
             )}
           </p>
         </div>
+
+        {/* Suggested city banner */}
+        {suggestedCity && (
+          <div className="mb-4 bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 flex items-center justify-between gap-3">
+            <span className="text-sm text-blue-800">
+              💡 Your location is closer to <strong>{suggestedCity.display}</strong>
+            </span>
+            <button
+              onClick={() => router.push(`/deals/${suggestedCity.slug}`)}
+              className="text-xs font-medium text-blue-700 bg-blue-100 hover:bg-blue-200 px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
+            >
+              Switch to {suggestedCity.name} →
+            </button>
+          </div>
+        )}
 
         {/* Loading state */}
         {loadingDeals && (
