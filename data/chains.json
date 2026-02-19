@@ -22,7 +22,12 @@
         "earn",
         "reward"
       ]
-    }
+    },
+    "food_categories": [
+      "chicken",
+      "sandwiches",
+      "breakfast"
+    ]
   },
   {
     "slug": "chipotle",
@@ -45,7 +50,12 @@
         "guac",
         "earn"
       ]
-    }
+    },
+    "food_categories": [
+      "mexican",
+      "tacos",
+      "burritos"
+    ]
   },
   {
     "slug": "starbucks",
@@ -67,7 +77,13 @@
         "birthday",
         "redeem"
       ]
-    }
+    },
+    "food_categories": [
+      "coffee",
+      "drinks",
+      "breakfast"
+    ],
+    "happy_hour_deals": true
   },
   {
     "slug": "subway",
@@ -89,7 +105,11 @@
         "earn",
         "birthday"
       ]
-    }
+    },
+    "food_categories": [
+      "sandwiches",
+      "subs"
+    ]
   },
   {
     "slug": "mcdonalds",
@@ -112,7 +132,13 @@
         "earn",
         "point"
       ]
-    }
+    },
+    "food_categories": [
+      "burgers",
+      "fries",
+      "breakfast",
+      "chicken"
+    ]
   },
   {
     "slug": "dunkin",
@@ -137,7 +163,14 @@
         "birthday",
         "earn"
       ]
-    }
+    },
+    "food_categories": [
+      "coffee",
+      "drinks",
+      "donuts",
+      "breakfast"
+    ],
+    "app_deal": true
   },
   {
     "slug": "panera",
@@ -161,7 +194,14 @@
         "earn",
         "reward"
       ]
-    }
+    },
+    "food_categories": [
+      "sandwiches",
+      "soup",
+      "salads",
+      "breakfast",
+      "coffee"
+    ]
   },
   {
     "slug": "taco-bell",
@@ -183,7 +223,12 @@
         "birthday",
         "earn"
       ]
-    }
+    },
+    "food_categories": [
+      "tacos",
+      "mexican",
+      "burritos"
+    ]
   },
   {
     "slug": "burger-king",
@@ -205,7 +250,12 @@
         "earn",
         "birthday"
       ]
-    }
+    },
+    "food_categories": [
+      "burgers",
+      "fries",
+      "breakfast"
+    ]
   },
   {
     "slug": "wendys",
@@ -228,7 +278,13 @@
         "birthday",
         "earn"
       ]
-    }
+    },
+    "food_categories": [
+      "burgers",
+      "fries",
+      "breakfast",
+      "chicken"
+    ]
   },
   {
     "slug": "pizza-hut",
@@ -249,7 +305,11 @@
         "earn",
         "birthday"
       ]
-    }
+    },
+    "food_categories": [
+      "pizza",
+      "wings"
+    ]
   },
   {
     "slug": "dominos",
@@ -272,7 +332,12 @@
         "pizza",
         "earn"
       ]
-    }
+    },
+    "food_categories": [
+      "pizza",
+      "wings",
+      "sandwiches"
+    ]
   },
   {
     "slug": "papa-johns",
@@ -294,7 +359,10 @@
         "earn",
         "birthday"
       ]
-    }
+    },
+    "food_categories": [
+      "pizza"
+    ]
   },
   {
     "slug": "kfc",
@@ -317,7 +385,12 @@
         "earn",
         "birthday"
       ]
-    }
+    },
+    "food_categories": [
+      "chicken",
+      "fries",
+      "breakfast"
+    ]
   },
   {
     "slug": "popeyes",
@@ -340,7 +413,12 @@
         "birthday",
         "point"
       ]
-    }
+    },
+    "food_categories": [
+      "chicken",
+      "sandwiches",
+      "fries"
+    ]
   },
   {
     "slug": "sonic",
@@ -363,7 +441,15 @@
         "earn",
         "birthday"
       ]
-    }
+    },
+    "food_categories": [
+      "burgers",
+      "fries",
+      "hot-dogs",
+      "drinks",
+      "ice-cream"
+    ],
+    "happy_hour_deals": true
   },
   {
     "slug": "panda-express",
@@ -385,7 +471,13 @@
         "birthday",
         "point"
       ]
-    }
+    },
+    "food_categories": [
+      "chinese",
+      "asian",
+      "rice",
+      "noodles"
+    ]
   },
   {
     "slug": "wingstop",
@@ -407,7 +499,13 @@
         "birthday",
         "wing"
       ]
-    }
+    },
+    "food_categories": [
+      "wings",
+      "chicken",
+      "fries"
+    ],
+    "bogo_deals": true
   },
   {
     "slug": "jersey-mikes",
@@ -429,7 +527,11 @@
         "earn",
         "point"
       ]
-    }
+    },
+    "food_categories": [
+      "sandwiches",
+      "subs"
+    ]
   },
   {
     "slug": "raising-canes",
@@ -452,7 +554,12 @@
         "birthday",
         "caniac"
       ]
-    }
+    },
+    "food_categories": [
+      "chicken",
+      "fries",
+      "sandwiches"
+    ]
   },
   {
     "slug": "whataburger",
@@ -474,7 +581,12 @@
         "birthday",
         "reward"
       ]
-    }
+    },
+    "food_categories": [
+      "burgers",
+      "fries",
+      "breakfast"
+    ]
   },
   {
     "slug": "jack-in-the-box",
@@ -496,7 +608,13 @@
         "earn",
         "app"
       ]
-    }
+    },
+    "food_categories": [
+      "burgers",
+      "tacos",
+      "fries",
+      "breakfast"
+    ]
   },
   {
     "slug": "del-taco",
@@ -518,7 +636,13 @@
         "birthday",
         "reward"
       ]
-    }
+    },
+    "food_categories": [
+      "tacos",
+      "mexican",
+      "burgers",
+      "fries"
+    ]
   },
   {
     "slug": "shake-shack",
@@ -540,7 +664,13 @@
         "point",
         "reward"
       ]
-    }
+    },
+    "food_categories": [
+      "burgers",
+      "fries",
+      "shakes",
+      "ice-cream"
+    ]
   },
   {
     "slug": "waffle-house",
@@ -561,7 +691,12 @@
         "deal",
         "birthday"
       ]
-    }
+    },
+    "food_categories": [
+      "breakfast",
+      "waffles",
+      "eggs"
+    ]
   },
   {
     "slug": "ihop",
@@ -583,7 +718,13 @@
         "pancake",
         "earn"
       ]
-    }
+    },
+    "food_categories": [
+      "breakfast",
+      "pancakes",
+      "eggs",
+      "waffles"
+    ]
   },
   {
     "slug": "dennys",
@@ -607,7 +748,13 @@
         "slam",
         "earn"
       ]
-    }
+    },
+    "food_categories": [
+      "breakfast",
+      "burgers",
+      "eggs",
+      "pancakes"
+    ]
   },
   {
     "slug": "applebees",
@@ -631,7 +778,14 @@
         "earn",
         "points"
       ]
-    }
+    },
+    "food_categories": [
+      "burgers",
+      "wings",
+      "casual-dining",
+      "drinks"
+    ],
+    "happy_hour_deals": true
   },
   {
     "slug": "chilis",
@@ -655,7 +809,15 @@
         "earn",
         "chip"
       ]
-    }
+    },
+    "food_categories": [
+      "burgers",
+      "tacos",
+      "casual-dining",
+      "drinks",
+      "margaritas"
+    ],
+    "happy_hour_deals": true
   },
   {
     "slug": "olive-garden",
@@ -678,7 +840,12 @@
         "dessert",
         "reward"
       ]
-    }
+    },
+    "food_categories": [
+      "italian",
+      "pasta",
+      "casual-dining"
+    ]
   },
   {
     "slug": "red-lobster",
@@ -700,7 +867,11 @@
         "earn",
         "catch"
       ]
-    }
+    },
+    "food_categories": [
+      "seafood",
+      "casual-dining"
+    ]
   },
   {
     "slug": "baskin-robbins",
@@ -723,7 +894,11 @@
         "scoop",
         "earn"
       ]
-    }
+    },
+    "food_categories": [
+      "ice-cream",
+      "dessert"
+    ]
   },
   {
     "slug": "cold-stone-creamery",
@@ -746,7 +921,11 @@
         "creation",
         "earn"
       ]
-    }
+    },
+    "food_categories": [
+      "ice-cream",
+      "dessert"
+    ]
   },
   {
     "slug": "dairy-queen",
@@ -771,6 +950,12 @@
         "blizzard",
         "earn"
       ]
-    }
+    },
+    "food_categories": [
+      "ice-cream",
+      "dessert",
+      "burgers",
+      "fries"
+    ]
   }
 ]
