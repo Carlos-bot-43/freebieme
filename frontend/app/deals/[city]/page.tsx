@@ -46,5 +46,9 @@ export default async function CityDealsPage({ params }: PageProps) {
     notFound();
   }
 
-  return <CityDealsClient cityConfig={cityConfig} allCities={cities} />;
+  // Only pass cities that have deal files (so the dropdown doesn't show broken links)
+  const available = new Set(getAvailableCities());
+  const availableCities = cities.filter((c) => available.has(c.slug));
+
+  return <CityDealsClient cityConfig={cityConfig} allCities={availableCities} />;
 }
