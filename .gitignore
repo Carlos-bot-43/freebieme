@@ -5,3 +5,6 @@ node_modules/
 .DS_Store
 frontend/.next/
 frontend/node_modules/
+
+# Generated data — NOT for git. Served via frontend/public/data/ instead.
+data/output/
