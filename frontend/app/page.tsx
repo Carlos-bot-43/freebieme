@@ -1,6 +1,6 @@
-import Link from 'next/link';
-import { getCities, getAvailableCities } from '../lib/data';
+import { getCities, getAvailableCities, getCityDealCount, getChainCount } from '../lib/data';
 import LocationDetector from '../components/LocationDetector';
+import CityGrid from '../components/CityGrid';
 
 export const dynamic = 'force-static';
 
@@ -9,7 +9,17 @@ export default function HomePage() {
   const availableCitySlugs = new Set(getAvailableCities());
 
   const availableCities = cities.filter((c) => availableCitySlugs.has(c.slug));
-  const sortedCities = [...availableCities].sort((a, b) => a.priority - b.priority || a.name.localeCompare(b.name));
+  const sortedCities = [...availableCities]
+    .sort((a, b) => a.priority - b.priority || a.name.localeCompare(b.name));
+
+  // Get deal counts at build time
+  const citiesWithCounts = sortedCities.map((city) => ({
+    ...city,
+    dealCount: getCityDealCount(city.slug),
+  }));
+
+  const totalDeals = citiesWithCounts.reduce((sum, c) => sum + c.dealCount, 0);
+  const chainCount = getChainCount();
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
@@ -41,8 +51,14 @@ export default function HomePage() {
             <div className="text-xs text-gray-500 uppercase tracking-wide">Cities</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-gray-900">20</div>
+            <div className="text-2xl font-bold text-gray-900">{chainCount}+</div>
             <div className="text-xs text-gray-500 uppercase tracking-wide">Chains</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-gray-900">
+              {totalDeals > 0 ? `${(totalDeals / 1000).toFixed(0)}K+` : 'Tons'}
+            </div>
+            <div className="text-xs text-gray-500 uppercase tracking-wide">Deals</div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-gray-900">Free</div>
@@ -56,31 +72,16 @@ export default function HomePage() {
         <h2 className="text-lg font-semibold text-gray-800 mb-4">
           Browse by City
         </h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-          {sortedCities.map((city) => (
-            <Link
-              key={city.slug}
-              href={`/deals/${city.slug}`}
-              className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 hover:shadow-md hover:border-blue-200 transition-all duration-200 group"
-            >
-              <div className="font-medium text-gray-900 text-sm group-hover:text-blue-700 transition-colors">
-                {city.name}
-              </div>
-              <div className="text-xs text-gray-500 mt-0.5">
-                {(city.population / 1000000).toFixed(1)}M metro
-              </div>
-            </Link>
-          ))}
-        </div>
+        <CityGrid cities={citiesWithCounts} />
 
         {/* How it works */}
         <div className="mt-12 bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
           <h2 className="text-lg font-semibold text-gray-800 mb-4">How It Works</h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {[
-              { emoji: '📍', title: 'Find Your City', desc: 'Auto-detect or pick from our list of 25 metro areas' },
-              { emoji: '🎯', title: 'Browse Deals', desc: 'Filter by deal type, distance, or app requirements' },
-              { emoji: '🆓', title: 'Claim for Free', desc: 'Click through to the official restaurant page to redeem' },
+              { emoji: '📍', title: 'Find Your City', desc: `Auto-detect location or search by ZIP code, or pick from ${availableCities.length}+ metro areas` },
+              { emoji: '🎯', title: 'Browse Deals', desc: 'Filter by deal type, distance, or app requirements — sorted nearest first' },
+              { emoji: '🆓', title: 'Claim for Free', desc: 'Click through to the official restaurant page to redeem your deal' },
             ].map((step) => (
               <div key={step.title} className="text-center p-4">
                 <div className="text-3xl mb-2">{step.emoji}</div>
@@ -89,6 +90,12 @@ export default function HomePage() {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* Footer */}
+        <div className="mt-8 text-center text-xs text-gray-400 pb-4">
+          <p>Deal data updated regularly • All deals subject to change • Always verify at the restaurant</p>
+          <p className="mt-1">FreebieMe is free, forever 🍔</p>
         </div>
       </div>
     </main>

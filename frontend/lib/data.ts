@@ -19,6 +19,16 @@ export type { CityConfig, CityDeals };
 export { distanceMiles, DEAL_TYPE_LABELS, DEAL_TYPE_COLORS } from './types';
 export type { Deal } from './types';
 
+export function getChainCount(): number {
+  try {
+    const chainsPath = path.join(process.cwd(), '..', 'data', 'chains.json');
+    const chains = JSON.parse(fs.readFileSync(chainsPath, 'utf-8'));
+    return chains.length;
+  } catch {
+    return 0;
+  }
+}
+
 export function getCities(): CityConfig[] {
   try {
     const citiesPath = path.join(process.cwd(), '..', 'data', 'cities.json');

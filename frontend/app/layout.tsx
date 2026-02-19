@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -7,19 +7,24 @@ const geistSans = Geist({
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
 export const metadata: Metadata = {
   title: "FreebieMe - Free Food Deals Near You",
-  description: "Find birthday freebies, app deals, sign-up bonuses, and restaurant rewards near you. Updated daily.",
-  keywords: ["free food", "restaurant deals", "birthday freebies", "food coupons", "app deals"],
+  description: "Find birthday freebies, app deals, sign-up bonuses, and restaurant rewards near you — at 50+ US cities. Updated regularly.",
+  keywords: ["free food", "restaurant deals", "birthday freebies", "food coupons", "app deals", "free meals", "Starbucks birthday", "Chick-fil-A rewards"],
   openGraph: {
     title: "FreebieMe - Free Food Deals Near You",
-    description: "Birthday freebies, app deals & sign-up bonuses at restaurants near you.",
+    description: "Birthday freebies, app deals & sign-up bonuses at restaurants near you — always free.",
     type: "website",
+    siteName: "FreebieMe",
+  },
+  twitter: {
+    card: "summary",
+    title: "FreebieMe - Free Food Deals Near You",
+    description: "Birthday freebies, app deals & sign-up bonuses at 50+ US cities. Always free.",
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 
@@ -30,9 +35,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} antialiased`}>
         {children}
       </body>
     </html>

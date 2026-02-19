@@ -3,240 +3,774 @@
     "slug": "chick-fil-a",
     "name": "Chick-fil-A",
     "rewards_url": "https://www.chick-fil-a.com/one",
-    "cuisine": ["fast-food", "chicken"],
-    "osm_name_variants": ["Chick-fil-A", "Chick Fil A", "CFA"],
+    "cuisine": [
+      "fast-food",
+      "chicken"
+    ],
+    "osm_name_variants": [
+      "Chick-fil-A",
+      "Chick Fil A",
+      "CFA"
+    ],
     "scrape_method": "playwright",
     "selectors": {
       "deal_containers": "[class*='benefit'], [class*='reward'], [class*='perk']",
-      "fallback_keywords": ["free", "birthday", "points", "earn", "reward"]
+      "fallback_keywords": [
+        "free",
+        "birthday",
+        "points",
+        "earn",
+        "reward"
+      ]
     }
   },
   {
     "slug": "chipotle",
     "name": "Chipotle",
     "rewards_url": "https://www.chipotle.com/rewards",
-    "cuisine": ["mexican", "fast-casual"],
-    "osm_name_variants": ["Chipotle", "Chipotle Mexican Grill"],
+    "cuisine": [
+      "mexican",
+      "fast-casual"
+    ],
+    "osm_name_variants": [
+      "Chipotle",
+      "Chipotle Mexican Grill"
+    ],
     "scrape_method": "playwright",
     "selectors": {
       "deal_containers": "[class*='reward'], [class*='benefit']",
-      "fallback_keywords": ["free", "birthday", "guac", "earn"]
+      "fallback_keywords": [
+        "free",
+        "birthday",
+        "guac",
+        "earn"
+      ]
     }
   },
   {
     "slug": "starbucks",
     "name": "Starbucks",
     "rewards_url": "https://www.starbucks.com/rewards",
-    "cuisine": ["coffee", "cafe"],
-    "osm_name_variants": ["Starbucks"],
+    "cuisine": [
+      "coffee",
+      "cafe"
+    ],
+    "osm_name_variants": [
+      "Starbucks"
+    ],
     "scrape_method": "playwright",
     "selectors": {
       "deal_containers": "[class*='reward'], [data-e2e*='reward']",
-      "fallback_keywords": ["free", "star", "birthday", "redeem"]
+      "fallback_keywords": [
+        "free",
+        "star",
+        "birthday",
+        "redeem"
+      ]
     }
   },
   {
     "slug": "subway",
     "name": "Subway",
     "rewards_url": "https://www.subway.com/en-US/MyWayRewards",
-    "cuisine": ["subs", "fast-food"],
-    "osm_name_variants": ["Subway"],
+    "cuisine": [
+      "subs",
+      "fast-food"
+    ],
+    "osm_name_variants": [
+      "Subway"
+    ],
     "scrape_method": "cheerio",
     "selectors": {
       "deal_containers": ".reward-item, .benefit-card",
-      "fallback_keywords": ["free", "token", "earn", "birthday"]
+      "fallback_keywords": [
+        "free",
+        "token",
+        "earn",
+        "birthday"
+      ]
     }
   },
   {
     "slug": "mcdonalds",
     "name": "McDonald's",
     "rewards_url": "https://www.mcdonalds.com/us/en-us/mcdapp.html",
-    "cuisine": ["fast-food", "burgers"],
-    "osm_name_variants": ["McDonald's", "McDonalds"],
+    "cuisine": [
+      "fast-food",
+      "burgers"
+    ],
+    "osm_name_variants": [
+      "McDonald's",
+      "McDonalds"
+    ],
     "scrape_method": "playwright",
     "selectors": {
       "deal_containers": "[class*='reward'], [class*='deal']",
-      "fallback_keywords": ["free", "mcrewards", "earn", "point"]
+      "fallback_keywords": [
+        "free",
+        "mcrewards",
+        "earn",
+        "point"
+      ]
     }
   },
   {
     "slug": "dunkin",
     "name": "Dunkin'",
     "rewards_url": "https://www.dunkindonuts.com/en/dd-perks",
-    "cuisine": ["coffee", "fast-food"],
-    "osm_name_variants": ["Dunkin'", "Dunkin", "Dunkin' Donuts", "Dunkin Donuts"],
+    "cuisine": [
+      "coffee",
+      "fast-food"
+    ],
+    "osm_name_variants": [
+      "Dunkin'",
+      "Dunkin",
+      "Dunkin' Donuts",
+      "Dunkin Donuts"
+    ],
     "scrape_method": "cheerio",
     "selectors": {
       "deal_containers": ".perk-item, .benefit",
-      "fallback_keywords": ["free", "point", "birthday", "earn"]
+      "fallback_keywords": [
+        "free",
+        "point",
+        "birthday",
+        "earn"
+      ]
     }
   },
   {
     "slug": "panera",
     "name": "Panera Bread",
     "rewards_url": "https://www.panerabread.com/en-us/mypanera.html",
-    "cuisine": ["bakery", "fast-casual", "cafe"],
-    "osm_name_variants": ["Panera Bread", "Panera"],
+    "cuisine": [
+      "bakery",
+      "fast-casual",
+      "cafe"
+    ],
+    "osm_name_variants": [
+      "Panera Bread",
+      "Panera"
+    ],
     "scrape_method": "playwright",
     "selectors": {
       "deal_containers": "[class*='benefit'], [class*='perk']",
-      "fallback_keywords": ["free", "birthday", "earn", "reward"]
+      "fallback_keywords": [
+        "free",
+        "birthday",
+        "earn",
+        "reward"
+      ]
     }
   },
   {
     "slug": "taco-bell",
     "name": "Taco Bell",
     "rewards_url": "https://www.tacobell.com/rewards",
-    "cuisine": ["mexican", "fast-food"],
-    "osm_name_variants": ["Taco Bell"],
+    "cuisine": [
+      "mexican",
+      "fast-food"
+    ],
+    "osm_name_variants": [
+      "Taco Bell"
+    ],
     "scrape_method": "playwright",
     "selectors": {
       "deal_containers": "[class*='reward']",
-      "fallback_keywords": ["free", "point", "birthday", "earn"]
+      "fallback_keywords": [
+        "free",
+        "point",
+        "birthday",
+        "earn"
+      ]
     }
   },
   {
     "slug": "burger-king",
     "name": "Burger King",
     "rewards_url": "https://www.bk.com/rewards",
-    "cuisine": ["fast-food", "burgers"],
-    "osm_name_variants": ["Burger King"],
+    "cuisine": [
+      "fast-food",
+      "burgers"
+    ],
+    "osm_name_variants": [
+      "Burger King"
+    ],
     "scrape_method": "playwright",
     "selectors": {
       "deal_containers": "[class*='reward'], [class*='crown']",
-      "fallback_keywords": ["free", "crown", "earn", "birthday"]
+      "fallback_keywords": [
+        "free",
+        "crown",
+        "earn",
+        "birthday"
+      ]
     }
   },
   {
     "slug": "wendys",
     "name": "Wendy's",
     "rewards_url": "https://www.wendys.com/wendys-rewards",
-    "cuisine": ["fast-food", "burgers"],
-    "osm_name_variants": ["Wendy's", "Wendys"],
+    "cuisine": [
+      "fast-food",
+      "burgers"
+    ],
+    "osm_name_variants": [
+      "Wendy's",
+      "Wendys"
+    ],
     "scrape_method": "playwright",
     "selectors": {
       "deal_containers": "[class*='reward']",
-      "fallback_keywords": ["free", "point", "birthday", "earn"]
+      "fallback_keywords": [
+        "free",
+        "point",
+        "birthday",
+        "earn"
+      ]
     }
   },
   {
     "slug": "pizza-hut",
     "name": "Pizza Hut",
     "rewards_url": "https://www.pizzahut.com/rewards",
-    "cuisine": ["pizza"],
-    "osm_name_variants": ["Pizza Hut"],
+    "cuisine": [
+      "pizza"
+    ],
+    "osm_name_variants": [
+      "Pizza Hut"
+    ],
     "scrape_method": "playwright",
     "selectors": {
       "deal_containers": "[class*='reward'], [class*='hut']",
-      "fallback_keywords": ["free", "point", "earn", "birthday"]
+      "fallback_keywords": [
+        "free",
+        "point",
+        "earn",
+        "birthday"
+      ]
     }
   },
   {
     "slug": "dominos",
     "name": "Domino's",
     "rewards_url": "https://www.dominos.com/en/pages/rewards/",
-    "cuisine": ["pizza"],
-    "osm_name_variants": ["Domino's", "Dominos", "Domino's Pizza"],
+    "cuisine": [
+      "pizza"
+    ],
+    "osm_name_variants": [
+      "Domino's",
+      "Dominos",
+      "Domino's Pizza"
+    ],
     "scrape_method": "cheerio",
     "selectors": {
       "deal_containers": ".reward-step, .benefit-item",
-      "fallback_keywords": ["free", "point", "pizza", "earn"]
+      "fallback_keywords": [
+        "free",
+        "point",
+        "pizza",
+        "earn"
+      ]
     }
   },
   {
     "slug": "papa-johns",
     "name": "Papa John's",
     "rewards_url": "https://www.papajohns.com/papa-rewards",
-    "cuisine": ["pizza"],
-    "osm_name_variants": ["Papa John's", "Papa Johns"],
+    "cuisine": [
+      "pizza"
+    ],
+    "osm_name_variants": [
+      "Papa John's",
+      "Papa Johns"
+    ],
     "scrape_method": "cheerio",
     "selectors": {
       "deal_containers": ".reward-item",
-      "fallback_keywords": ["free", "point", "earn", "birthday"]
+      "fallback_keywords": [
+        "free",
+        "point",
+        "earn",
+        "birthday"
+      ]
     }
   },
   {
     "slug": "kfc",
     "name": "KFC",
     "rewards_url": "https://www.kfc.com/rewards",
-    "cuisine": ["fast-food", "chicken"],
-    "osm_name_variants": ["KFC", "Kentucky Fried Chicken"],
+    "cuisine": [
+      "fast-food",
+      "chicken"
+    ],
+    "osm_name_variants": [
+      "KFC",
+      "Kentucky Fried Chicken"
+    ],
     "scrape_method": "playwright",
     "selectors": {
       "deal_containers": "[class*='reward']",
-      "fallback_keywords": ["free", "colonel", "earn", "birthday"]
+      "fallback_keywords": [
+        "free",
+        "colonel",
+        "earn",
+        "birthday"
+      ]
     }
   },
   {
     "slug": "popeyes",
     "name": "Popeyes",
     "rewards_url": "https://www.popeyes.com/rewards",
-    "cuisine": ["fast-food", "chicken"],
-    "osm_name_variants": ["Popeyes", "Popeye's"],
+    "cuisine": [
+      "fast-food",
+      "chicken"
+    ],
+    "osm_name_variants": [
+      "Popeyes",
+      "Popeye's"
+    ],
     "scrape_method": "playwright",
     "selectors": {
       "deal_containers": "[class*='reward'], [class*='benefit']",
-      "fallback_keywords": ["free", "earn", "birthday", "point"]
+      "fallback_keywords": [
+        "free",
+        "earn",
+        "birthday",
+        "point"
+      ]
     }
   },
   {
     "slug": "sonic",
     "name": "Sonic Drive-In",
     "rewards_url": "https://www.sonicdrivein.com/rewards",
-    "cuisine": ["fast-food", "burgers"],
-    "osm_name_variants": ["Sonic", "Sonic Drive-In"],
+    "cuisine": [
+      "fast-food",
+      "burgers"
+    ],
+    "osm_name_variants": [
+      "Sonic",
+      "Sonic Drive-In"
+    ],
     "scrape_method": "playwright",
     "selectors": {
       "deal_containers": "[class*='reward']",
-      "fallback_keywords": ["free", "slush", "earn", "birthday"]
+      "fallback_keywords": [
+        "free",
+        "slush",
+        "earn",
+        "birthday"
+      ]
     }
   },
   {
     "slug": "panda-express",
     "name": "Panda Express",
     "rewards_url": "https://www.pandaexpress.com/rewards",
-    "cuisine": ["asian", "fast-food"],
-    "osm_name_variants": ["Panda Express"],
+    "cuisine": [
+      "asian",
+      "fast-food"
+    ],
+    "osm_name_variants": [
+      "Panda Express"
+    ],
     "scrape_method": "playwright",
     "selectors": {
       "deal_containers": "[class*='reward'], [class*='panda']",
-      "fallback_keywords": ["free", "earn", "birthday", "point"]
+      "fallback_keywords": [
+        "free",
+        "earn",
+        "birthday",
+        "point"
+      ]
     }
   },
   {
     "slug": "wingstop",
     "name": "Wingstop",
     "rewards_url": "https://www.wingstop.com/thewing",
-    "cuisine": ["wings", "fast-food"],
-    "osm_name_variants": ["Wingstop"],
+    "cuisine": [
+      "wings",
+      "fast-food"
+    ],
+    "osm_name_variants": [
+      "Wingstop"
+    ],
     "scrape_method": "playwright",
     "selectors": {
       "deal_containers": "[class*='reward'], [class*='wing']",
-      "fallback_keywords": ["free", "earn", "birthday", "wing"]
+      "fallback_keywords": [
+        "free",
+        "earn",
+        "birthday",
+        "wing"
+      ]
     }
   },
   {
     "slug": "jersey-mikes",
     "name": "Jersey Mike's",
     "rewards_url": "https://www.jerseymikes.com/mikes-way-rewards",
-    "cuisine": ["subs"],
-    "osm_name_variants": ["Jersey Mike's", "Jersey Mikes"],
+    "cuisine": [
+      "subs"
+    ],
+    "osm_name_variants": [
+      "Jersey Mike's",
+      "Jersey Mikes"
+    ],
     "scrape_method": "cheerio",
     "selectors": {
       "deal_containers": ".reward-item, .benefit",
-      "fallback_keywords": ["free", "birthday", "earn", "point"]
+      "fallback_keywords": [
+        "free",
+        "birthday",
+        "earn",
+        "point"
+      ]
     }
   },
   {
     "slug": "raising-canes",
     "name": "Raising Cane's",
     "rewards_url": "https://www.raisingcanes.com/canes-rewards",
-    "cuisine": ["chicken", "fast-food"],
-    "osm_name_variants": ["Raising Cane's", "Raising Canes"],
+    "cuisine": [
+      "chicken",
+      "fast-food"
+    ],
+    "osm_name_variants": [
+      "Raising Cane's",
+      "Raising Canes"
+    ],
     "scrape_method": "playwright",
     "selectors": {
       "deal_containers": "[class*='reward']",
-      "fallback_keywords": ["free", "earn", "birthday", "caniac"]
+      "fallback_keywords": [
+        "free",
+        "earn",
+        "birthday",
+        "caniac"
+      ]
+    }
+  },
+  {
+    "slug": "whataburger",
+    "name": "Whataburger",
+    "rewards_url": "https://www.whataburger.com/whataburger-rewards",
+    "cuisine": [
+      "fast-food",
+      "burgers"
+    ],
+    "osm_name_variants": [
+      "Whataburger"
+    ],
+    "scrape_method": "playwright",
+    "selectors": {
+      "deal_containers": "[class*='reward']",
+      "fallback_keywords": [
+        "free",
+        "earn",
+        "birthday",
+        "reward"
+      ]
+    }
+  },
+  {
+    "slug": "jack-in-the-box",
+    "name": "Jack in the Box",
+    "rewards_url": "https://www.jackinthebox.com/deals",
+    "cuisine": [
+      "fast-food",
+      "burgers"
+    ],
+    "osm_name_variants": [
+      "Jack in the Box"
+    ],
+    "scrape_method": "playwright",
+    "selectors": {
+      "deal_containers": "[class*='deal'], [class*='reward']",
+      "fallback_keywords": [
+        "free",
+        "deal",
+        "earn",
+        "app"
+      ]
+    }
+  },
+  {
+    "slug": "del-taco",
+    "name": "Del Taco",
+    "rewards_url": "https://www.deltaco.com/rewards",
+    "cuisine": [
+      "mexican",
+      "fast-food"
+    ],
+    "osm_name_variants": [
+      "Del Taco"
+    ],
+    "scrape_method": "playwright",
+    "selectors": {
+      "deal_containers": "[class*='reward']",
+      "fallback_keywords": [
+        "free",
+        "earn",
+        "birthday",
+        "reward"
+      ]
+    }
+  },
+  {
+    "slug": "shake-shack",
+    "name": "Shake Shack",
+    "rewards_url": "https://www.shakeshack.com/shack-track-rewards",
+    "cuisine": [
+      "burgers",
+      "fast-casual"
+    ],
+    "osm_name_variants": [
+      "Shake Shack"
+    ],
+    "scrape_method": "playwright",
+    "selectors": {
+      "deal_containers": "[class*='reward']",
+      "fallback_keywords": [
+        "free",
+        "earn",
+        "point",
+        "reward"
+      ]
+    }
+  },
+  {
+    "slug": "waffle-house",
+    "name": "Waffle House",
+    "rewards_url": "https://www.wafflehouse.com",
+    "cuisine": [
+      "breakfast",
+      "diner"
+    ],
+    "osm_name_variants": [
+      "Waffle House"
+    ],
+    "scrape_method": "cheerio",
+    "selectors": {
+      "deal_containers": ".deal, .offer",
+      "fallback_keywords": [
+        "free",
+        "deal",
+        "birthday"
+      ]
+    }
+  },
+  {
+    "slug": "ihop",
+    "name": "IHOP",
+    "rewards_url": "https://www.ihop.com/en/ihop-rewards",
+    "cuisine": [
+      "breakfast",
+      "diner"
+    ],
+    "osm_name_variants": [
+      "IHOP"
+    ],
+    "scrape_method": "playwright",
+    "selectors": {
+      "deal_containers": "[class*='reward']",
+      "fallback_keywords": [
+        "free",
+        "birthday",
+        "pancake",
+        "earn"
+      ]
+    }
+  },
+  {
+    "slug": "dennys",
+    "name": "Denny's",
+    "rewards_url": "https://www.dennys.com/rewards",
+    "cuisine": [
+      "breakfast",
+      "diner"
+    ],
+    "osm_name_variants": [
+      "Denny's",
+      "Dennys",
+      "Denny's Diner"
+    ],
+    "scrape_method": "playwright",
+    "selectors": {
+      "deal_containers": "[class*='reward'], [class*='deal']",
+      "fallback_keywords": [
+        "free",
+        "birthday",
+        "slam",
+        "earn"
+      ]
+    }
+  },
+  {
+    "slug": "applebees",
+    "name": "Applebee's",
+    "rewards_url": "https://www.applebees.com/en/rewards",
+    "cuisine": [
+      "casual-dining",
+      "american"
+    ],
+    "osm_name_variants": [
+      "Applebee's",
+      "Applebees",
+      "Applebee's Neighborhood Grill"
+    ],
+    "scrape_method": "playwright",
+    "selectors": {
+      "deal_containers": "[class*='reward'], [class*='deal']",
+      "fallback_keywords": [
+        "free",
+        "birthday",
+        "earn",
+        "points"
+      ]
+    }
+  },
+  {
+    "slug": "chilis",
+    "name": "Chili's",
+    "rewards_url": "https://www.chilis.com/rewards",
+    "cuisine": [
+      "casual-dining",
+      "american"
+    ],
+    "osm_name_variants": [
+      "Chili's",
+      "Chilis",
+      "Chili's Grill & Bar"
+    ],
+    "scrape_method": "playwright",
+    "selectors": {
+      "deal_containers": "[class*='reward']",
+      "fallback_keywords": [
+        "free",
+        "birthday",
+        "earn",
+        "chip"
+      ]
+    }
+  },
+  {
+    "slug": "olive-garden",
+    "name": "Olive Garden",
+    "rewards_url": "https://www.olivegarden.com/specials/eclub",
+    "cuisine": [
+      "italian",
+      "casual-dining"
+    ],
+    "osm_name_variants": [
+      "Olive Garden",
+      "Olive Garden Italian Restaurant"
+    ],
+    "scrape_method": "playwright",
+    "selectors": {
+      "deal_containers": "[class*='deal'], [class*='special']",
+      "fallback_keywords": [
+        "free",
+        "birthday",
+        "dessert",
+        "reward"
+      ]
+    }
+  },
+  {
+    "slug": "red-lobster",
+    "name": "Red Lobster",
+    "rewards_url": "https://www.redlobster.com/fresh-catch-club",
+    "cuisine": [
+      "seafood",
+      "casual-dining"
+    ],
+    "osm_name_variants": [
+      "Red Lobster"
+    ],
+    "scrape_method": "playwright",
+    "selectors": {
+      "deal_containers": "[class*='reward'], [class*='deal']",
+      "fallback_keywords": [
+        "free",
+        "birthday",
+        "earn",
+        "catch"
+      ]
+    }
+  },
+  {
+    "slug": "baskin-robbins",
+    "name": "Baskin-Robbins",
+    "rewards_url": "https://www.baskinrobbins.com/en/baskin-rewards",
+    "cuisine": [
+      "ice-cream",
+      "dessert"
+    ],
+    "osm_name_variants": [
+      "Baskin-Robbins",
+      "Baskin Robbins"
+    ],
+    "scrape_method": "playwright",
+    "selectors": {
+      "deal_containers": "[class*='reward']",
+      "fallback_keywords": [
+        "free",
+        "birthday",
+        "scoop",
+        "earn"
+      ]
+    }
+  },
+  {
+    "slug": "cold-stone-creamery",
+    "name": "Cold Stone Creamery",
+    "rewards_url": "https://www.coldstonecreamery.com/icecream/mycoldstone",
+    "cuisine": [
+      "ice-cream",
+      "dessert"
+    ],
+    "osm_name_variants": [
+      "Cold Stone Creamery",
+      "Cold Stone"
+    ],
+    "scrape_method": "playwright",
+    "selectors": {
+      "deal_containers": "[class*='reward']",
+      "fallback_keywords": [
+        "free",
+        "birthday",
+        "creation",
+        "earn"
+      ]
+    }
+  },
+  {
+    "slug": "dairy-queen",
+    "name": "Dairy Queen",
+    "rewards_url": "https://www.dairyqueen.com/en-us/dq-rewards/",
+    "cuisine": [
+      "ice-cream",
+      "fast-food"
+    ],
+    "osm_name_variants": [
+      "Dairy Queen",
+      "DQ",
+      "Dairy Queen Grill & Chill",
+      "DQ Grill & Chill"
+    ],
+    "scrape_method": "playwright",
+    "selectors": {
+      "deal_containers": "[class*='reward']",
+      "fallback_keywords": [
+        "free",
+        "birthday",
+        "blizzard",
+        "earn"
+      ]
     }
   }
 ]
