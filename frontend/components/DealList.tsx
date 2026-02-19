@@ -58,7 +58,7 @@ export default function DealList({ deals, filters, userLat, userLng }: DealListP
     });
   }
 
-  // Sort: if user has location, sort by distance; else by confidence
+  // Sort: if user has location, sort strictly by distance; else by confidence
   const sorted = [...filtered].sort((a, b) => {
     if (hasLocation) {
       const da = a.lat && a.lng ? distanceMiles(userLat!, userLng!, a.lat, a.lng) : 999;
@@ -68,25 +68,38 @@ export default function DealList({ deals, filters, userLat, userLng }: DealListP
     return b.confidence_score - a.confidence_score;
   });
 
-  // Deduplicate: don't show 10 deals for the same chain in a row
-  // Group by chain, then interleave
-  const byChain: Record<string, Deal[]> = {};
-  for (const deal of sorted) {
-    if (!byChain[deal.chain_slug]) byChain[deal.chain_slug] = [];
-    byChain[deal.chain_slug].push(deal);
-  }
+  let displayed: Deal[];
 
-  // Interleave: take one from each chain in rotation
-  const interleaved: Deal[] = [];
-  const chains = Object.keys(byChain);
-  const maxLen = Math.max(...chains.map((c) => byChain[c].length));
-  for (let i = 0; i < maxLen; i++) {
-    for (const chain of chains) {
-      if (byChain[chain][i]) interleaved.push(byChain[chain][i]);
+  if (hasLocation) {
+    // When sorted by distance, show strictly sorted (no interleaving)
+    // Deduplicate exact same deal_type+chain_slug within 0.1 miles (same restaurant)
+    const seen = new Set<string>();
+    const deduped: Deal[] = [];
+    for (const deal of sorted) {
+      const key = `${deal.chain_slug}_${deal.deal_type}_${Math.round(deal.lat * 100)}_${Math.round(deal.lng * 100)}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        deduped.push(deal);
+      }
     }
+    displayed = deduped.slice(0, 200);
+  } else {
+    // When sorted by confidence, interleave by chain for variety
+    const byChain: Record<string, Deal[]> = {};
+    for (const deal of sorted) {
+      if (!byChain[deal.chain_slug]) byChain[deal.chain_slug] = [];
+      byChain[deal.chain_slug].push(deal);
+    }
+    const chains = Object.keys(byChain);
+    const interleaved: Deal[] = [];
+    const maxLen = Math.max(...chains.map((c) => byChain[c].length));
+    for (let i = 0; i < maxLen; i++) {
+      for (const chain of chains) {
+        if (byChain[chain][i]) interleaved.push(byChain[chain][i]);
+      }
+    }
+    displayed = interleaved.slice(0, 200);
   }
-
-  const displayed = interleaved.slice(0, 200); // Cap at 200 for performance
 
   // Count deals within 10 miles
   const nearbyCount = hasLocation
