@@ -25,6 +25,7 @@ export interface Deal {
   lng: number;
   phone: string | null;
   opening_hours: string | null;
+  food_tags: string[]; // deal-level food categories, computed at data generation
 }
 
 export interface CityDeals {
@@ -64,6 +65,7 @@ export interface DealGroup {
   locations: Array<{ address: string | null; lat: number; lng: number; phone: string | null; deal_id: string }>;
   nearestDistance: number | null; // miles, null if no user location
   nearestLocation: { address: string | null; lat: number; lng: number } | null;
+  food_tags: string[]; // from the group's deals (all same since same chain+deal_type)
 }
 
 // Calculate distance in miles between two lat/lng points
@@ -103,6 +105,7 @@ export function groupDeals(deals: Deal[], userLat?: number, userLng?: number): D
         locations: [],
         nearestDistance: null,
         nearestLocation: null,
+        food_tags: deal.food_tags || [],
       });
     }
     const group = groups.get(key)!;

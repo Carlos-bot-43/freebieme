@@ -3,7 +3,6 @@
 import { useMemo, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Deal, DealGroup, groupDeals } from '../lib/types';
-import { CHAIN_FOOD_CATEGORIES } from '../lib/foodCategories';
 import DealGroupCard from './DealGroupCard';
 import { Filters } from './FilterBar';
 import { getSavedDealIds } from '../lib/savedDeals';
@@ -53,25 +52,23 @@ export default function DealList({ deals, filters, userLat, userLng, updatedAt, 
       filtered = filtered.filter((g) => g.locations.some((loc) => savedIds.has(loc.deal_id)));
     }
 
-    // Food category filter
+    // Food category filter — uses deal-level food_tags (not chain-level lookup)
     if (filters.foodCategory) {
-      filtered = filtered.filter((g) => {
-        const cats = CHAIN_FOOD_CATEGORIES[g.chain_slug] || [];
-        return cats.includes(filters.foodCategory);
-      });
+      filtered = filtered.filter((g) =>
+        (g.food_tags || []).includes(filters.foodCategory)
+      );
     }
 
-    // Search filter — match chain slug, location name, title, description, and food categories
+    // Search filter — match chain slug, location name, title, description, and food tags
     if (filters.search.trim()) {
       const q = filters.search.toLowerCase();
       filtered = filtered.filter((g) => {
-        const cats = CHAIN_FOOD_CATEGORIES[g.chain_slug] || [];
         return (
           g.title.toLowerCase().includes(q) ||
           g.location_name.toLowerCase().includes(q) ||
           (g.description || '').toLowerCase().includes(q) ||
           g.chain_slug.toLowerCase().includes(q) ||
-          cats.some((c) => c.includes(q))
+          (g.food_tags || []).some((t) => t.includes(q))
         );
       });
     }

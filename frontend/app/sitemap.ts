@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 import { getAvailableCities } from '../lib/data';
 
-const SEO_CATEGORIES = ['burgers', 'pizza', 'chicken', 'tacos', 'breakfast', 'coffee', 'ice-cream', 'sandwiches', 'wings'];
+const SEO_CATEGORIES = ['burgers', 'pizza', 'chicken', 'tacos', 'breakfast', 'coffee', 'ice-cream', 'sandwiches', 'wings', 'casual-dining'];
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://freebieme.vercel.app';

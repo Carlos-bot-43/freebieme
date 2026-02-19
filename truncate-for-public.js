@@ -4,6 +4,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { tagDeal } = require('./lib/tag-deals');
 
 const INPUT  = path.join(__dirname, 'data/output/deals');
 const OUTPUT = path.join(__dirname, 'frontend/public/data/deals');
@@ -126,9 +127,10 @@ for (const file of fs.readdirSync(INPUT).filter(f => f.endsWith('.json'))) {
   // Step 8: Final sort for display (by deal_type priority, then confidence)
   selected.sort((a, b) => dealScore(a) - dealScore(b));
 
-  // Step 9: Strip large/unused fields to reduce payload size
+  // Step 9: Strip large/unused fields to reduce payload size; apply food_tags
   const stripped = selected.map(deal => {
     const { opening_hours, phone, ...rest } = deal;
+    rest.food_tags = tagDeal(deal); // deal-level tagging (single source of truth)
     return rest;
   });
 

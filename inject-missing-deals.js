@@ -3,6 +3,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { tagDeal } = require('./lib/tag-deals');
 
 const INPUT_DIR = path.join(__dirname, 'data/output/deals');
 const OUTPUT_DIR = path.join(__dirname, 'data/output/deals'); // update in place
@@ -556,6 +557,7 @@ for (const file of fs.readdirSync(INPUT_DIR).filter(f => f.endsWith('.json'))) {
           phone: loc.phone,
           opening_hours: loc.opening_hours,
         };
+        newDeal.food_tags = tagDeal(newDeal); // deal-level tagging
         newDeals.push(newDeal);
         injectedCount++;
       }

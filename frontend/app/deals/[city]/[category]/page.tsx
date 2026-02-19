@@ -11,7 +11,7 @@ interface PageProps {
 
 export const dynamicParams = false;
 
-const SEO_CATEGORIES = ['burgers', 'pizza', 'chicken', 'tacos', 'breakfast', 'coffee', 'ice-cream', 'sandwiches', 'wings'];
+const SEO_CATEGORIES = ['burgers', 'pizza', 'chicken', 'tacos', 'breakfast', 'coffee', 'ice-cream', 'sandwiches', 'wings', 'casual-dining'];
 
 export async function generateStaticParams() {
   const cities = getAvailableCities();
@@ -31,6 +31,7 @@ const CATEGORY_CHAINS: Record<string, string[]> = {
   'ice-cream': ['Dairy Queen', 'Baskin-Robbins', 'Cold Stone Creamery'],
   'sandwiches': ['Subway', 'Jersey Mike\'s', 'Panera', 'Jimmy John\'s'],
   'wings': ['Wingstop', 'Buffalo Wild Wings', 'Pizza Hut'],
+  'casual-dining': ["Applebee's", "Chili's", 'Olive Garden', 'Red Lobster'],
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
