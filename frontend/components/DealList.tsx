@@ -125,17 +125,38 @@ export default function DealList({ deals, filters, userLat, userLng }: DealListP
   }, [deals, filters, hasLocation, userLat, userLng, savedIds]);
 
   if (displayed.length === 0) {
+    // Build specific hints based on active filters
+    const hints: string[] = [];
+    if (filters.nearMe) hints.push('disable "Near Me" to see deals farther away');
+    if (filters.maxDistance !== null) hints.push(`increase max distance (currently ${filters.maxDistance} mi)`);
+    if (filters.dealType !== 'all') hints.push('select "All Deals" for more deal types');
+    if (filters.requiresApp === 'no') hints.push('allow app deals');
+    if (filters.requiresApp === 'yes') hints.push('allow non-app deals');
+    if (filters.search.trim()) hints.push('clear your search text');
+
     return (
       <div className="text-center py-12 text-gray-500">
         <p className="text-4xl mb-3">🍽️</p>
-        <p className="font-medium">
-          {filters.savedOnly ? 'No saved deals in this city' : 'No deals found'}
+        <p className="font-medium text-gray-700">
+          {filters.savedOnly ? 'No saved deals in this city' : 'No deals match your filters'}
         </p>
-        <p className="text-sm mt-1">
-          {filters.savedOnly
-            ? 'Star deals in other cities to see them here'
-            : 'Try adjusting your filters'}
-        </p>
+        {filters.savedOnly ? (
+          <p className="text-sm mt-2 text-gray-500">Star deals to save them — then find them here</p>
+        ) : hints.length > 0 ? (
+          <div className="mt-3 text-sm text-gray-500 max-w-xs mx-auto">
+            <p className="mb-2">Try:</p>
+            <ul className="text-left space-y-1 inline-block">
+              {hints.map((hint, i) => (
+                <li key={i} className="flex items-start gap-1.5">
+                  <span className="text-blue-400 mt-0.5">→</span>
+                  <span className="capitalize-first">{hint.charAt(0).toUpperCase() + hint.slice(1)}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : (
+          <p className="text-sm mt-1">Try adjusting your filters or search terms</p>
+        )}
       </div>
     );
   }
