@@ -11,9 +11,10 @@ interface DealListProps {
   filters: Filters;
   userLat?: number;
   userLng?: number;
+  updatedAt?: string;
 }
 
-export default function DealList({ deals, filters, userLat, userLng }: DealListProps) {
+export default function DealList({ deals, filters, userLat, userLng, updatedAt }: DealListProps) {
   const hasLocation = !!(userLat && userLng);
 
   // Track saved IDs reactively (updates when savedOnly filter activates)
@@ -183,6 +184,7 @@ export default function DealList({ deals, filters, userLat, userLng }: DealListP
             deal={deal}
             userLat={userLat}
             userLng={userLng}
+            updatedAt={updatedAt}
           />
         ))}
       </div>

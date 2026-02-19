@@ -20,6 +20,7 @@ interface DealCardProps {
   deal: Deal;
   userLat?: number;
   userLng?: number;
+  updatedAt?: string;
 }
 
 function getDistanceBadge(distance: number): { text: string; className: string } {
@@ -29,7 +30,7 @@ function getDistanceBadge(distance: number): { text: string; className: string }
   return { text, className: 'bg-gray-100 text-gray-500' };
 }
 
-export default function DealCard({ deal, userLat, userLng }: DealCardProps) {
+export default function DealCard({ deal, userLat, userLng, updatedAt }: DealCardProps) {
   const [copied, setCopied] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -164,6 +165,11 @@ export default function DealCard({ deal, userLat, userLng }: DealCardProps) {
           <span className="text-xs text-gray-400">
             {deal.confidence_score >= 0.9 ? 'Verified' : deal.confidence_score >= 0.7 ? 'Likely valid' : 'Unverified'}
           </span>
+          {updatedAt && (
+            <span className="text-xs text-gray-300" title={`Data updated ${updatedAt}`}>
+              · {new Date(updatedAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+            </span>
+          )}
         </div>
         <a
           href={deal.source_url}

@@ -387,6 +387,7 @@ export default function CityDealsClient({ cityConfig, allCities, nearbyCities = 
                 filters={filters}
                 userLat={userLat}
                 userLng={userLng}
+                updatedAt={cityDeals.updated_at}
               />
             </div>
           </div>
