@@ -11,6 +11,7 @@ export interface Filters {
   search: string;
   savedOnly: boolean;
   foodCategory: string; // '' = all
+  claimType: '' | 'instant' | 'same_day_setup' | 'birthday_only';
 }
 
 interface FilterBarProps {
@@ -30,6 +31,7 @@ export const DEFAULT_FILTERS: Filters = {
   search: '',
   savedOnly: false,
   foodCategory: '',
+  claimType: '',
 };
 
 // 2D: Exclude defaultFoodCategory from "active" check
@@ -40,7 +42,8 @@ function isFiltered(filters: Filters, defaultFoodCategory = ''): boolean {
     filters.nearMe ||
     filters.savedOnly ||
     filters.search.trim() !== '' ||
-    (filters.foodCategory !== '' && filters.foodCategory !== defaultFoodCategory);
+    (filters.foodCategory !== '' && filters.foodCategory !== defaultFoodCategory) ||
+    filters.claimType !== '';
 }
 
 // 6A: Count active filters for mobile badge
@@ -53,6 +56,7 @@ function countActiveFilters(filters: Filters, defaultFoodCategory = ''): number 
   if (filters.savedOnly) count++;
   if (filters.search.trim() !== '') count++;
   if (filters.foodCategory !== '' && filters.foodCategory !== defaultFoodCategory) count++;
+  if (filters.claimType !== '') count++;
   return count;
 }
 
@@ -89,6 +93,33 @@ export default function FilterBar({ filters, onFiltersChange, hasLocation, defau
           onChange={(e) => update({ search: e.target.value })}
           className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
+      </div>
+
+      {/* Claim type quick filter — "Get it when?" */}
+      <div>
+        <label className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5 block">
+          Get it when?
+        </label>
+        <div className="flex flex-wrap gap-1.5">
+          {[
+            { value: '', label: '🍽️ Any time' },
+            { value: 'instant', label: '⚡ Right now' },
+            { value: 'same_day_setup', label: '📲 Today (quick setup)' },
+            { value: 'birthday_only', label: '🎂 Birthday month' },
+          ].map(({ value, label }) => (
+            <button
+              key={value}
+              onClick={() => update({ claimType: value as Filters['claimType'] })}
+              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                filters.claimType === value
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Food Category Quick Filters */}

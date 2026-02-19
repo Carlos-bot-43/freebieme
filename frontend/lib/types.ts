@@ -26,6 +26,12 @@ export interface Deal {
   phone: string | null;
   opening_hours: string | null;
   food_tags: string[]; // deal-level food categories, computed at data generation
+  claim_type: 'instant' | 'same_day_setup' | 'advance_required' | 'birthday_only';
+  claim_steps: string[];
+  happy_hour_start?: string;   // "14:00"
+  happy_hour_end?: string;     // "16:00"
+  happy_hour_days?: string;    // "every day" | "Mon–Fri"
+  happy_hour_note?: string;
 }
 
 export interface CityDeals {
@@ -66,6 +72,12 @@ export interface DealGroup {
   nearestDistance: number | null; // miles, null if no user location
   nearestLocation: { address: string | null; lat: number; lng: number } | null;
   food_tags: string[]; // from the group's deals (all same since same chain+deal_type)
+  claim_type: 'instant' | 'same_day_setup' | 'advance_required' | 'birthday_only';
+  claim_steps: string[];
+  happy_hour_start?: string;
+  happy_hour_end?: string;
+  happy_hour_days?: string;
+  happy_hour_note?: string;
 }
 
 // Calculate distance in miles between two lat/lng points
@@ -106,6 +118,12 @@ export function groupDeals(deals: Deal[], userLat?: number, userLng?: number): D
         nearestDistance: null,
         nearestLocation: null,
         food_tags: deal.food_tags || [],
+        claim_type: deal.claim_type || 'same_day_setup',
+        claim_steps: deal.claim_steps || [],
+        happy_hour_start: deal.happy_hour_start,
+        happy_hour_end: deal.happy_hour_end,
+        happy_hour_days: deal.happy_hour_days,
+        happy_hour_note: deal.happy_hour_note,
       });
     }
     const group = groups.get(key)!;

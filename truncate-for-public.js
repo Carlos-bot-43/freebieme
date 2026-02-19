@@ -5,6 +5,7 @@
 const fs = require('fs');
 const path = require('path');
 const { tagDeal } = require('./lib/tag-deals');
+const { getClaimType, getClaimSteps, HAPPY_HOUR_DATA } = require('./lib/claim-steps');
 
 const INPUT  = path.join(__dirname, 'data/output/deals');
 const OUTPUT = path.join(__dirname, 'frontend/public/data/deals');
@@ -127,10 +128,22 @@ for (const file of fs.readdirSync(INPUT).filter(f => f.endsWith('.json'))) {
   // Step 8: Final sort for display (by deal_type priority, then confidence)
   selected.sort((a, b) => dealScore(a) - dealScore(b));
 
-  // Step 9: Strip large/unused fields to reduce payload size; apply food_tags
+  // Step 9: Strip large/unused fields to reduce payload size; apply food_tags + claim data
   const stripped = selected.map(deal => {
     const { opening_hours, phone, ...rest } = deal;
     rest.food_tags = tagDeal(deal); // deal-level tagging (single source of truth)
+    rest.claim_type = getClaimType(deal);
+    rest.claim_steps = getClaimSteps(deal);
+    // Add structured happy hour data
+    if (deal.deal_type === 'happy_hour') {
+      const hh = HAPPY_HOUR_DATA[deal.chain_slug];
+      if (hh) {
+        rest.happy_hour_start = hh.start;
+        rest.happy_hour_end = hh.end;
+        rest.happy_hour_days = hh.days;
+        rest.happy_hour_note = hh.note;
+      }
+    }
     return rest;
   });
 

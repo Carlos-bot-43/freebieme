@@ -254,16 +254,21 @@ export default function CityDealsClient({
             {loadingDeals ? 'Loading deals...' : dealsError ? 'Failed to load deals.' : dealStats ? (
               <>
                 <span className="font-medium text-gray-700">{dealStats.groupCount}</span> unique deal{dealStats.groupCount !== 1 ? 's' : ''}{' '}
-                at <span className="font-medium text-gray-700">{dealStats.locationCount.toLocaleString()}</span> restaurant locations •{' '}
-                Updated {cityDeals && new Date(cityDeals.updated_at).toLocaleDateString('en-US', {
-                  month: 'short', day: 'numeric', year: 'numeric',
-                })}
+                at <span className="font-medium text-gray-700">{dealStats.locationCount.toLocaleString()}</span> restaurant locations
                 {locationStatus === 'found' && locationLabel && (
-                  <> • Nearest to <strong>{locationLabel}</strong></>
+                  <> · Nearest to <strong>{locationLabel}</strong></>
                 )}
               </>
             ) : null}
           </p>
+          {!loadingDeals && !dealsError && cityDeals && (
+            <p className="text-xs text-gray-400 mt-0.5">
+              Deal data sourced from official restaurant sites ·{' '}
+              {new Date(cityDeals.updated_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+              {' · '}
+              <span className="text-gray-400">Always verify at the restaurant before visiting</span>
+            </p>
+          )}
         </div>
 
         {/* Suggested city banner */}
@@ -322,6 +327,7 @@ export default function CityDealsClient({
                   filters.savedOnly,
                   filters.search.trim() !== '',
                   filters.foodCategory !== '' && filters.foodCategory !== defaultFoodCategory,
+                  filters.claimType !== '',
                 ].filter(Boolean).length;
                 return (
                   <button

@@ -16,26 +16,19 @@ const DEAL_TYPE_BORDER: Record<string, string> = {
   other: 'border-l-gray-300',
 };
 
-// Accurate deal-type specific badges (replaces misleading "No purchase needed")
-function getDealTypeBadge(dealType: string): { icon: string; label: string; className: string } | null {
-  switch (dealType) {
-    case 'signup_bonus':
-      return { icon: '🆓', label: 'Free with sign up', className: 'bg-purple-50 text-purple-700' };
-    case 'birthday':
-      return { icon: '🎂', label: 'Must join rewards', className: 'bg-pink-50 text-pink-700' };
-    case 'app_deal':
-      return { icon: '📲', label: 'App exclusive', className: 'bg-blue-50 text-blue-700' };
-    case 'happy_hour':
-      return { icon: '⏰', label: 'Time-limited', className: 'bg-yellow-50 text-yellow-700' };
-    case 'freebie':
-      return { icon: '🆓', label: 'Free item', className: 'bg-emerald-50 text-emerald-700' };
-    case 'bogo':
-      return { icon: '2️⃣', label: 'Buy one get one', className: 'bg-orange-50 text-orange-700' };
-    case 'rewards_program':
-      return { icon: '⭐', label: 'Earn rewards', className: 'bg-green-50 text-green-700' };
-    default:
-      return null;
-  }
+// Claim type display config — answers the #1 hangry-user question instantly
+const CLAIM_TYPE_CONFIG: Record<string, { label: string; className: string }> = {
+  instant:          { label: '⚡ Use right now',    className: 'bg-green-100 text-green-800' },
+  same_day_setup:   { label: '📲 ~10 min setup',    className: 'bg-yellow-100 text-yellow-800' },
+  advance_required: { label: '📅 Setup in advance', className: 'bg-orange-100 text-orange-800' },
+  birthday_only:    { label: '🎂 Birthday month',   className: 'bg-pink-100 text-pink-800' },
+};
+
+function formatHHTime(timeStr: string): string {
+  const [h, m] = timeStr.split(':').map(Number);
+  const period = h >= 12 ? 'PM' : 'AM';
+  const hour = h > 12 ? h - 12 : (h === 0 ? 12 : h);
+  return m === 0 ? `${hour} ${period}` : `${hour}:${m.toString().padStart(2, '0')} ${period}`;
 }
 
 interface DealGroupCardProps {
@@ -58,9 +51,14 @@ function getDistBadgeClass(d: number): string {
 
 export default function DealGroupCard({ group, userLat, userLng, cityName, updatedAt }: DealGroupCardProps) {
   const [showLocations, setShowLocations] = useState(false);
+  const [showSteps, setShowSteps] = useState(false);
   const [saved, setSaved] = useState(false);
   const [copied, setCopied] = useState(false);
   const [shared, setShared] = useState(false);
+
+  // Happy hour live status
+  const [hhStatus, setHhStatus] = useState<'active' | 'upcoming' | 'closed' | null>(null);
+  const [hhCountdown, setHhCountdown] = useState<string>('');
 
   // Use the first location's deal_id as the "group save" key
   const primaryDealId = group.locations[0]?.deal_id || group.group_id;
@@ -69,10 +67,58 @@ export default function DealGroupCard({ group, userLat, userLng, cityName, updat
     setSaved(isDealSaved(primaryDealId));
   }, [primaryDealId]);
 
+  // Time-aware happy hour status (updates every minute)
+  useEffect(() => {
+    if (!group.happy_hour_start || !group.happy_hour_end) return;
+
+    const updateStatus = () => {
+      const now = new Date();
+      const [startH, startM] = group.happy_hour_start!.split(':').map(Number);
+      const [endH, endM] = group.happy_hour_end!.split(':').map(Number);
+      const dayStr = group.happy_hour_days || '';
+
+      // Check if today is a valid day
+      const todayIdx = now.getDay(); // 0=Sun, 1=Mon ... 6=Sat
+      const isWeekday = todayIdx >= 1 && todayIdx <= 5;
+      const validToday =
+        dayStr.includes('every day') ||
+        (dayStr.includes('Mon') && isWeekday) ||
+        dayStr.includes('select'); // seasonal = treat as unknown/possible
+
+      if (!validToday) {
+        setHhStatus('closed');
+        setHhCountdown(`Next: ${dayStr} at ${formatHHTime(group.happy_hour_start!)}`);
+        return;
+      }
+
+      const nowMins = now.getHours() * 60 + now.getMinutes();
+      const startMins = startH * 60 + startM;
+      const endMins = endH * 60 + endM;
+
+      if (nowMins >= startMins && nowMins < endMins) {
+        setHhStatus('active');
+        const remaining = endMins - nowMins;
+        setHhCountdown(`Ends in ${Math.floor(remaining / 60)}h ${remaining % 60}m`);
+      } else if (nowMins < startMins) {
+        setHhStatus('upcoming');
+        const wait = startMins - nowMins;
+        setHhCountdown(`Starts in ${Math.floor(wait / 60)}h ${wait % 60}m`);
+      } else {
+        setHhStatus('closed');
+        const nextDay = dayStr.includes('every') ? 'tomorrow' : `next ${dayStr.split('–')[0]}`;
+        setHhCountdown(`Next: ${nextDay} at ${formatHHTime(group.happy_hour_start!)}`);
+      }
+    };
+
+    updateStatus();
+    const timer = setInterval(updateStatus, 60000);
+    return () => clearInterval(timer);
+  }, [group.happy_hour_start, group.happy_hour_end, group.happy_hour_days]);
+
   const typeLabel = DEAL_TYPE_LABELS[group.deal_type] || DEAL_TYPE_LABELS.other;
   const typeColor = DEAL_TYPE_COLORS[group.deal_type] || DEAL_TYPE_COLORS.other;
   const typeBorder = DEAL_TYPE_BORDER[group.deal_type] || DEAL_TYPE_BORDER.other;
-  const dealTypeBadge = getDealTypeBadge(group.deal_type);
+  const claimConfig = group.claim_type ? CLAIM_TYPE_CONFIG[group.claim_type] : null;
 
   const hasLocation = !!(userLat && userLng);
 
@@ -98,7 +144,7 @@ export default function DealGroupCard({ group, userLat, userLng, cityName, updat
     } catch { /* ignore */ }
   };
 
-  // 2F: Social sharing
+  // Social sharing
   const handleShare = async () => {
     const text = `${group.title} at ${group.location_name} — claim it free at FreebieMe`;
     const url = typeof window !== 'undefined' ? window.location.href : 'https://freebieme.vercel.app';
@@ -117,30 +163,28 @@ export default function DealGroupCard({ group, userLat, userLng, cityName, updat
     }
   };
 
-  // 2G: Report expired deal
-  const handleReport = () => {
-    const subject = encodeURIComponent('Expired deal report');
-    const body = encodeURIComponent(
-      `Chain: ${group.location_name}\nDeal: ${group.title}\nURL: ${typeof window !== 'undefined' ? window.location.href : ''}`
-    );
-    window.open(`mailto:deals@freebieme.com?subject=${subject}&body=${body}`, '_blank');
-  };
-
   return (
     <div className={`bg-white rounded-xl shadow-sm border border-gray-100 border-l-4 ${typeBorder} p-4 hover:shadow-md transition-shadow duration-200 flex flex-col`}>
-      {/* Header: Chain name + deal type badge + save + share */}
+
+      {/* Header: Chain name + deal type badge + claim type badge + save + share */}
       <div className="flex items-start justify-between gap-2 mb-2">
         <div className="flex-1 min-w-0">
           <span className="font-bold text-gray-900 text-base leading-tight block">
             {group.location_name}
           </span>
-          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium mt-1 ${typeColor}`}>
-            {typeLabel}
-          </span>
+          <div className="flex flex-wrap items-center gap-1.5 mt-1">
+            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${typeColor}`}>
+              {typeLabel}
+            </span>
+            {claimConfig && (
+              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${claimConfig.className}`}>
+                {claimConfig.label}
+              </span>
+            )}
+          </div>
         </div>
         {/* Action buttons */}
         <div className="flex items-center gap-1 flex-shrink-0">
-          {/* Share button */}
           <button
             onClick={handleShare}
             title="Share this deal"
@@ -148,7 +192,6 @@ export default function DealGroupCard({ group, userLat, userLng, cityName, updat
           >
             {shared ? '✅' : '🔗'}
           </button>
-          {/* Save button */}
           <button
             onClick={handleToggleSave}
             title={saved ? 'Remove bookmark' : 'Save deal'}
@@ -164,7 +207,7 @@ export default function DealGroupCard({ group, userLat, userLng, cityName, updat
         {group.title}
       </h3>
 
-      {/* 6B: Free item highlighted prominently right below title */}
+      {/* Free item highlighted prominently */}
       {group.free_item && (
         <div className="mb-2">
           <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-semibold bg-green-50 text-green-700 border border-green-200">
@@ -175,7 +218,7 @@ export default function DealGroupCard({ group, userLat, userLng, cityName, updat
 
       {/* Description */}
       {group.description && group.description !== group.title && (
-        <p className="text-xs text-gray-500 mb-2 line-clamp-2 flex-1 leading-relaxed">
+        <p className="text-xs text-gray-500 mb-2 line-clamp-2 leading-relaxed">
           {group.description}
         </p>
       )}
@@ -196,25 +239,68 @@ export default function DealGroupCard({ group, userLat, userLng, cityName, updat
         </div>
       )}
 
-      {/* Requirements row — 2B: accurate deal-type badges */}
-      <div className="flex flex-wrap gap-1.5 mb-2">
-        {/* Deal-type specific badge */}
-        {dealTypeBadge && (
-          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${dealTypeBadge.className}`}>
-            {dealTypeBadge.icon} {dealTypeBadge.label}
-          </span>
-        )}
-        {group.requires_app && (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
-            📱 App required
-          </span>
-        )}
-        {group.requires_signup && !group.requires_app && (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
-            ✍️ Sign up required
-          </span>
+      {/* Happy hour live status banner */}
+      {hhStatus && (
+        <div className={`rounded-lg px-3 py-1.5 mb-2 text-xs font-medium ${
+          hhStatus === 'active'   ? 'bg-green-50 text-green-800 border border-green-200' :
+          hhStatus === 'upcoming' ? 'bg-yellow-50 text-yellow-800 border border-yellow-200' :
+                                    'bg-gray-50 text-gray-500 border border-gray-200'
+        }`}>
+          {hhStatus === 'active'   && `🟢 Happy Hour is ON now · ${hhCountdown}`}
+          {hhStatus === 'upcoming' && `🟡 ${hhCountdown}`}
+          {hhStatus === 'closed'   && `⚫ Happy hour is over for today · ${hhCountdown}`}
+        </div>
+      )}
+
+      {/* Birthday advance warning — the most important trust signal */}
+      {group.deal_type === 'birthday' && (
+        <div className="bg-orange-50 border border-orange-200 rounded-lg px-3 py-2 mb-2">
+          <p className="text-xs text-orange-800 font-medium">
+            ⚠️ Register before your birthday month — you can&apos;t sign up and claim same day
+          </p>
+        </div>
+      )}
+
+      {/* Purchase requirement warning */}
+      {group.requires_purchase && group.deal_type !== 'rewards_program' && (
+        <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-2">
+          <p className="text-xs text-amber-800">💳 Requires a purchase to redeem</p>
+        </div>
+      )}
+
+      {/* Compact requirements summary */}
+      <div className="text-xs text-gray-400 mb-2 flex flex-wrap gap-x-2">
+        <span>{group.requires_app ? '📱 App required' : '🌐 No app needed'}</span>
+        <span>·</span>
+        <span>{group.requires_signup ? '✍️ Free signup' : '👋 Walk-in'}</span>
+        {group.requires_purchase && (
+          <>
+            <span>·</span>
+            <span>💳 With purchase</span>
+          </>
         )}
       </div>
+
+      {/* How to Claim expandable section */}
+      {group.claim_steps && group.claim_steps.length > 0 && (
+        <div className="mb-2">
+          <button
+            onClick={() => setShowSteps(!showSteps)}
+            className="text-xs text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1"
+          >
+            {showSteps ? '▲' : '▼'} How to claim
+          </button>
+          {showSteps && (
+            <ol className="mt-2 space-y-1 pl-4">
+              {group.claim_steps.map((step, i) => (
+                <li key={i} className="text-xs text-gray-600 list-decimal leading-relaxed">
+                  {step}
+                </li>
+              ))}
+            </ol>
+          )}
+        </div>
+      )}
 
       {/* Coupon code */}
       {group.coupon_code && (
@@ -233,7 +319,6 @@ export default function DealGroupCard({ group, userLat, userLng, cityName, updat
 
       {/* Location info */}
       <div className="mt-auto">
-        {/* 2C: Show location count instead of confidence dots */}
         {hasLocation && group.nearestDistance !== null ? (
           <div className="mb-2">
             <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold mr-2 ${getDistBadgeClass(group.nearestDistance)}`}>
@@ -282,38 +367,30 @@ export default function DealGroupCard({ group, userLat, userLng, cityName, updat
         )}
       </div>
 
-      {/* Footer: location count + CTA + report link */}
-      <div className="flex items-center justify-between pt-2 border-t border-gray-50">
-        <div className="flex items-center gap-2">
-          {/* 2C: Location count + updated date instead of confidence dots */}
-          <span className="text-xs text-gray-400">
-            {group.locations.length} location{group.locations.length !== 1 ? 's' : ''}
+      {/* Footer: sourced date + report + CTA */}
+      <div className="flex items-center justify-between pt-2 border-t border-gray-50 mt-auto">
+        <div className="text-xs text-gray-400">
+          <span title="When we last collected deal data from official sources">
+            Sourced {updatedAt ? new Date(updatedAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'recently'}
           </span>
-          {updatedAt && (
-            <span className="text-xs text-gray-300" title={`Data updated ${updatedAt}`}>
-              · {new Date(updatedAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
-            </span>
-          )}
-        </div>
-        <div className="flex items-center gap-2">
-          {/* 2G: Report expired deal */}
-          <button
-            onClick={handleReport}
-            title="Report expired or incorrect deal"
-            className="text-xs text-gray-300 hover:text-gray-500 transition-colors"
-          >
-            ⚑ Report
-          </button>
+          {' · '}
           <a
-            href={group.source_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-white bg-blue-600 hover:bg-blue-700 font-medium px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
+            href={`mailto:deals@freebieme.com?subject=Expired deal: ${encodeURIComponent(group.location_name + ' - ' + group.title)}&body=This deal appears to be expired or incorrect.%0A%0AChain: ${encodeURIComponent(group.location_name)}%0ADeal: ${encodeURIComponent(group.title)}%0APage: ${typeof window !== 'undefined' ? window.location.href : ''}`}
+            className="hover:text-red-500 transition-colors"
             onClick={(e) => e.stopPropagation()}
           >
-            Get deal →
+            ⚑ Report
           </a>
         </div>
+        <a
+          href={group.source_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs text-white bg-blue-600 hover:bg-blue-700 font-medium px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
+          onClick={(e) => e.stopPropagation()}
+        >
+          Get deal →
+        </a>
       </div>
     </div>
   );

@@ -4,6 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 const { tagDeal } = require('./lib/tag-deals');
+const { getClaimType, getClaimSteps, HAPPY_HOUR_DATA } = require('./lib/claim-steps');
 
 const INPUT_DIR = path.join(__dirname, 'data/output/deals');
 const OUTPUT_DIR = path.join(__dirname, 'data/output/deals'); // update in place
@@ -558,6 +559,17 @@ for (const file of fs.readdirSync(INPUT_DIR).filter(f => f.endsWith('.json'))) {
           opening_hours: loc.opening_hours,
         };
         newDeal.food_tags = tagDeal(newDeal); // deal-level tagging
+        newDeal.claim_type = getClaimType(newDeal);
+        newDeal.claim_steps = getClaimSteps(newDeal);
+        if (newDeal.deal_type === 'happy_hour') {
+          const hh = HAPPY_HOUR_DATA[newDeal.chain_slug];
+          if (hh) {
+            newDeal.happy_hour_start = hh.start;
+            newDeal.happy_hour_end = hh.end;
+            newDeal.happy_hour_days = hh.days;
+            newDeal.happy_hour_note = hh.note;
+          }
+        }
         newDeals.push(newDeal);
         injectedCount++;
       }

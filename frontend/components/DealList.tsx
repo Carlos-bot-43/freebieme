@@ -95,6 +95,11 @@ export default function DealList({ deals, filters, userLat, userLng, updatedAt, 
       filtered = filtered.filter((g) => g.nearestDistance !== null && g.nearestDistance <= (filters.maxDistance as number));
     }
 
+    // Claim type filter
+    if (filters.claimType) {
+      filtered = filtered.filter((g) => g.claim_type === filters.claimType);
+    }
+
     return { displayed: filtered, filteredCount: filtered.length };
   }, [allGroups, filters, hasLocation, savedIds]);
 
