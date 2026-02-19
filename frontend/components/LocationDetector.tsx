@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import { useState, useEffect, FormEvent } from 'react';
 import { CityConfig, distanceMiles } from '../lib/types';
 import { useRouter } from 'next/navigation';
 
@@ -45,7 +45,16 @@ export default function LocationDetector({ cities }: LocationDetectorProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchStatus, setSearchStatus] = useState<'idle' | 'searching' | 'found' | 'error'>('idle');
   const [searchMessage, setSearchMessage] = useState('');
+  const [savedLocation, setSavedLocation] = useState<{ lat: number; lng: number; label: string } | null>(null);
   const router = useRouter();
+
+  // Check sessionStorage for a remembered location
+  useEffect(() => {
+    try {
+      const cached = sessionStorage.getItem('freebieme_location');
+      if (cached) setSavedLocation(JSON.parse(cached));
+    } catch {}
+  }, []);
 
   const detectLocation = () => {
     if (!navigator.geolocation) {
@@ -63,6 +72,7 @@ export default function LocationDetector({ cities }: LocationDetectorProps) {
         const nearest = findNearestCity(latitude, longitude, cities);
         setGpsStatus('found');
         setGpsMessage(`Found you near ${nearest.display}! Loading deals...`);
+        try { sessionStorage.setItem('freebieme_location', JSON.stringify({ lat: latitude, lng: longitude, label: 'GPS' })); } catch {}
         setTimeout(() => router.push(`/deals/${nearest.slug}`), 800);
       },
       (error) => {
@@ -94,11 +104,28 @@ export default function LocationDetector({ cities }: LocationDetectorProps) {
     const nearest = findNearestCity(result.lat, result.lng, cities);
     setSearchStatus('found');
     setSearchMessage(`Found deals near ${nearest.display}! Loading...`);
+    try { sessionStorage.setItem('freebieme_location', JSON.stringify({ lat: result.lat, lng: result.lng, label: searchQuery.trim() })); } catch {}
     setTimeout(() => router.push(`/deals/${nearest.slug}`), 600);
+  };
+
+  const handleUseSavedLocation = () => {
+    if (!savedLocation) return;
+    const nearest = findNearestCity(savedLocation.lat, savedLocation.lng, cities);
+    router.push(`/deals/${nearest.slug}`);
   };
 
   return (
     <div className="space-y-4">
+      {/* Saved location quick access */}
+      {savedLocation && gpsStatus === 'idle' && (
+        <button
+          onClick={handleUseSavedLocation}
+          className="w-full py-2.5 px-4 bg-green-50 border border-green-200 rounded-xl text-sm text-green-800 font-medium hover:bg-green-100 transition-colors flex items-center justify-between"
+        >
+          <span>📍 Continue near {savedLocation.label}</span>
+          <span className="text-green-600 text-xs">use this →</span>
+        </button>
+      )}
       {/* GPS button */}
       <div className="text-center">
         {gpsStatus === 'idle' && (
