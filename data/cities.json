@@ -223,5 +223,230 @@
     "bbox": { "min_lat": 27.6, "max_lat": 28.3, "min_lng": -82.9, "max_lng": -82.0 },
     "population": 3200000,
     "priority": 1
+  },
+  {
+    "slug": "baltimore-md",
+    "name": "Baltimore, MD",
+    "display": "Baltimore Metro, MD",
+    "center": { "lat": 39.2904, "lng": -76.6122 },
+    "bbox": { "min_lat": 39.0, "max_lat": 39.6, "min_lng": -77.1, "max_lng": -76.2 },
+    "population": 2800000,
+    "priority": 3
+  },
+  {
+    "slug": "detroit-mi",
+    "name": "Detroit, MI",
+    "display": "Detroit Metro, MI",
+    "center": { "lat": 42.3314, "lng": -83.0458 },
+    "bbox": { "min_lat": 42.0, "max_lat": 42.7, "min_lng": -83.6, "max_lng": -82.5 },
+    "population": 4400000,
+    "priority": 3
+  },
+  {
+    "slug": "memphis-tn",
+    "name": "Memphis, TN",
+    "display": "Memphis Metro, TN",
+    "center": { "lat": 35.1495, "lng": -90.0490 },
+    "bbox": { "min_lat": 34.9, "max_lat": 35.4, "min_lng": -90.5, "max_lng": -89.5 },
+    "population": 1300000,
+    "priority": 3
+  },
+  {
+    "slug": "louisville-ky",
+    "name": "Louisville, KY",
+    "display": "Louisville Metro, KY",
+    "center": { "lat": 38.2527, "lng": -85.7585 },
+    "bbox": { "min_lat": 38.0, "max_lat": 38.5, "min_lng": -86.2, "max_lng": -85.3 },
+    "population": 1400000,
+    "priority": 3
+  },
+  {
+    "slug": "columbus-oh",
+    "name": "Columbus, OH",
+    "display": "Columbus Metro, OH",
+    "center": { "lat": 39.9612, "lng": -82.9988 },
+    "bbox": { "min_lat": 39.7, "max_lat": 40.2, "min_lng": -83.4, "max_lng": -82.5 },
+    "population": 2100000,
+    "priority": 3
+  },
+  {
+    "slug": "indianapolis-in",
+    "name": "Indianapolis, IN",
+    "display": "Indianapolis Metro, IN",
+    "center": { "lat": 39.7684, "lng": -86.1581 },
+    "bbox": { "min_lat": 39.5, "max_lat": 40.0, "min_lng": -86.6, "max_lng": -85.7 },
+    "population": 2100000,
+    "priority": 3
+  },
+  {
+    "slug": "oklahoma-city-ok",
+    "name": "Oklahoma City, OK",
+    "display": "Oklahoma City Metro, OK",
+    "center": { "lat": 35.4676, "lng": -97.5164 },
+    "bbox": { "min_lat": 35.2, "max_lat": 35.8, "min_lng": -98.0, "max_lng": -97.0 },
+    "population": 1400000,
+    "priority": 3
+  },
+  {
+    "slug": "el-paso-tx",
+    "name": "El Paso, TX",
+    "display": "El Paso Metro, TX",
+    "center": { "lat": 31.7619, "lng": -106.4850 },
+    "bbox": { "min_lat": 31.5, "max_lat": 32.0, "min_lng": -107.0, "max_lng": -106.0 },
+    "population": 870000,
+    "priority": 3
+  },
+  {
+    "slug": "albuquerque-nm",
+    "name": "Albuquerque, NM",
+    "display": "Albuquerque Metro, NM",
+    "center": { "lat": 35.0844, "lng": -106.6504 },
+    "bbox": { "min_lat": 34.8, "max_lat": 35.4, "min_lng": -107.2, "max_lng": -106.2 },
+    "population": 910000,
+    "priority": 3
+  },
+  {
+    "slug": "tucson-az",
+    "name": "Tucson, AZ",
+    "display": "Tucson Metro, AZ",
+    "center": { "lat": 32.2226, "lng": -110.9747 },
+    "bbox": { "min_lat": 32.0, "max_lat": 32.5, "min_lng": -111.5, "max_lng": -110.5 },
+    "population": 1000000,
+    "priority": 3
+  },
+  {
+    "slug": "fresno-ca",
+    "name": "Fresno, CA",
+    "display": "Fresno Metro, CA",
+    "center": { "lat": 36.7378, "lng": -119.7871 },
+    "bbox": { "min_lat": 36.5, "max_lat": 37.0, "min_lng": -120.3, "max_lng": -119.3 },
+    "population": 1000000,
+    "priority": 3
+  },
+  {
+    "slug": "sacramento-ca",
+    "name": "Sacramento, CA",
+    "display": "Sacramento Metro, CA",
+    "center": { "lat": 38.5816, "lng": -121.4944 },
+    "bbox": { "min_lat": 38.3, "max_lat": 38.8, "min_lng": -122.0, "max_lng": -121.0 },
+    "population": 2400000,
+    "priority": 3
+  },
+  {
+    "slug": "raleigh-nc",
+    "name": "Raleigh, NC",
+    "display": "Raleigh-Durham Metro, NC",
+    "center": { "lat": 35.7796, "lng": -78.6382 },
+    "bbox": { "min_lat": 35.5, "max_lat": 36.0, "min_lng": -79.1, "max_lng": -78.1 },
+    "population": 1400000,
+    "priority": 3
+  },
+  {
+    "slug": "virginia-beach-va",
+    "name": "Virginia Beach, VA",
+    "display": "Virginia Beach / Hampton Roads, VA",
+    "center": { "lat": 36.8529, "lng": -75.9780 },
+    "bbox": { "min_lat": 36.6, "max_lat": 37.1, "min_lng": -76.5, "max_lng": -75.6 },
+    "population": 1800000,
+    "priority": 3
+  },
+  {
+    "slug": "new-orleans-la",
+    "name": "New Orleans, LA",
+    "display": "New Orleans Metro, LA",
+    "center": { "lat": 29.9511, "lng": -90.0715 },
+    "bbox": { "min_lat": 29.7, "max_lat": 30.2, "min_lng": -90.6, "max_lng": -89.6 },
+    "population": 1300000,
+    "priority": 3
+  },
+  {
+    "slug": "salt-lake-city-ut",
+    "name": "Salt Lake City, UT",
+    "display": "Salt Lake City Metro, UT",
+    "center": { "lat": 40.7608, "lng": -111.8910 },
+    "bbox": { "min_lat": 40.4, "max_lat": 41.0, "min_lng": -112.4, "max_lng": -111.4 },
+    "population": 1200000,
+    "priority": 3
+  },
+  {
+    "slug": "kansas-city-mo",
+    "name": "Kansas City, MO",
+    "display": "Kansas City Metro, MO",
+    "center": { "lat": 39.0997, "lng": -94.5786 },
+    "bbox": { "min_lat": 38.8, "max_lat": 39.4, "min_lng": -95.0, "max_lng": -94.1 },
+    "population": 2200000,
+    "priority": 3
+  },
+  {
+    "slug": "st-louis-mo",
+    "name": "St. Louis, MO",
+    "display": "St. Louis Metro, MO",
+    "center": { "lat": 38.6270, "lng": -90.1994 },
+    "bbox": { "min_lat": 38.3, "max_lat": 38.9, "min_lng": -90.7, "max_lng": -90.0 },
+    "population": 2800000,
+    "priority": 3
+  },
+  {
+    "slug": "pittsburgh-pa",
+    "name": "Pittsburgh, PA",
+    "display": "Pittsburgh Metro, PA",
+    "center": { "lat": 40.4406, "lng": -79.9959 },
+    "bbox": { "min_lat": 40.2, "max_lat": 40.7, "min_lng": -80.4, "max_lng": -79.5 },
+    "population": 2400000,
+    "priority": 3
+  },
+  {
+    "slug": "cleveland-oh",
+    "name": "Cleveland, OH",
+    "display": "Cleveland Metro, OH",
+    "center": { "lat": 41.4993, "lng": -81.6944 },
+    "bbox": { "min_lat": 41.2, "max_lat": 41.8, "min_lng": -82.2, "max_lng": -81.2 },
+    "population": 2000000,
+    "priority": 3
+  },
+  {
+    "slug": "cincinnati-oh",
+    "name": "Cincinnati, OH",
+    "display": "Cincinnati Metro, OH",
+    "center": { "lat": 39.1031, "lng": -84.5120 },
+    "bbox": { "min_lat": 38.8, "max_lat": 39.4, "min_lng": -85.0, "max_lng": -84.1 },
+    "population": 2300000,
+    "priority": 3
+  },
+  {
+    "slug": "orlando-fl",
+    "name": "Orlando, FL",
+    "display": "Orlando Metro, FL",
+    "center": { "lat": 28.5383, "lng": -81.3792 },
+    "bbox": { "min_lat": 28.2, "max_lat": 28.9, "min_lng": -81.9, "max_lng": -81.0 },
+    "population": 2600000,
+    "priority": 3
+  },
+  {
+    "slug": "fort-worth-tx",
+    "name": "Fort Worth, TX",
+    "display": "Fort Worth Metro, TX",
+    "center": { "lat": 32.7555, "lng": -97.3308 },
+    "bbox": { "min_lat": 32.5, "max_lat": 33.0, "min_lng": -97.8, "max_lng": -97.0 },
+    "population": 2500000,
+    "priority": 3
+  },
+  {
+    "slug": "omaha-ne",
+    "name": "Omaha, NE",
+    "display": "Omaha Metro, NE",
+    "center": { "lat": 41.2565, "lng": -95.9345 },
+    "bbox": { "min_lat": 41.0, "max_lat": 41.5, "min_lng": -96.4, "max_lng": -95.5 },
+    "population": 950000,
+    "priority": 3
+  },
+  {
+    "slug": "hartford-ct",
+    "name": "Hartford, CT",
+    "display": "Hartford Metro, CT",
+    "center": { "lat": 41.7658, "lng": -72.6851 },
+    "bbox": { "min_lat": 41.5, "max_lat": 42.0, "min_lng": -73.1, "max_lng": -72.2 },
+    "population": 1200000,
+    "priority": 3
   }
 ]
