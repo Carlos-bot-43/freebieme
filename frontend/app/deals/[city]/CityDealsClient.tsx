@@ -80,23 +80,35 @@ export default function CityDealsClient({ cityConfig, allCities, nearbyCities = 
   const [loadingDeals, setLoadingDeals] = useState(true);
   const [dealsError, setDealsError] = useState(false);
 
-  // Fetch deal data from public static file
+  // Fetch deal data from public static file (with retry)
   useEffect(() => {
+    let cancelled = false;
     setLoadingDeals(true);
     setDealsError(false);
-    fetch(`/data/deals/${cityConfig.slug}.json`)
-      .then((res) => {
+
+    const fetchWithRetry = async (retries = 2): Promise<void> => {
+      try {
+        const res = await fetch(`/data/deals/${cityConfig.slug}.json`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json();
-      })
-      .then((data: CityDeals) => {
-        setCityDeals(data);
-        setLoadingDeals(false);
-      })
-      .catch(() => {
-        setDealsError(true);
-        setLoadingDeals(false);
-      });
+        const data: CityDeals = await res.json();
+        if (!cancelled) {
+          setCityDeals(data);
+          setLoadingDeals(false);
+        }
+      } catch (err) {
+        if (retries > 0 && !cancelled) {
+          await new Promise(r => setTimeout(r, 1000));
+          return fetchWithRetry(retries - 1);
+        }
+        if (!cancelled) {
+          setDealsError(true);
+          setLoadingDeals(false);
+        }
+      }
+    };
+
+    fetchWithRetry();
+    return () => { cancelled = true; };
   }, [cityConfig.slug]);
 
   // Try to restore location from sessionStorage first, then auto-detect
