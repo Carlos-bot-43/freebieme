@@ -24,6 +24,7 @@ const DEFAULT_FILTERS: Filters = {
   maxDistance: null,
   nearMe: false,
   search: '',
+  savedOnly: false,
 };
 
 async function geocodeQuery(query: string): Promise<{ lat: number; lng: number; display: string } | null> {

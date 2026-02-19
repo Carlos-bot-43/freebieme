@@ -3,6 +3,7 @@
 import { Deal, distanceMiles } from '../lib/types';
 import DealCard from './DealCard';
 import { Filters } from './FilterBar';
+import { getSavedDealIds } from '../lib/savedDeals';
 
 interface DealListProps {
   deals: Deal[];
@@ -14,8 +15,16 @@ interface DealListProps {
 export default function DealList({ deals, filters, userLat, userLng }: DealListProps) {
   const hasLocation = !!(userLat && userLng);
 
+  // Get saved deal IDs for filtering
+  const savedIds = filters.savedOnly ? getSavedDealIds() : new Set<string>();
+
   // Apply filters
   let filtered = deals;
+
+  // Saved only filter
+  if (filters.savedOnly) {
+    filtered = filtered.filter((d) => savedIds.has(d.deal_id));
+  }
 
   // Search filter
   if (filters.search.trim()) {

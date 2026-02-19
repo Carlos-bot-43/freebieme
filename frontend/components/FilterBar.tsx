@@ -8,6 +8,7 @@ export interface Filters {
   maxDistance: number | null;
   nearMe: boolean;
   search: string;
+  savedOnly: boolean;
 }
 
 interface FilterBarProps {
@@ -24,6 +25,7 @@ const DEFAULT_FILTERS: Filters = {
   maxDistance: null,
   nearMe: false,
   search: '',
+  savedOnly: false,
 };
 
 function isFiltered(filters: Filters): boolean {
@@ -31,6 +33,7 @@ function isFiltered(filters: Filters): boolean {
     filters.requiresApp !== 'any' ||
     filters.maxDistance !== null ||
     filters.nearMe ||
+    filters.savedOnly ||
     filters.search.trim() !== '';
 }
 
@@ -65,20 +68,33 @@ export default function FilterBar({ filters, onFiltersChange, hasLocation }: Fil
         />
       </div>
 
-      {/* Near Me quick filter */}
-      {hasLocation && (
+      {/* Quick filter buttons row */}
+      <div className="flex gap-2">
+        {/* Near Me quick filter */}
+        {hasLocation && (
+          <button
+            onClick={() => update({ nearMe: !filters.nearMe, maxDistance: null })}
+            className={`flex-1 py-2 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1 ${
+              filters.nearMe
+                ? 'bg-green-600 text-white'
+                : 'bg-green-50 text-green-700 hover:bg-green-100 border border-green-200'
+            }`}
+          >
+            📍 Near Me
+          </button>
+        )}
+        {/* Saved deals filter */}
         <button
-          onClick={() => update({ nearMe: !filters.nearMe, maxDistance: null })}
-          className={`w-full py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 ${
-            filters.nearMe
-              ? 'bg-green-600 text-white'
-              : 'bg-green-50 text-green-700 hover:bg-green-100 border border-green-200'
+          onClick={() => update({ savedOnly: !filters.savedOnly })}
+          className={`${hasLocation ? 'flex-1' : 'w-full'} py-2 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1 ${
+            filters.savedOnly
+              ? 'bg-yellow-500 text-white'
+              : 'bg-yellow-50 text-yellow-700 hover:bg-yellow-100 border border-yellow-200'
           }`}
         >
-          📍 Near Me (within 5 mi)
-          {filters.nearMe && <span className="text-xs opacity-75">✕ clear</span>}
+          ★ Saved
         </button>
-      )}
+      </div>
 
       {/* Deal type filter */}
       <div>
