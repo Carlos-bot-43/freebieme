@@ -167,7 +167,7 @@ export default function CityDealsClient({ cityConfig, allCities, nearbyCities = 
 
     const result = await geocodeQuery(locationSearch.trim());
     if (!result) {
-      setLocationSearchError(`Could not find "${locationSearch}". Try a different query.`);
+      setLocationSearchError(`Could not find "${locationSearch}". Try a ZIP code or city name like "90210" or "Austin TX".`);
       setLocationSearching(false);
       return;
     }
@@ -181,8 +181,13 @@ export default function CityDealsClient({ cityConfig, allCities, nearbyCities = 
     try { sessionStorage.setItem('freebieme_location', JSON.stringify({ lat: result.lat, lng: result.lng, label: locationSearch.trim() })); } catch {}
 
     // Check if closer to different city
-    const { city: nearest } = findNearestCity(result.lat, result.lng, allCities);
-    if (nearest.slug !== cityConfig.slug) {
+    const { city: nearest, dist: nearestDist } = findNearestCity(result.lat, result.lng, allCities);
+    if (nearestDist > 60) {
+      // Too far from any covered city
+      setLocationSearchError(
+        `We don't cover "${locationSearch.trim()}" yet. The closest city we have is ${nearest.name} (${Math.round(nearestDist)} mi away). Browse their deals below or check back as we expand!`
+      );
+    } else if (nearest.slug !== cityConfig.slug) {
       setSuggestedCity(nearest);
     }
   };
@@ -236,6 +241,14 @@ export default function CityDealsClient({ cityConfig, allCities, nearbyCities = 
       </div>
 
       <div className="max-w-6xl mx-auto px-4 py-6">
+        {/* Breadcrumb */}
+        <nav className="text-xs text-gray-400 mb-3 flex items-center gap-1.5">
+          <Link href="/" className="hover:text-blue-600 transition-colors">FreebieMe</Link>
+          <span>›</span>
+          <Link href="/" className="hover:text-blue-600 transition-colors">Cities</Link>
+          <span>›</span>
+          <span className="text-gray-600 font-medium">{cityConfig.name}</span>
+        </nav>
         {/* Page header */}
         <div className="mb-4">
           <h1 className="text-2xl font-bold text-gray-900">
@@ -378,6 +391,20 @@ export default function CityDealsClient({ cityConfig, allCities, nearbyCities = 
             </div>
           </div>
         )}
+
+        {/* Footer */}
+        <footer className="mt-12 pt-6 border-t border-gray-200 text-center">
+          <div className="flex flex-wrap justify-center gap-x-6 gap-y-1 text-xs text-gray-400 mb-3">
+            <Link href="/" className="hover:text-blue-600 transition-colors">🍔 FreebieMe Home</Link>
+            <span>•</span>
+            <span>Free restaurant deals &amp; freebies across {allCities.length} US cities</span>
+            <span>•</span>
+            <span>Always free to use</span>
+          </div>
+          <p className="text-xs text-gray-300">
+            Deals subject to change · Always verify at the restaurant · FreebieMe is not affiliated with any restaurant chain
+          </p>
+        </footer>
       </div>
     </div>
   );
