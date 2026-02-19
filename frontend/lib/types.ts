@@ -28,6 +28,7 @@ export interface Deal {
   food_tags: string[]; // deal-level food categories, computed at data generation
   claim_type: 'instant' | 'same_day_setup' | 'advance_required' | 'birthday_only';
   claim_steps: string[];
+  value_summary: string; // "Free Whopper" or "50% off drinks 2–4 PM" or "Points toward free food"
   happy_hour_start?: string;   // "14:00"
   happy_hour_end?: string;     // "16:00"
   happy_hour_days?: string;    // "every day" | "Mon–Fri"
@@ -74,6 +75,7 @@ export interface DealGroup {
   food_tags: string[]; // from the group's deals (all same since same chain+deal_type)
   claim_type: 'instant' | 'same_day_setup' | 'advance_required' | 'birthday_only';
   claim_steps: string[];
+  value_summary: string; // "Free Whopper" or "50% off drinks 2–4 PM" or "Points toward free food"
   happy_hour_start?: string;
   happy_hour_end?: string;
   happy_hour_days?: string;
@@ -120,6 +122,7 @@ export function groupDeals(deals: Deal[], userLat?: number, userLng?: number): D
         food_tags: deal.food_tags || [],
         claim_type: deal.claim_type || 'same_day_setup',
         claim_steps: deal.claim_steps || [],
+        value_summary: deal.value_summary || '',
         happy_hour_start: deal.happy_hour_start,
         happy_hour_end: deal.happy_hour_end,
         happy_hour_days: deal.happy_hour_days,

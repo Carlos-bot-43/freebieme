@@ -5,7 +5,7 @@
 const fs = require('fs');
 const path = require('path');
 const { tagDeal } = require('./lib/tag-deals');
-const { getClaimType, getClaimSteps, HAPPY_HOUR_DATA } = require('./lib/claim-steps');
+const { getClaimType, getClaimSteps, getValueSummary, HAPPY_HOUR_DATA } = require('./lib/claim-steps');
 
 const INPUT  = path.join(__dirname, 'data/output/deals');
 const OUTPUT = path.join(__dirname, 'frontend/public/data/deals');
@@ -134,6 +134,7 @@ for (const file of fs.readdirSync(INPUT).filter(f => f.endsWith('.json'))) {
     rest.food_tags = tagDeal(deal); // deal-level tagging (single source of truth)
     rest.claim_type = getClaimType(deal);
     rest.claim_steps = getClaimSteps(deal);
+    rest.value_summary = getValueSummary(deal);
     // Add structured happy hour data
     if (deal.deal_type === 'happy_hour') {
       const hh = HAPPY_HOUR_DATA[deal.chain_slug];

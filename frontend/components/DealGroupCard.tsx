@@ -16,6 +16,17 @@ const DEAL_TYPE_BORDER: Record<string, string> = {
   other: 'border-l-gray-300',
 };
 
+const VALUE_SUMMARY_COLORS: Record<string, string> = {
+  birthday: 'text-pink-700',
+  signup_bonus: 'text-purple-700',
+  app_deal: 'text-blue-700',
+  happy_hour: 'text-amber-700',
+  rewards_program: 'text-green-700',
+  freebie: 'text-emerald-700',
+  bogo: 'text-orange-700',
+  discount: 'text-red-700',
+};
+
 // Claim type display config — answers the #1 hangry-user question instantly
 const CLAIM_TYPE_CONFIG: Record<string, { label: string; className: string }> = {
   instant:          { label: '⚡ Use right now',    className: 'bg-green-100 text-green-800' },
@@ -202,24 +213,17 @@ export default function DealGroupCard({ group, userLat, userLng, cityName, updat
         </div>
       </div>
 
-      {/* Deal title */}
-      <h3 className="text-gray-900 font-semibold text-sm mb-1.5 leading-snug">
-        {group.title}
-      </h3>
-
-      {/* Free item highlighted prominently */}
-      {group.free_item && (
-        <div className="mb-2">
-          <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-semibold bg-green-50 text-green-700 border border-green-200">
-            🆓 {group.free_item}
-          </span>
+      {/* Value summary — the most important line: what you actually get */}
+      {group.value_summary && (
+        <div className={`text-base font-bold mb-0.5 leading-tight ${VALUE_SUMMARY_COLORS[group.deal_type] || 'text-gray-900'}`}>
+          {group.value_summary}
         </div>
       )}
 
-      {/* Description */}
-      {group.description && group.description !== group.title && (
-        <p className="text-xs text-gray-500 mb-2 line-clamp-2 leading-relaxed">
-          {group.description}
+      {/* Deal title — secondary context, shown only if different from value_summary */}
+      {group.title && group.title !== group.value_summary && (
+        <p className="text-xs text-gray-500 mb-1.5 leading-relaxed line-clamp-2">
+          {group.title}
         </p>
       )}
 

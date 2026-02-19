@@ -4,6 +4,7 @@ import { getCities, getAvailableCities, getCityDealCount, getChainCount, getUniq
 import HomepageSearch from '../components/HomepageSearch';
 import CityGrid from '../components/CityGrid';
 import NearMePreview from '../components/NearMePreview';
+import BirthdayBanner from '../components/BirthdayBanner';
 
 export const dynamic = 'force-static';
 
@@ -78,9 +79,12 @@ export default function HomePage() {
           📍 Find free food near me →
         </Link>
 
-        <p className="text-xs text-gray-400 mb-10">
+        <p className="text-xs text-gray-400 mb-6">
           Uses your location · No account needed · Always free
         </p>
+
+        {/* Birthday month banner — shown after 30s on first visit, or active in birth month */}
+        <BirthdayBanner />
 
         {/* Food-first search — secondary action */}
         <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-5 mb-6 text-left">

@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { CityConfig, CityDeals, groupDeals, distanceMiles, DealGroup } from '../../lib/types';
+import BirthdayBanner from '../../components/BirthdayBanner';
 
 // Minimal city data baked in (avoids a separate fetch)
 import citiesData from '../../lib/cities-static.json';
@@ -171,6 +172,9 @@ export default function NearMePage() {
               </p>
             </div>
 
+            {/* Birthday month banner */}
+            <BirthdayBanner />
+
             {/* ⚡ INSTANT section — happy hour and walk-in deals */}
             {instant.length > 0 && (
               <section className="mb-8">
@@ -232,10 +236,22 @@ export default function NearMePage() {
   );
 }
 
+const NEAR_ME_VALUE_COLORS: Record<string, string> = {
+  birthday: 'text-pink-700',
+  signup_bonus: 'text-purple-700',
+  app_deal: 'text-blue-700',
+  happy_hour: 'text-amber-700',
+  rewards_program: 'text-green-700',
+  freebie: 'text-emerald-700',
+  bogo: 'text-orange-700',
+  discount: 'text-red-700',
+};
+
 // Compact deal card for near-me page — optimised for speed scanning
 function NearMeDealCard({ group, userLat: _userLat, userLng: _userLng }: { group: DealGroup; userLat: number; userLng: number }) {
   const dist = group.nearestDistance;
   const claimConfig = CLAIM_LABELS[group.claim_type as ClaimType] || CLAIM_LABELS.same_day_setup;
+  const valueColor = NEAR_ME_VALUE_COLORS[group.deal_type] || 'text-gray-900';
 
   return (
     <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex items-center gap-3 hover:shadow-md transition-shadow">
@@ -246,14 +262,14 @@ function NearMeDealCard({ group, userLat: _userLat, userLng: _userLng }: { group
             {claimConfig.label}
           </span>
         </div>
-        <p className="text-sm text-gray-700 leading-snug">{group.title}</p>
-        {group.free_item && (
-          <p className="text-xs text-green-700 font-medium mt-0.5">🆓 {group.free_item}</p>
-        )}
+        {/* value_summary is the headline — what you actually get */}
+        <p className={`text-base font-bold leading-snug ${valueColor}`}>
+          {group.value_summary || group.title}
+        </p>
         {dist !== null && (
           <p className="text-xs text-gray-400 mt-0.5">
             📍 {formatDist(dist)} away
-            {group.nearestLocation?.address && ` · ${group.nearestLocation.address}`}
+            {group.nearestLocation?.address && ` · ${group.nearestLocation.address.split(',')[0]}`}
           </p>
         )}
       </div>
