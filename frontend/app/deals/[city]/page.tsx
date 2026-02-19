@@ -7,6 +7,10 @@ interface PageProps {
   params: Promise<{ city: string }>;
 }
 
+// All city params are pre-generated at build time — no ISR fallback needed.
+// This prevents Vercel from creating oversized fallback RSC payloads.
+export const dynamicParams = false;
+
 export async function generateStaticParams() {
   const available = getAvailableCities();
   return available.map((city) => ({ city }));
