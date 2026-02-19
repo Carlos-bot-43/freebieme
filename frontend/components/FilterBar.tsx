@@ -61,7 +61,7 @@ export default function FilterBar({ filters, onFiltersChange, hasLocation }: Fil
       <div>
         <input
           type="text"
-          placeholder="Search deals, restaurants..."
+          placeholder="Search chains, deals, locations..."
           value={filters.search}
           onChange={(e) => update({ search: e.target.value })}
           className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
