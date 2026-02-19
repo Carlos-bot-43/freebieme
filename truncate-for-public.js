@@ -1,6 +1,6 @@
 // Generates truncated city deal files for frontend/public/data/deals/
-// Limits to 1000 deals per city, with CHAIN DIVERSITY guaranteed.
-// Each city will include deals from ALL available chains (not just the highest-priority ones).
+// Limits to 1000 deals per city, with CHAIN+DEAL_TYPE DIVERSITY guaranteed.
+// Each city will include deals from ALL chain+deal_type combos (not just top chains).
 
 const fs = require('fs');
 const path = require('path');
@@ -16,10 +16,10 @@ const DEAL_TYPE_PRIORITY = {
 
 const LIMIT = 1000;
 
-// Score a deal (lower = better)
+// Score a deal (lower = better) — used to rank within a group
 function dealScore(deal) {
   const typePriority = DEAL_TYPE_PRIORITY[deal.deal_type] ?? 9;
-  // Convert confidence to 0-1 descending (higher confidence = lower score)
+  // Higher confidence = lower score (better)
   const confPenalty = 1 - (deal.confidence_score ?? 0);
   return typePriority * 100 + confPenalty * 10;
 }
@@ -37,74 +37,96 @@ for (const file of fs.readdirSync(INPUT).filter(f => f.endsWith('.json'))) {
     continue;
   }
 
-  // Group deals by chain_slug
-  const byChain = {};
+  // === NEW ALGORITHM: Group by chain_slug + deal_type ===
+  // This guarantees every unique chain+deal_type combo appears in the output.
+
+  // Step 1: Group deals by chain_slug+deal_type
+  const byGroup = {};
   for (const deal of deals) {
-    const chain = deal.chain_slug || 'unknown';
-    if (!byChain[chain]) byChain[chain] = [];
-    byChain[chain].push(deal);
+    const groupKey = `${deal.chain_slug || 'unknown'}::${deal.deal_type || 'other'}`;
+    if (!byGroup[groupKey]) byGroup[groupKey] = [];
+    byGroup[groupKey].push(deal);
   }
 
-  // Sort each chain's deals by priority (best first)
-  for (const chain of Object.keys(byChain)) {
-    byChain[chain].sort((a, b) => dealScore(a) - dealScore(b));
+  // Step 2: Sort each group by confidence (best first) — within same deal_type, sort by score
+  for (const key of Object.keys(byGroup)) {
+    byGroup[key].sort((a, b) => dealScore(a) - dealScore(b));
   }
 
-  const chains = Object.keys(byChain);
-  const numChains = chains.length;
+  const groups = Object.keys(byGroup);
+  const numGroups = groups.length;
 
-  // Guarantee: each chain gets at least some slots.
-  // Strategy: round-robin through chains in deal-priority order, up to LIMIT total deals.
-  // This ensures chain diversity while still prioritizing quality within each chain.
+  // Step 3: Calculate per-group cap so no single chain+deal_type dominates
+  // Cap = max(1, floor(LIMIT / numGroups))
+  const perGroupCap = Math.max(1, Math.floor(LIMIT / numGroups));
 
-  // Step 1: figure out how many deals to take from each chain
-  // Give each chain a base allocation of floor(LIMIT / numChains), at least 1
-  // Then fill remaining slots by giving chains with the highest-priority remaining deals priority
-
-  const baseAlloc = Math.max(1, Math.floor(LIMIT / numChains));
+  // Step 4: First pass — guarantee at least 1 deal from every group
   const allocation = {};
-  for (const chain of chains) {
-    allocation[chain] = Math.min(baseAlloc, byChain[chain].length);
+  for (const key of groups) {
+    allocation[key] = Math.min(1, byGroup[key].length);
   }
 
-  // Calculate remaining slots after base allocation
-  let used = chains.reduce((sum, c) => sum + allocation[c], 0);
+  // Count slots used after first pass
+  let used = groups.reduce((sum, k) => sum + allocation[k], 0);
   let remaining = LIMIT - used;
 
-  // Distribute remaining slots to chains with more deals, prioritizing those with better next deals
+  // Step 5: Second pass — fill remaining slots up to perGroupCap via round-robin
+  // Round-robin: each group gets 1 more slot per round until cap or exhausted
   if (remaining > 0) {
-    // Build priority queue: chains that still have deals left after base alloc, sorted by next deal quality
-    let moreAvailable = chains.filter(c => byChain[c].length > allocation[c]);
+    let changed = true;
+    while (remaining > 0 && changed) {
+      changed = false;
+      // Sort groups by their next deal's score (best first) for fair round-robin
+      const eligible = groups
+        .filter(k => allocation[k] < perGroupCap && allocation[k] < byGroup[k].length)
+        .sort((a, b) => {
+          const nextA = byGroup[a][allocation[a]];
+          const nextB = byGroup[b][allocation[b]];
+          return dealScore(nextA) - dealScore(nextB);
+        });
 
-    while (remaining > 0 && moreAvailable.length > 0) {
-      // Sort by next deal score (lowest = best)
-      moreAvailable.sort((a, b) => {
-        const nextA = byChain[a][allocation[a]];
-        const nextB = byChain[b][allocation[b]];
-        return dealScore(nextA) - dealScore(nextB);
-      });
-
-      const chain = moreAvailable[0];
-      allocation[chain]++;
-      remaining--;
-
-      // Remove from moreAvailable if exhausted
-      if (allocation[chain] >= byChain[chain].length) {
-        moreAvailable = moreAvailable.filter(c => c !== chain);
+      for (const key of eligible) {
+        if (remaining <= 0) break;
+        allocation[key]++;
+        remaining--;
+        changed = true;
       }
     }
   }
 
-  // Step 2: collect deals per chain according to allocation
-  const selected = [];
-  for (const chain of chains) {
-    selected.push(...byChain[chain].slice(0, allocation[chain]));
+  // Step 6: If there are still remaining slots (rare — when numGroups is small),
+  // allow chains to exceed perGroupCap, again via round-robin with best-deal priority
+  if (remaining > 0) {
+    let changed = true;
+    while (remaining > 0 && changed) {
+      changed = false;
+      const eligible = groups
+        .filter(k => allocation[k] < byGroup[k].length)
+        .sort((a, b) => {
+          const nextA = byGroup[a][allocation[a]];
+          const nextB = byGroup[b][allocation[b]];
+          return dealScore(nextA) - dealScore(nextB);
+        });
+
+      for (const key of eligible) {
+        if (remaining <= 0) break;
+        allocation[key]++;
+        remaining--;
+        changed = true;
+      }
+    }
   }
 
-  // Step 3: final sort for display (by deal priority, then confidence)
+  // Step 7: Collect deals per group according to allocation
+  const selected = [];
+  for (const key of groups) {
+    selected.push(...byGroup[key].slice(0, allocation[key]));
+  }
+
+  // Step 8: Final sort for display (by deal_type priority, then confidence)
   selected.sort((a, b) => dealScore(a) - dealScore(b));
 
-  // Step 4: strip large/unused fields to reduce payload size
+  // Step 9: Strip large/unused fields to reduce payload size
   const stripped = selected.map(deal => {
     const { opening_hours, phone, ...rest } = deal;
     return rest;
@@ -117,11 +139,10 @@ for (const file of fs.readdirSync(INPUT).filter(f => f.endsWith('.json'))) {
   fs.writeFileSync(path.join(OUTPUT, file), JSON.stringify(data));
   total += selected.length;
 
-  // Show chain distribution
-  const chainDist = {};
-  for (const d of selected) chainDist[d.chain_slug] = (chainDist[d.chain_slug] || 0) + 1;
-  const chainSummary = Object.keys(chainDist).length;
-  console.log(`${file}: ${selected.length} deals from ${chainSummary} chains`);
+  // Show chain diversity in output
+  const chainTypeSet = new Set(selected.map(d => `${d.chain_slug}::${d.deal_type}`));
+  const chainSet = new Set(selected.map(d => d.chain_slug));
+  console.log(`${file}: ${selected.length} deals | ${chainSet.size} chains | ${chainTypeSet.size} chain+type combos`);
 }
 
 console.log(`\nTotal: ${total} deals across ${fs.readdirSync(OUTPUT).length} cities`);
