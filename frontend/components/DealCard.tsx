@@ -9,16 +9,10 @@ interface DealCardProps {
 }
 
 function getDistanceBadge(distance: number): { text: string; className: string } {
-  if (distance < 1) {
-    return { text: `${(distance * 5280 / 1000 * 1000 / 5280).toFixed(1)} mi`, className: 'bg-green-100 text-green-700' };
-  }
-  if (distance <= 5) {
-    return { text: `${distance.toFixed(1)} mi`, className: 'bg-green-100 text-green-700' };
-  }
-  if (distance <= 10) {
-    return { text: `${distance.toFixed(1)} mi`, className: 'bg-yellow-100 text-yellow-700' };
-  }
-  return { text: `${distance.toFixed(1)} mi`, className: 'bg-gray-100 text-gray-500' };
+  const text = distance < 0.1 ? '< 0.1 mi' : `${distance.toFixed(1)} mi`;
+  if (distance <= 5) return { text, className: 'bg-green-100 text-green-700' };
+  if (distance <= 10) return { text, className: 'bg-yellow-100 text-yellow-700' };
+  return { text, className: 'bg-gray-100 text-gray-500' };
 }
 
 export default function DealCard({ deal, userLat, userLng }: DealCardProps) {

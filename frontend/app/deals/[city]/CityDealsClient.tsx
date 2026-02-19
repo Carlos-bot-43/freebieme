@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, FormEvent } from 'react';
+import { useState, useEffect, FormEvent, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { CityConfig, CityDeals, distanceMiles } from '../../../lib/types';
@@ -64,6 +64,9 @@ export default function CityDealsClient({ cityConfig, allCities }: CityDealsClie
   const [locationSearch, setLocationSearch] = useState('');
   const [locationSearching, setLocationSearching] = useState(false);
   const [locationSearchError, setLocationSearchError] = useState('');
+
+  // Mobile filter toggle
+  const [showFilters, setShowFilters] = useState(false);
 
   // Deal data fetched client-side from public/data/deals/ (CDN, no serverless needed)
   const [cityDeals, setCityDeals] = useState<CityDeals | null>(null);
@@ -262,7 +265,15 @@ export default function CityDealsClient({ cityConfig, allCities }: CityDealsClie
           <div className="flex gap-6 flex-col lg:flex-row">
             {/* Sidebar filters */}
             <div className="lg:w-72 flex-shrink-0">
-              <div className="sticky top-20">
+              {/* Mobile filter toggle */}
+              <button
+                className="lg:hidden w-full mb-3 py-2 px-4 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700 flex items-center justify-between shadow-sm"
+                onClick={() => setShowFilters(!showFilters)}
+              >
+                <span>🔍 Filters & Sort</span>
+                <span className="text-gray-400">{showFilters ? '▲' : '▼'}</span>
+              </button>
+              <div className={`sticky top-20 ${!showFilters ? 'hidden lg:block' : ''}`}>
                 <FilterBar
                   filters={filters}
                   onFiltersChange={setFilters}
