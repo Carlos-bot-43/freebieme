@@ -1,14 +1,13 @@
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
-import { getCities, getCityDeals, getAvailableCities } from '../../../lib/data';
+import { getCities, getAvailableCities } from '../../../lib/data';
 import CityDealsClient from './CityDealsClient';
 
 interface PageProps {
   params: Promise<{ city: string }>;
 }
 
-// All city params are pre-generated at build time — no ISR fallback needed.
-// This prevents Vercel from creating oversized fallback RSC payloads.
+// Only pre-generate the 25 known city slugs. No ISR fallback.
 export const dynamicParams = false;
 
 export async function generateStaticParams() {
@@ -35,21 +34,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
+// Server component only handles metadata + city config (tiny).
+// Deal data is fetched client-side from /data/deals/[city].json
+// This prevents the 241MB data files from being bundled into serverless functions.
 export default async function CityDealsPage({ params }: PageProps) {
   const { city } = await params;
   const cities = getCities();
   const cityConfig = cities.find((c) => c.slug === city);
-  const cityDeals = getCityDeals(city);
 
-  if (!cityConfig || !cityDeals) {
+  if (!cityConfig) {
     notFound();
   }
 
-  return (
-    <CityDealsClient
-      cityConfig={cityConfig}
-      cityDeals={cityDeals}
-      allCities={cities}
-    />
-  );
+  return <CityDealsClient cityConfig={cityConfig} allCities={cities} />;
 }
