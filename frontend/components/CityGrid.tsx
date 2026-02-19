@@ -56,11 +56,12 @@ export default function CityGrid({ cities }: CityGridProps) {
               href={`/deals/${city.slug}`}
               className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 hover:shadow-md hover:border-blue-200 transition-all duration-200 group"
             >
-              <div className="font-medium text-gray-900 text-sm group-hover:text-blue-700 transition-colors leading-tight">
+              <div className="font-medium text-gray-900 text-sm group-hover:text-blue-700 transition-colors leading-tight flex items-center gap-1">
                 {city.name}
+                {city.dealCount >= 1000 && <span className="text-xs text-orange-500">🔥</span>}
               </div>
               {city.dealCount > 0 ? (
-                <div className="text-xs text-gray-500 mt-1">
+                <div className={`text-xs mt-1 ${city.dealCount >= 500 ? 'text-green-600' : city.dealCount >= 100 ? 'text-yellow-600' : 'text-gray-400'}`}>
                   {city.dealCount.toLocaleString()} deals
                 </div>
               ) : (
