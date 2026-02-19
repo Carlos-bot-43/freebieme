@@ -16,6 +16,28 @@ const DEAL_TYPE_BORDER: Record<string, string> = {
   other: 'border-l-gray-300',
 };
 
+// Accurate deal-type specific badges (replaces misleading "No purchase needed")
+function getDealTypeBadge(dealType: string): { icon: string; label: string; className: string } | null {
+  switch (dealType) {
+    case 'signup_bonus':
+      return { icon: '🆓', label: 'Free with sign up', className: 'bg-purple-50 text-purple-700' };
+    case 'birthday':
+      return { icon: '🎂', label: 'Must join rewards', className: 'bg-pink-50 text-pink-700' };
+    case 'app_deal':
+      return { icon: '📲', label: 'App exclusive', className: 'bg-blue-50 text-blue-700' };
+    case 'happy_hour':
+      return { icon: '⏰', label: 'Time-limited', className: 'bg-yellow-50 text-yellow-700' };
+    case 'freebie':
+      return { icon: '🆓', label: 'Free item', className: 'bg-emerald-50 text-emerald-700' };
+    case 'bogo':
+      return { icon: '2️⃣', label: 'Buy one get one', className: 'bg-orange-50 text-orange-700' };
+    case 'rewards_program':
+      return { icon: '⭐', label: 'Earn rewards', className: 'bg-green-50 text-green-700' };
+    default:
+      return null;
+  }
+}
+
 interface DealGroupCardProps {
   group: DealGroup;
   userLat?: number;
@@ -38,6 +60,7 @@ export default function DealGroupCard({ group, userLat, userLng, cityName, updat
   const [showLocations, setShowLocations] = useState(false);
   const [saved, setSaved] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [shared, setShared] = useState(false);
 
   // Use the first location's deal_id as the "group save" key
   const primaryDealId = group.locations[0]?.deal_id || group.group_id;
@@ -49,6 +72,7 @@ export default function DealGroupCard({ group, userLat, userLng, cityName, updat
   const typeLabel = DEAL_TYPE_LABELS[group.deal_type] || DEAL_TYPE_LABELS.other;
   const typeColor = DEAL_TYPE_COLORS[group.deal_type] || DEAL_TYPE_COLORS.other;
   const typeBorder = DEAL_TYPE_BORDER[group.deal_type] || DEAL_TYPE_BORDER.other;
+  const dealTypeBadge = getDealTypeBadge(group.deal_type);
 
   const hasLocation = !!(userLat && userLng);
 
@@ -74,9 +98,37 @@ export default function DealGroupCard({ group, userLat, userLng, cityName, updat
     } catch { /* ignore */ }
   };
 
+  // 2F: Social sharing
+  const handleShare = async () => {
+    const text = `${group.title} at ${group.location_name} — claim it free at FreebieMe`;
+    const url = typeof window !== 'undefined' ? window.location.href : 'https://freebieme.vercel.app';
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({ title: group.title, text, url });
+        setShared(true);
+        setTimeout(() => setShared(false), 2000);
+      } catch { /* ignore cancel */ }
+    } else {
+      try {
+        await navigator.clipboard.writeText(`${text} ${url}`);
+        setShared(true);
+        setTimeout(() => setShared(false), 2000);
+      } catch { /* ignore */ }
+    }
+  };
+
+  // 2G: Report expired deal
+  const handleReport = () => {
+    const subject = encodeURIComponent('Expired deal report');
+    const body = encodeURIComponent(
+      `Chain: ${group.location_name}\nDeal: ${group.title}\nURL: ${typeof window !== 'undefined' ? window.location.href : ''}`
+    );
+    window.open(`mailto:deals@freebieme.com?subject=${subject}&body=${body}`, '_blank');
+  };
+
   return (
     <div className={`bg-white rounded-xl shadow-sm border border-gray-100 border-l-4 ${typeBorder} p-4 hover:shadow-md transition-shadow duration-200 flex flex-col`}>
-      {/* Header: Chain name + deal type badge */}
+      {/* Header: Chain name + deal type badge + save + share */}
       <div className="flex items-start justify-between gap-2 mb-2">
         <div className="flex-1 min-w-0">
           <span className="font-bold text-gray-900 text-base leading-tight block">
@@ -86,20 +138,40 @@ export default function DealGroupCard({ group, userLat, userLng, cityName, updat
             {typeLabel}
           </span>
         </div>
-        {/* Save button */}
-        <button
-          onClick={handleToggleSave}
-          title={saved ? 'Remove bookmark' : 'Save deal'}
-          className={`text-xl transition-colors flex-shrink-0 ${saved ? 'text-yellow-500' : 'text-gray-200 hover:text-yellow-400'}`}
-        >
-          {saved ? '★' : '☆'}
-        </button>
+        {/* Action buttons */}
+        <div className="flex items-center gap-1 flex-shrink-0">
+          {/* Share button */}
+          <button
+            onClick={handleShare}
+            title="Share this deal"
+            className="text-sm text-gray-300 hover:text-blue-500 transition-colors p-0.5"
+          >
+            {shared ? '✅' : '🔗'}
+          </button>
+          {/* Save button */}
+          <button
+            onClick={handleToggleSave}
+            title={saved ? 'Remove bookmark' : 'Save deal'}
+            className={`text-xl transition-colors ${saved ? 'text-yellow-500' : 'text-gray-200 hover:text-yellow-400'}`}
+          >
+            {saved ? '★' : '☆'}
+          </button>
+        </div>
       </div>
 
       {/* Deal title */}
       <h3 className="text-gray-900 font-semibold text-sm mb-1.5 leading-snug">
         {group.title}
       </h3>
+
+      {/* 6B: Free item highlighted prominently right below title */}
+      {group.free_item && (
+        <div className="mb-2">
+          <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-semibold bg-green-50 text-green-700 border border-green-200">
+            🆓 {group.free_item}
+          </span>
+        </div>
+      )}
 
       {/* Description */}
       {group.description && group.description !== group.title && (
@@ -108,20 +180,15 @@ export default function DealGroupCard({ group, userLat, userLng, cityName, updat
         </p>
       )}
 
-      {/* Free item / discount badges */}
-      {(group.free_item || group.discount_percent || group.discount_amount) && (
+      {/* Discount badges (only when no free item) */}
+      {!group.free_item && (group.discount_percent || group.discount_amount) && (
         <div className="flex flex-wrap gap-1.5 mb-2">
-          {group.free_item && (
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700">
-              🆓 {group.free_item}
-            </span>
-          )}
-          {group.discount_percent && !group.free_item && (
+          {group.discount_percent && (
             <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700">
               {group.discount_percent}% off
             </span>
           )}
-          {group.discount_amount && !group.free_item && !group.discount_percent && (
+          {group.discount_amount && !group.discount_percent && (
             <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700">
               ${group.discount_amount} off
             </span>
@@ -129,8 +196,14 @@ export default function DealGroupCard({ group, userLat, userLng, cityName, updat
         </div>
       )}
 
-      {/* Requirements row */}
+      {/* Requirements row — 2B: accurate deal-type badges */}
       <div className="flex flex-wrap gap-1.5 mb-2">
+        {/* Deal-type specific badge */}
+        {dealTypeBadge && (
+          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${dealTypeBadge.className}`}>
+            {dealTypeBadge.icon} {dealTypeBadge.label}
+          </span>
+        )}
         {group.requires_app && (
           <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
             📱 App required
@@ -139,11 +212,6 @@ export default function DealGroupCard({ group, userLat, userLng, cityName, updat
         {group.requires_signup && !group.requires_app && (
           <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
             ✍️ Sign up required
-          </span>
-        )}
-        {!group.requires_purchase && (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700">
-            🆓 No purchase needed
           </span>
         )}
       </div>
@@ -165,7 +233,7 @@ export default function DealGroupCard({ group, userLat, userLng, cityName, updat
 
       {/* Location info */}
       <div className="mt-auto">
-        {/* Nearest location or count */}
+        {/* 2C: Show location count instead of confidence dots */}
         {hasLocation && group.nearestDistance !== null ? (
           <div className="mb-2">
             <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold mr-2 ${getDistBadgeClass(group.nearestDistance)}`}>
@@ -214,23 +282,12 @@ export default function DealGroupCard({ group, userLat, userLng, cityName, updat
         )}
       </div>
 
-      {/* Footer: CTA + confidence */}
+      {/* Footer: location count + CTA + report link */}
       <div className="flex items-center justify-between pt-2 border-t border-gray-50">
         <div className="flex items-center gap-2">
-          <div className="flex gap-0.5">
-            {[1, 2, 3, 4, 5].map(i => (
-              <div
-                key={i}
-                className={`w-1.5 h-1.5 rounded-full ${
-                  i <= Math.round(group.confidence_score * 5)
-                    ? 'bg-green-400'
-                    : 'bg-gray-200'
-                }`}
-              />
-            ))}
-          </div>
+          {/* 2C: Location count + updated date instead of confidence dots */}
           <span className="text-xs text-gray-400">
-            {group.confidence_score >= 0.9 ? 'Verified' : group.confidence_score >= 0.7 ? 'Likely valid' : 'Unverified'}
+            {group.locations.length} location{group.locations.length !== 1 ? 's' : ''}
           </span>
           {updatedAt && (
             <span className="text-xs text-gray-300" title={`Data updated ${updatedAt}`}>
@@ -238,15 +295,25 @@ export default function DealGroupCard({ group, userLat, userLng, cityName, updat
             </span>
           )}
         </div>
-        <a
-          href={group.source_url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-xs text-white bg-blue-600 hover:bg-blue-700 font-medium px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
-          onClick={(e) => e.stopPropagation()}
-        >
-          Get deal →
-        </a>
+        <div className="flex items-center gap-2">
+          {/* 2G: Report expired deal */}
+          <button
+            onClick={handleReport}
+            title="Report expired or incorrect deal"
+            className="text-xs text-gray-300 hover:text-gray-500 transition-colors"
+          >
+            ⚑ Report
+          </button>
+          <a
+            href={group.source_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-white bg-blue-600 hover:bg-blue-700 font-medium px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
+            onClick={(e) => e.stopPropagation()}
+          >
+            Get deal →
+          </a>
+        </div>
       </div>
     </div>
   );

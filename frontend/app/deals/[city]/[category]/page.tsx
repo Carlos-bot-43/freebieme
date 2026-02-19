@@ -1,6 +1,5 @@
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
-import Link from 'next/link';
 import { getCities, getAvailableCities } from '../../../../lib/data';
 import { distanceMiles } from '../../../../lib/types';
 import { FOOD_CATEGORY_LABELS } from '../../../../lib/foodCategories';
@@ -112,19 +111,7 @@ export default async function CategoryDealsPage({ params }: PageProps) {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      {/* SEO text above the fold for category pages */}
-      <div className="sr-only">
-        <h1>{categoryLabel} Deals in {cityConfig.display}</h1>
-        <p>
-          Find the best free {categoryLabel.toLowerCase()} deals in {cityConfig.display}.
-          {chains.length > 0 && ` Including deals from ${chains.join(', ')}.`}
-          Birthday freebies, app deals, sign-up bonuses and rewards programs at restaurants near you.
-        </p>
-        <nav>
-          <Link href="/">FreebieMe Home</Link>
-          <Link href={`/deals/${cityConfig.slug}`}>All deals in {cityConfig.name}</Link>
-        </nav>
-      </div>
+      {/* 3C: The visible h1 rendered by CityDealsClient is sufficient; no sr-only duplication needed */}
       <CityDealsClient
         cityConfig={cityConfig}
         allCities={availableCities}

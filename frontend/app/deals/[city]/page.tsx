@@ -31,12 +31,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: `${countStr}Free Food Deals in ${cityConfig.name} | FreebieMe`,
     description: `Find ${countStr}birthday freebies, app deals, and sign-up bonuses at restaurants in ${cityConfig.display}. Sorted by distance. Always free to use.`,
+    alternates: {
+      canonical: `https://freebieme.vercel.app/deals/${city}`,
+    },
     openGraph: {
       title: `Free Food Deals in ${cityConfig.name}`,
       description: `${countStr}birthday freebies, app deals & sign-up bonuses near ${cityConfig.name}.`,
+      images: [{ url: `https://freebieme.vercel.app/deals/${city}/opengraph-image` }],
     },
     twitter: {
-      card: 'summary',
+      card: 'summary_large_image',
       title: `Free Food in ${cityConfig.name} | FreebieMe`,
       description: `${countStr}restaurant freebies & deals near ${cityConfig.name}.`,
     },
@@ -87,9 +91,41 @@ export default async function CityDealsPage({ params }: PageProps) {
     },
   };
 
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: `What free food deals are available in ${cityConfig.name}?`,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: `FreebieMe tracks birthday freebies, app deals, and sign-up bonuses at 34+ restaurant chains in ${cityConfig.display}, including McDonald's, Chipotle, Starbucks, Chick-fil-A, and more.`,
+        },
+      },
+      {
+        '@type': 'Question',
+        name: `How do I get free food in ${cityConfig.name}?`,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: `The easiest way to get free food in ${cityConfig.name} is to sign up for restaurant rewards apps. Chains like Chipotle, McDonald's, and Starbucks offer free items just for joining. Birthday freebies are also available at over 20 chains — no purchase required at most locations.`,
+        },
+      },
+      {
+        '@type': 'Question',
+        name: `What restaurants offer birthday freebies in ${cityConfig.name}?`,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: `Restaurants offering birthday freebies in ${cityConfig.name} include Starbucks (free drink), Chipotle (free entrée), Dairy Queen (free Blizzard), IHOP (free pancakes), Denny's (free Grand Slam), Baskin-Robbins (free scoop), and more.`,
+        },
+      },
+    ],
+  };
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <CityDealsClient cityConfig={cityConfig} allCities={availableCities} nearbyCities={nearbyCities} />
     </>
   );

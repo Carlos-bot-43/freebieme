@@ -17,6 +17,7 @@ interface FilterBarProps {
   filters: Filters;
   onFiltersChange: (filters: Filters) => void;
   hasLocation: boolean;
+  defaultFoodCategory?: string; // 2D: category pages pass this to avoid false "Filters active"
 }
 
 const DEAL_TYPES = ['all', ...Object.keys(DEAL_TYPE_LABELS)];
@@ -31,30 +32,47 @@ export const DEFAULT_FILTERS: Filters = {
   foodCategory: '',
 };
 
-function isFiltered(filters: Filters): boolean {
+// 2D: Exclude defaultFoodCategory from "active" check
+function isFiltered(filters: Filters, defaultFoodCategory = ''): boolean {
   return filters.dealType !== 'all' ||
     filters.requiresApp !== 'any' ||
     filters.maxDistance !== null ||
     filters.nearMe ||
     filters.savedOnly ||
     filters.search.trim() !== '' ||
-    filters.foodCategory !== '';
+    (filters.foodCategory !== '' && filters.foodCategory !== defaultFoodCategory);
 }
 
-export default function FilterBar({ filters, onFiltersChange, hasLocation }: FilterBarProps) {
+// 6A: Count active filters for mobile badge
+function countActiveFilters(filters: Filters, defaultFoodCategory = ''): number {
+  let count = 0;
+  if (filters.dealType !== 'all') count++;
+  if (filters.requiresApp !== 'any') count++;
+  if (filters.maxDistance !== null) count++;
+  if (filters.nearMe) count++;
+  if (filters.savedOnly) count++;
+  if (filters.search.trim() !== '') count++;
+  if (filters.foodCategory !== '' && filters.foodCategory !== defaultFoodCategory) count++;
+  return count;
+}
+
+export default function FilterBar({ filters, onFiltersChange, hasLocation, defaultFoodCategory = '' }: FilterBarProps) {
   const update = (patch: Partial<Filters>) =>
     onFiltersChange({ ...filters, ...patch });
 
-  const filtered = isFiltered(filters);
+  const filtered = isFiltered(filters, defaultFoodCategory);
+  const activeFilterCount = countActiveFilters(filters, defaultFoodCategory);
 
   return (
     <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 space-y-3">
       {/* Header with reset */}
       {filtered && (
         <div className="flex items-center justify-between">
-          <span className="text-xs font-medium text-blue-600">Filters active</span>
+          <span className="text-xs font-medium text-blue-600">
+            Filters active {activeFilterCount > 0 && `(${activeFilterCount})`}
+          </span>
           <button
-            onClick={() => onFiltersChange(DEFAULT_FILTERS)}
+            onClick={() => onFiltersChange({ ...DEFAULT_FILTERS, foodCategory: defaultFoodCategory })}
             className="text-xs text-gray-500 hover:text-gray-700 underline"
           >
             Reset all
@@ -80,9 +98,9 @@ export default function FilterBar({ filters, onFiltersChange, hasLocation }: Fil
         </label>
         <div className="flex flex-wrap gap-1.5">
           <button
-            onClick={() => update({ foodCategory: '' })}
+            onClick={() => update({ foodCategory: defaultFoodCategory })}
             className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-              filters.foodCategory === ''
+              filters.foodCategory === '' || filters.foodCategory === defaultFoodCategory
                 ? 'bg-blue-600 text-white'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
@@ -92,7 +110,7 @@ export default function FilterBar({ filters, onFiltersChange, hasLocation }: Fil
           {TOP_FOOD_CATEGORIES.map((cat) => (
             <button
               key={cat}
-              onClick={() => update({ foodCategory: filters.foodCategory === cat ? '' : cat })}
+              onClick={() => update({ foodCategory: filters.foodCategory === cat ? defaultFoodCategory : cat })}
               className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
                 filters.foodCategory === cat
                   ? 'bg-blue-600 text-white'

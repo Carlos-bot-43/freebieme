@@ -104,8 +104,14 @@ for (const file of fs.readdirSync(INPUT).filter(f => f.endsWith('.json'))) {
   // Step 3: final sort for display (by deal priority, then confidence)
   selected.sort((a, b) => dealScore(a) - dealScore(b));
 
-  data.deals = selected;
-  data.deal_count = selected.length;
+  // Step 4: strip large/unused fields to reduce payload size
+  const stripped = selected.map(deal => {
+    const { opening_hours, phone, ...rest } = deal;
+    return rest;
+  });
+
+  data.deals = stripped;
+  data.deal_count = stripped.length;
   data.truncated_to = LIMIT;
 
   fs.writeFileSync(path.join(OUTPUT, file), JSON.stringify(data));

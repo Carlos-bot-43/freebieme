@@ -5,6 +5,22 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { CityConfig, CityDeals, distanceMiles, groupDeals } from '../../../lib/types';
 import FilterBar, { Filters, DEFAULT_FILTERS } from '../../../components/FilterBar';
+
+// 2A: Map category slug to proper display label (no plural s)
+function formatCategoryTitle(slug: string): string {
+  const labels: Record<string, string> = {
+    'burgers': 'Burger',
+    'pizza': 'Pizza',
+    'chicken': 'Chicken',
+    'tacos': 'Taco',
+    'breakfast': 'Breakfast',
+    'coffee': 'Coffee',
+    'ice-cream': 'Ice Cream',
+    'sandwiches': 'Sandwich',
+    'wings': 'Wing',
+  };
+  return labels[slug] || slug.charAt(0).toUpperCase() + slug.slice(1);
+}
 import DealList from '../../../components/DealList';
 import { DealListSkeleton } from '../../../components/DealSkeleton';
 
@@ -231,7 +247,7 @@ export default function CityDealsClient({
         <div className="mb-4">
           <h1 className="text-2xl font-bold text-gray-900">
             {defaultFoodCategory
-              ? `${defaultFoodCategory.charAt(0).toUpperCase() + defaultFoodCategory.slice(1)} Deals in ${cityConfig.display}`
+              ? `${formatCategoryTitle(defaultFoodCategory)} Deals in ${cityConfig.display}`
               : `Free Food Deals in ${cityConfig.display}`}
           </h1>
           <p className="text-gray-500 text-sm mt-1">
@@ -296,18 +312,33 @@ export default function CityDealsClient({
           <div className="flex gap-6 flex-col lg:flex-row">
             {/* Sidebar filters */}
             <div className="lg:w-72 flex-shrink-0">
-              <button
-                className="lg:hidden w-full mb-3 py-2 px-4 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700 flex items-center justify-between shadow-sm"
-                onClick={() => setShowFilters(!showFilters)}
-              >
-                <span>🔍 Filters & Sort</span>
-                <span className="text-gray-400">{showFilters ? '▲' : '▼'}</span>
-              </button>
+              {/* 6A: Mobile filter button with active count */}
+              {(() => {
+                const activeCnt = [
+                  filters.dealType !== 'all',
+                  filters.requiresApp !== 'any',
+                  filters.maxDistance !== null,
+                  filters.nearMe,
+                  filters.savedOnly,
+                  filters.search.trim() !== '',
+                  filters.foodCategory !== '' && filters.foodCategory !== defaultFoodCategory,
+                ].filter(Boolean).length;
+                return (
+                  <button
+                    className="lg:hidden w-full mb-3 py-2 px-4 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700 flex items-center justify-between shadow-sm"
+                    onClick={() => setShowFilters(!showFilters)}
+                  >
+                    <span>🔍 Filters {activeCnt > 0 ? `(${activeCnt})` : ''}</span>
+                    <span className="text-gray-400">{showFilters ? '▲' : '▼'}</span>
+                  </button>
+                );
+              })()}
               <div className={`sticky top-20 ${!showFilters ? 'hidden lg:block' : ''}`}>
                 <FilterBar
                   filters={filters}
                   onFiltersChange={setFilters}
                   hasLocation={locationStatus === 'found'}
+                  defaultFoodCategory={defaultFoodCategory}
                 />
                 {/* Deal breakdown */}
                 <div className="mt-4 bg-white rounded-xl border border-gray-100 shadow-sm p-4">
@@ -368,6 +399,7 @@ export default function CityDealsClient({
                 userLng={userLng}
                 updatedAt={cityDeals.updated_at}
                 cityName={cityConfig.name}
+                citySlug={cityConfig.slug}
               />
             </div>
           </div>

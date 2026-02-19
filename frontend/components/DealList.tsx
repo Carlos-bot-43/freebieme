@@ -1,11 +1,15 @@
 'use client';
 
 import { useMemo, useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Deal, DealGroup, groupDeals } from '../lib/types';
 import { CHAIN_FOOD_CATEGORIES } from '../lib/foodCategories';
 import DealGroupCard from './DealGroupCard';
 import { Filters } from './FilterBar';
 import { getSavedDealIds } from '../lib/savedDeals';
+
+const INITIAL_VISIBLE = 20;
+const LOAD_MORE_COUNT = 20;
 
 interface DealListProps {
   deals: Deal[];
@@ -14,10 +18,19 @@ interface DealListProps {
   userLng?: number;
   updatedAt?: string;
   cityName?: string;
+  citySlug?: string; // for "browse all" link in no-results state
 }
 
-export default function DealList({ deals, filters, userLat, userLng, updatedAt, cityName }: DealListProps) {
+export default function DealList({ deals, filters, userLat, userLng, updatedAt, cityName, citySlug }: DealListProps) {
   const hasLocation = !!(userLat && userLng);
+
+  // 5B: Lazy loading state
+  const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE);
+
+  // Reset visible count when filters change
+  useEffect(() => {
+    setVisibleCount(INITIAL_VISIBLE);
+  }, [filters]);
 
   // Track saved IDs reactively (updates when savedOnly filter activates)
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
@@ -92,6 +105,11 @@ export default function DealList({ deals, filters, userLat, userLng, updatedAt, 
     return displayed.reduce((sum, g) => sum + g.locations.length, 0);
   }, [displayed]);
 
+  // 5B: Lazy slice
+  const visibleGroups = displayed.slice(0, visibleCount);
+  const hasMore = visibleCount < displayed.length;
+
+  // 6C: Better "no deals" state
   if (displayed.length === 0) {
     const hints: string[] = [];
     if (filters.nearMe) hints.push('disable "Near Me" to see deals farther away');
@@ -102,14 +120,33 @@ export default function DealList({ deals, filters, userLat, userLng, updatedAt, 
     if (filters.requiresApp === 'yes') hints.push('allow non-app deals');
     if (filters.search.trim()) hints.push('clear your search text');
 
+    // 6C: Category-specific message
+    const foodCategoryLabel = filters.foodCategory
+      ? filters.foodCategory.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+      : null;
+
     return (
       <div className="text-center py-12 text-gray-500">
         <p className="text-4xl mb-3">🍽️</p>
         <p className="font-medium text-gray-700">
-          {filters.savedOnly ? 'No saved deals in this city' : 'No deals match your filters'}
+          {filters.savedOnly
+            ? 'No saved deals in this city'
+            : foodCategoryLabel
+            ? `No ${foodCategoryLabel} deals in ${cityName || 'this city'} yet`
+            : 'No deals match your filters'}
         </p>
         {filters.savedOnly ? (
           <p className="text-sm mt-2 text-gray-500">Star deals to save them — then find them here</p>
+        ) : foodCategoryLabel && citySlug ? (
+          <div className="mt-3 text-sm text-gray-500 space-y-2">
+            <p>This category may not have coverage in {cityName || 'this city'} yet.</p>
+            <Link
+              href={`/deals/${citySlug}`}
+              className="inline-block mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+            >
+              Browse all deals in {cityName} →
+            </Link>
+          </div>
         ) : hints.length > 0 ? (
           <div className="mt-3 text-sm text-gray-500 max-w-xs mx-auto">
             <p className="mb-2">Try:</p>
@@ -132,12 +169,13 @@ export default function DealList({ deals, filters, userLat, userLng, updatedAt, 
   return (
     <div>
       <p className="text-sm text-gray-500 mb-3">
-        Showing <span className="font-medium text-gray-700">{filteredCount}</span> unique deal{filteredCount !== 1 ? 's' : ''}{' '}
+        Showing <span className="font-medium text-gray-700">{Math.min(visibleCount, filteredCount)}</span>{' '}
+        of <span className="font-medium text-gray-700">{filteredCount}</span> deal{filteredCount !== 1 ? 's' : ''}{' '}
         <span className="text-gray-400">({totalLocations.toLocaleString()} total locations)</span>
         {hasLocation ? ' · sorted by distance' : ' · sorted by confidence'}
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-        {displayed.map((group) => (
+        {visibleGroups.map((group) => (
           <DealGroupCard
             key={group.group_id}
             group={group}
@@ -148,6 +186,17 @@ export default function DealList({ deals, filters, userLat, userLng, updatedAt, 
           />
         ))}
       </div>
+      {/* 5B: Load more button */}
+      {hasMore && (
+        <div className="mt-6 text-center">
+          <button
+            onClick={() => setVisibleCount(prev => prev + LOAD_MORE_COUNT)}
+            className="px-6 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-colors shadow-sm"
+          >
+            Show more deals ({displayed.length - visibleCount} remaining)
+          </button>
+        </div>
+      )}
     </div>
   );
 }

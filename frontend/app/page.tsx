@@ -12,12 +12,22 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'FreebieMe — Free Food Deals Near You',
     description: 'Find free burgers, pizza, chicken and more. Birthday freebies, app deals and sign-up bonuses at 34+ chains across 74 US cities.',
+    images: [{ url: 'https://freebieme.vercel.app/opengraph-image', width: 1200, height: 630 }],
   },
   twitter: {
-    card: 'summary',
+    card: 'summary_large_image',
     title: 'FreebieMe — Free Food Deals Near You',
     description: 'Find free burgers, pizza, chicken and more near you.',
   },
+};
+
+// Popular food categories for footer SEO links — category: [city slugs]
+const FOOTER_CATEGORY_CITIES: Record<string, { label: string; cities: string[] }> = {
+  burgers: { label: 'Burger Deals', cities: ['new-york-ny', 'chicago-il', 'los-angeles-ca', 'houston-tx'] },
+  pizza: { label: 'Pizza Deals', cities: ['new-york-ny', 'chicago-il', 'los-angeles-ca', 'philadelphia-pa'] },
+  chicken: { label: 'Chicken Deals', cities: ['atlanta-ga', 'dallas-tx', 'houston-tx', 'chicago-il'] },
+  coffee: { label: 'Coffee Deals', cities: ['seattle-wa', 'new-york-ny', 'los-angeles-ca', 'boston-ma'] },
+  breakfast: { label: 'Breakfast Deals', cities: ['new-york-ny', 'chicago-il', 'miami-fl', 'dallas-tx'] },
 };
 
 export default function HomePage() {
@@ -32,6 +42,8 @@ export default function HomePage() {
     ...city,
     dealCount: getCityDealCount(city.slug),
   }));
+
+  const cityNameMap = new Map(cities.map((c) => [c.slug, c.name]));
 
   const chainCount = getChainCount();
   const uniqueGroupCount = getUniqueDealGroupCount();
@@ -152,32 +164,93 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Footer */}
+      {/* 4A: Email capture */}
+      {/* TODO: Replace "xpwzrjqe" with your actual Formspree form ID from https://formspree.io */}
+      <div className="max-w-md mx-auto px-4 mt-2 mb-10">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 text-center">
+          <div className="text-3xl mb-3">📬</div>
+          <h2 className="text-lg font-semibold text-gray-900 mb-1">Get weekly deal alerts</h2>
+          <p className="text-sm text-gray-500 mb-4">New freebies and limited-time deals delivered to your inbox</p>
+          <form action="https://formspree.io/f/xpwzrjqe" method="POST" className="flex gap-2">
+            <input
+              type="email"
+              name="email"
+              placeholder="your@email.com"
+              required
+              className="flex-1 px-4 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <button
+              type="submit"
+              className="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-blue-700 transition-colors"
+            >
+              Subscribe
+            </button>
+          </form>
+          <p className="text-xs text-gray-400 mt-2">No spam. Unsubscribe anytime.</p>
+        </div>
+      </div>
+
+      {/* 6D: Improved footer with SEO category links and about section */}
       <footer className="border-t border-gray-200 bg-white">
-        <div className="max-w-4xl mx-auto px-4 py-8">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div>
-              <div className="font-bold text-gray-900 text-lg mb-1">🍔 FreebieMe</div>
-              <p className="text-sm text-gray-500 max-w-xs">
-                Free restaurant deals, birthday freebies, and app bonuses across {availableCities.length}+ US cities.
-              </p>
-            </div>
-            <div className="text-sm text-gray-500 space-y-1">
-              <p>Always free to use · No sign-up required</p>
-              <p className="text-xs text-gray-400">Deals subject to change · Always verify at the restaurant</p>
-              <p className="text-xs text-gray-400">FreebieMe is not affiliated with any restaurant chain</p>
+        <div className="max-w-4xl mx-auto px-4 py-10">
+          {/* About section */}
+          <div className="mb-8">
+            <div className="font-bold text-gray-900 text-xl mb-2">🍔 FreebieMe</div>
+            <p className="text-sm text-gray-600 max-w-2xl leading-relaxed">
+              FreebieMe tracks free food deals, birthday freebies, app bonuses, and sign-up rewards at 34+ restaurant chains
+              across 74 US cities. We&apos;re a free, no-sign-up tool that helps you find the best restaurant deals near you —
+              from McDonald&apos;s and Chipotle to Starbucks and Chick-fil-A. Updated regularly.
+            </p>
+          </div>
+
+          {/* 6D: Food category links — SEO-friendly internal links */}
+          <div className="mb-8">
+            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Popular Food Deal Categories</h3>
+            <div className="space-y-3">
+              {Object.entries(FOOTER_CATEGORY_CITIES).map(([slug, { label, cities: citySlugs }]) => (
+                <div key={slug} className="flex flex-wrap items-center gap-1 text-sm">
+                  <span className="text-gray-700 font-medium mr-1">{label} in</span>
+                  {citySlugs.map((citySlug, i) => {
+                    const cityName = cityNameMap.get(citySlug);
+                    if (!cityName) return null;
+                    return (
+                      <span key={citySlug} className="inline-flex items-center">
+                        <Link
+                          href={`/deals/${citySlug}/${slug}`}
+                          className="text-blue-600 hover:text-blue-800 hover:underline"
+                        >
+                          {cityName}
+                        </Link>
+                        {i < citySlugs.length - 1 && <span className="text-gray-300 mx-1">·</span>}
+                      </span>
+                    );
+                  })}
+                </div>
+              ))}
             </div>
           </div>
-          <div className="mt-6 pt-4 border-t border-gray-100 flex flex-wrap gap-x-4 gap-y-1">
-            {sortedCities.slice(0, 20).map((city) => (
-              <Link
-                key={city.slug}
-                href={`/deals/${city.slug}`}
-                className="text-xs text-gray-400 hover:text-blue-600 transition-colors"
-              >
-                {city.name}
-              </Link>
-            ))}
+
+          {/* City links */}
+          <div className="mb-6">
+            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">All Cities</h3>
+            <div className="flex flex-wrap gap-x-3 gap-y-1">
+              {sortedCities.map((city) => (
+                <Link
+                  key={city.slug}
+                  href={`/deals/${city.slug}`}
+                  className="text-xs text-gray-400 hover:text-blue-600 transition-colors"
+                >
+                  {city.name}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          <div className="pt-4 border-t border-gray-100">
+            <p className="text-xs text-gray-400">
+              Always free to use · No sign-up required · Deals subject to change · Always verify at the restaurant ·{' '}
+              FreebieMe is not affiliated with any restaurant chain
+            </p>
           </div>
         </div>
       </footer>
