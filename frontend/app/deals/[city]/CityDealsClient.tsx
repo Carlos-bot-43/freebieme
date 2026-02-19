@@ -183,6 +183,13 @@ export default function CityDealsClient({
     return { groupCount: groups.length, locationCount: cityDeals.deals.length };
   }, [cityDeals, userLat, userLng]);
 
+  // Compute instant deals nearby for the banner
+  const instantNearby = useMemo(() => {
+    if (!cityDeals || !userLat || !userLng) return [];
+    const groups = groupDeals(cityDeals.deals, userLat, userLng);
+    return groups.filter(g => g.claim_type === 'instant' && (g.nearestDistance ?? 999) <= 5);
+  }, [cityDeals, userLat, userLng]);
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -328,6 +335,7 @@ export default function CityDealsClient({
                   filters.search.trim() !== '',
                   filters.foodCategory !== '' && filters.foodCategory !== defaultFoodCategory,
                   filters.claimType !== '',
+                  filters.noApp,
                 ].filter(Boolean).length;
                 return (
                   <button
@@ -398,6 +406,27 @@ export default function CityDealsClient({
 
             {/* Deal list */}
             <div className="flex-1 min-w-0">
+              {/* ⚡ Instant deals nearby banner */}
+              {instantNearby.length > 0 && filters.claimType !== 'instant' && (
+                <div className="mb-4 bg-green-50 border border-green-200 rounded-xl px-4 py-3 flex items-center justify-between gap-3">
+                  <div>
+                    <span className="text-sm font-semibold text-green-800">
+                      ⚡ {instantNearby.length} deal{instantNearby.length !== 1 ? 's' : ''} you can use RIGHT NOW
+                    </span>
+                    <p className="text-xs text-green-600">
+                      {instantNearby.map(g => g.location_name).slice(0, 3).join(', ')}
+                      {instantNearby.length > 3 ? ` +${instantNearby.length - 3} more` : ''}
+                      {' '}— within 5 miles
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setFilters(f => ({ ...f, claimType: 'instant' }))}
+                    className="text-xs font-semibold text-white bg-green-600 hover:bg-green-700 px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
+                  >
+                    Show only →
+                  </button>
+                </div>
+              )}
               <DealList
                 deals={cityDeals.deals}
                 filters={filters}

@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { getCities, getAvailableCities, getCityDealCount, getChainCount, getUniqueDealGroupCount } from '../lib/data';
 import HomepageSearch from '../components/HomepageSearch';
 import CityGrid from '../components/CityGrid';
+import NearMePreview from '../components/NearMePreview';
 
 export const dynamic = 'force-static';
 
@@ -60,20 +61,31 @@ export default function HomePage() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Hero */}
-      <div className="max-w-3xl mx-auto px-4 pt-14 pb-8 text-center">
+      <div className="max-w-3xl mx-auto px-4 pt-12 pb-8 text-center">
         <div className="text-5xl mb-3">🍔</div>
         <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-2 tracking-tight">
-          Find Free Food Near You
+          Free food near you
         </h1>
-        <p className="text-lg text-gray-600 mb-1">
-          Birthday freebies · App deals · Sign-up bonuses · Happy hour
-        </p>
-        <p className="text-sm text-gray-400 mb-8">
-          At <strong>{chainCount}+</strong> restaurant chains across <strong>{availableCities.length}</strong> US cities
+        <p className="text-gray-500 mb-8 text-lg">
+          Birthday freebies, app deals, happy hour and more — at {chainCount}+ chains near you
         </p>
 
-        {/* Food-first search */}
-        <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6 mb-8 text-left">
+        {/* PRIMARY CTA — big, unmissable */}
+        <Link
+          href="/near-me"
+          className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold px-8 py-4 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 mb-4"
+        >
+          📍 Find free food near me →
+        </Link>
+
+        <p className="text-xs text-gray-400 mb-10">
+          Uses your location · No account needed · Always free
+        </p>
+
+        {/* Food-first search — secondary action */}
+        <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-5 mb-6 text-left">
+          <p className="text-xs text-gray-400 uppercase tracking-wide font-medium mb-3">Or search by craving</p>
+          <NearMePreview />
           <HomepageSearch cities={availableCities} />
         </div>
 

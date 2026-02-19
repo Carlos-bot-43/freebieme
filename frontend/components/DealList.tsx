@@ -100,6 +100,11 @@ export default function DealList({ deals, filters, userLat, userLng, updatedAt, 
       filtered = filtered.filter((g) => g.claim_type === filters.claimType);
     }
 
+    // No app needed filter
+    if (filters.noApp) {
+      filtered = filtered.filter((g) => !g.requires_app);
+    }
+
     return { displayed: filtered, filteredCount: filtered.length };
   }, [allGroups, filters, hasLocation, savedIds]);
 

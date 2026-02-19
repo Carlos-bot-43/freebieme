@@ -12,6 +12,7 @@ export interface Filters {
   savedOnly: boolean;
   foodCategory: string; // '' = all
   claimType: '' | 'instant' | 'same_day_setup' | 'birthday_only';
+  noApp: boolean; // true = only show deals with no app required
 }
 
 interface FilterBarProps {
@@ -32,6 +33,7 @@ export const DEFAULT_FILTERS: Filters = {
   savedOnly: false,
   foodCategory: '',
   claimType: '',
+  noApp: false,
 };
 
 // 2D: Exclude defaultFoodCategory from "active" check
@@ -43,7 +45,8 @@ function isFiltered(filters: Filters, defaultFoodCategory = ''): boolean {
     filters.savedOnly ||
     filters.search.trim() !== '' ||
     (filters.foodCategory !== '' && filters.foodCategory !== defaultFoodCategory) ||
-    filters.claimType !== '';
+    filters.claimType !== '' ||
+    filters.noApp;
 }
 
 // 6A: Count active filters for mobile badge
@@ -57,6 +60,7 @@ function countActiveFilters(filters: Filters, defaultFoodCategory = ''): number 
   if (filters.search.trim() !== '') count++;
   if (filters.foodCategory !== '' && filters.foodCategory !== defaultFoodCategory) count++;
   if (filters.claimType !== '') count++;
+  if (filters.noApp) count++;
   return count;
 }
 
@@ -119,6 +123,17 @@ export default function FilterBar({ filters, onFiltersChange, hasLocation, defau
               {label}
             </button>
           ))}
+          {/* No app needed quick filter */}
+          <button
+            onClick={() => update({ noApp: !filters.noApp })}
+            className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+              filters.noApp
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            🚶 No app needed
+          </button>
         </div>
       </div>
 
