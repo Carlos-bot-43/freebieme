@@ -44,6 +44,28 @@ export interface CityConfig {
   priority: number;
 }
 
+export interface DealGroup {
+  group_id: string; // chain_slug + '_' + deal_type
+  chain_slug: string;
+  location_name: string; // e.g., "Chipotle"
+  title: string;
+  description: string;
+  deal_type: string;
+  free_item: string | null;
+  discount_percent: number | null;
+  discount_amount: number | null;
+  requires_app: boolean;
+  requires_signup: boolean;
+  requires_purchase: boolean;
+  coupon_code: string | null;
+  confidence_score: number;
+  source_url: string;
+  is_recurring: boolean;
+  locations: Array<{ address: string | null; lat: number; lng: number; phone: string | null; deal_id: string }>;
+  nearestDistance: number | null; // miles, null if no user location
+  nearestLocation: { address: string | null; lat: number; lng: number } | null;
+}
+
 // Calculate distance in miles between two lat/lng points
 export function distanceMiles(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const R = 3958.8;
@@ -53,6 +75,59 @@ export function distanceMiles(lat1: number, lng1: number, lat2: number, lng2: nu
     Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
     Math.sin(dLng / 2) ** 2;
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+export function groupDeals(deals: Deal[], userLat?: number, userLng?: number): DealGroup[] {
+  const groups = new Map<string, DealGroup>();
+
+  for (const deal of deals) {
+    const key = `${deal.chain_slug}_${deal.deal_type}`;
+    if (!groups.has(key)) {
+      groups.set(key, {
+        group_id: key,
+        chain_slug: deal.chain_slug,
+        location_name: deal.location_name,
+        title: deal.title,
+        description: deal.description,
+        deal_type: deal.deal_type,
+        free_item: deal.free_item,
+        discount_percent: deal.discount_percent,
+        discount_amount: deal.discount_amount,
+        requires_app: deal.requires_app,
+        requires_signup: deal.requires_signup,
+        requires_purchase: deal.requires_purchase,
+        coupon_code: deal.coupon_code,
+        confidence_score: deal.confidence_score,
+        source_url: deal.source_url,
+        is_recurring: deal.is_recurring,
+        locations: [],
+        nearestDistance: null,
+        nearestLocation: null,
+      });
+    }
+    const group = groups.get(key)!;
+    const dist = (userLat && userLng) ? distanceMiles(userLat, userLng, deal.lat, deal.lng) : null;
+    group.locations.push({ address: deal.address, lat: deal.lat, lng: deal.lng, phone: deal.phone, deal_id: deal.deal_id });
+    if (dist !== null && (group.nearestDistance === null || dist < group.nearestDistance)) {
+      group.nearestDistance = dist;
+      group.nearestLocation = { address: deal.address, lat: deal.lat, lng: deal.lng };
+    }
+  }
+
+  const result = Array.from(groups.values());
+
+  // Sort: by nearest distance if available, else by confidence_score desc
+  if (userLat && userLng) {
+    result.sort((a, b) => {
+      if (a.nearestDistance === null) return 1;
+      if (b.nearestDistance === null) return -1;
+      return a.nearestDistance - b.nearestDistance;
+    });
+  } else {
+    result.sort((a, b) => b.confidence_score - a.confidence_score);
+  }
+
+  return result;
 }
 
 export const DEAL_TYPE_LABELS: Record<string, string> = {

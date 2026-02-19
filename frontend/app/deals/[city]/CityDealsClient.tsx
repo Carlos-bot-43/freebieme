@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect, FormEvent } from 'react';
+import { useState, useEffect, useMemo, FormEvent } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { CityConfig, CityDeals, distanceMiles } from '../../../lib/types';
-import FilterBar, { Filters } from '../../../components/FilterBar';
+import { CityConfig, CityDeals, distanceMiles, groupDeals } from '../../../lib/types';
+import FilterBar, { Filters, DEFAULT_FILTERS } from '../../../components/FilterBar';
 import DealList from '../../../components/DealList';
 import { DealListSkeleton } from '../../../components/DealSkeleton';
 
@@ -16,23 +16,13 @@ interface CityDealsClientProps {
   cityConfig: CityConfig;
   allCities: CityConfig[];
   nearbyCities?: NearbyCity[];
+  defaultFoodCategory?: string; // for SEO category pages
 }
-
-const DEFAULT_FILTERS: Filters = {
-  dealType: 'all',
-  requiresApp: 'any',
-  maxDistance: null,
-  nearMe: false,
-  search: '',
-  savedOnly: false,
-};
 
 async function geocodeQuery(query: string): Promise<{ lat: number; lng: number; display: string } | null> {
   try {
     const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&countrycodes=us&format=json&limit=1`;
-    const res = await fetch(url, {
-      headers: { 'Accept-Language': 'en' },
-    });
+    const res = await fetch(url, { headers: { 'Accept-Language': 'en' } });
     const data = await res.json();
     if (!data.length) return null;
     return {
@@ -50,37 +40,39 @@ function findNearestCity(lat: number, lng: number, cities: CityConfig[]): { city
   let minDist = Infinity;
   for (const city of cities) {
     const dist = distanceMiles(lat, lng, city.center.lat, city.center.lng);
-    if (dist < minDist) {
-      minDist = dist;
-      nearest = city;
-    }
+    if (dist < minDist) { minDist = dist; nearest = city; }
   }
   return { city: nearest, dist: minDist };
 }
 
-export default function CityDealsClient({ cityConfig, allCities, nearbyCities = [] }: CityDealsClientProps) {
+export default function CityDealsClient({
+  cityConfig,
+  allCities,
+  nearbyCities = [],
+  defaultFoodCategory = '',
+}: CityDealsClientProps) {
   const router = useRouter();
-  const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
+  const [filters, setFilters] = useState<Filters>({
+    ...DEFAULT_FILTERS,
+    foodCategory: defaultFoodCategory,
+  });
   const [userLat, setUserLat] = useState<number | undefined>();
   const [userLng, setUserLng] = useState<number | undefined>();
   const [locationStatus, setLocationStatus] = useState<'idle' | 'detecting' | 'found' | 'error'>('idle');
   const [locationLabel, setLocationLabel] = useState<string>('');
   const [suggestedCity, setSuggestedCity] = useState<CityConfig | null>(null);
 
-  // Location search state
   const [locationSearch, setLocationSearch] = useState('');
   const [locationSearching, setLocationSearching] = useState(false);
   const [locationSearchError, setLocationSearchError] = useState('');
 
-  // Mobile filter toggle
   const [showFilters, setShowFilters] = useState(false);
 
-  // Deal data fetched client-side from public/data/deals/ (CDN, no serverless needed)
   const [cityDeals, setCityDeals] = useState<CityDeals | null>(null);
   const [loadingDeals, setLoadingDeals] = useState(true);
   const [dealsError, setDealsError] = useState(false);
 
-  // Fetch deal data from public static file (with retry)
+  // Fetch deal data from public static file
   useEffect(() => {
     let cancelled = false;
     setLoadingDeals(true);
@@ -91,19 +83,13 @@ export default function CityDealsClient({ cityConfig, allCities, nearbyCities = 
         const res = await fetch(`/data/deals/${cityConfig.slug}.json`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data: CityDeals = await res.json();
-        if (!cancelled) {
-          setCityDeals(data);
-          setLoadingDeals(false);
-        }
-      } catch (err) {
+        if (!cancelled) { setCityDeals(data); setLoadingDeals(false); }
+      } catch {
         if (retries > 0 && !cancelled) {
           await new Promise(r => setTimeout(r, 1000));
           return fetchWithRetry(retries - 1);
         }
-        if (!cancelled) {
-          setDealsError(true);
-          setLoadingDeals(false);
-        }
+        if (!cancelled) { setDealsError(true); setLoadingDeals(false); }
       }
     };
 
@@ -111,37 +97,29 @@ export default function CityDealsClient({ cityConfig, allCities, nearbyCities = 
     return () => { cancelled = true; };
   }, [cityConfig.slug]);
 
-  // Try to restore location from sessionStorage first, then auto-detect
+  // Restore location from sessionStorage or auto-detect GPS
   useEffect(() => {
-    // Check session storage for previous location
     try {
       const cached = sessionStorage.getItem('freebieme_location');
       if (cached) {
         const { lat, lng, label } = JSON.parse(cached);
-        setUserLat(lat);
-        setUserLng(lng);
-        setLocationStatus('found');
-        setLocationLabel(label || 'saved');
+        setUserLat(lat); setUserLng(lng);
+        setLocationStatus('found'); setLocationLabel(label || 'saved');
         const { city: nearest } = findNearestCity(lat, lng, allCities);
         if (nearest.slug !== cityConfig.slug) setSuggestedCity(nearest);
         return;
       }
     } catch {}
 
-    // No cached location — try GPS
     if (navigator.geolocation) {
       setLocationStatus('detecting');
       navigator.geolocation.getCurrentPosition(
         (pos) => {
           const lat = pos.coords.latitude;
           const lng = pos.coords.longitude;
-          setUserLat(lat);
-          setUserLng(lng);
-          setLocationStatus('found');
-          setLocationLabel('GPS');
-          // Cache in sessionStorage
+          setUserLat(lat); setUserLng(lng);
+          setLocationStatus('found'); setLocationLabel('GPS');
           try { sessionStorage.setItem('freebieme_location', JSON.stringify({ lat, lng, label: 'GPS' })); } catch {}
-          // Check if user is closer to a different city
           const { city: nearest } = findNearestCity(lat, lng, allCities);
           if (nearest.slug !== cityConfig.slug) setSuggestedCity(nearest);
         },
@@ -153,14 +131,11 @@ export default function CityDealsClient({ cityConfig, allCities, nearbyCities = 
     }
   }, [cityConfig.slug, allCities]);
 
-  const handleCityChange = (slug: string) => {
-    router.push(`/deals/${slug}`);
-  };
+  const handleCityChange = (slug: string) => router.push(`/deals/${slug}`);
 
   const handleLocationSearch = async (e: FormEvent) => {
     e.preventDefault();
     if (!locationSearch.trim()) return;
-
     setLocationSearching(true);
     setLocationSearchError('');
     setSuggestedCity(null);
@@ -172,32 +147,31 @@ export default function CityDealsClient({ cityConfig, allCities, nearbyCities = 
       return;
     }
 
-    setUserLat(result.lat);
-    setUserLng(result.lng);
-    setLocationStatus('found');
-    setLocationLabel(locationSearch.trim());
+    setUserLat(result.lat); setUserLng(result.lng);
+    setLocationStatus('found'); setLocationLabel(locationSearch.trim());
     setLocationSearching(false);
-    // Cache in sessionStorage for navigation between city pages
     try { sessionStorage.setItem('freebieme_location', JSON.stringify({ lat: result.lat, lng: result.lng, label: locationSearch.trim() })); } catch {}
 
-    // Check if closer to different city
     const { city: nearest, dist: nearestDist } = findNearestCity(result.lat, result.lng, allCities);
     if (nearestDist > 60) {
-      // Too far from any covered city
-      setLocationSearchError(
-        `We don't cover "${locationSearch.trim()}" yet. The closest city we have is ${nearest.name} (${Math.round(nearestDist)} mi away). Browse their deals below or check back as we expand!`
-      );
+      setLocationSearchError(`We don't cover "${locationSearch.trim()}" yet. The closest city we have is ${nearest.name} (${Math.round(nearestDist)} mi away). Browse their deals below or check back as we expand!`);
     } else if (nearest.slug !== cityConfig.slug) {
       setSuggestedCity(nearest);
     }
   };
+
+  // Compute grouped deal stats for the header
+  const dealStats = useMemo(() => {
+    if (!cityDeals) return null;
+    const groups = groupDeals(cityDeals.deals, userLat, userLng);
+    return { groupCount: groups.length, locationCount: cityDeals.deals.length };
+  }, [cityDeals, userLat, userLng]);
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-4 py-2">
-          {/* Row 1: Logo + City selector */}
           <div className="flex items-center gap-2 mb-2">
             <Link href="/" className="text-lg font-bold text-gray-900 hover:text-blue-700 transition-colors whitespace-nowrap">
               🍔 FreebieMe
@@ -209,13 +183,10 @@ export default function CityDealsClient({ cityConfig, allCities, nearbyCities = 
               className="text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 max-w-48"
             >
               {[...allCities].sort((a, b) => a.name.localeCompare(b.name)).map((city) => (
-                <option key={city.slug} value={city.slug}>
-                  {city.name}
-                </option>
+                <option key={city.slug} value={city.slug}>{city.name}</option>
               ))}
             </select>
           </div>
-          {/* Row 2: Location search */}
           <form onSubmit={handleLocationSearch} className="flex gap-2">
             <input
               type="text"
@@ -242,30 +213,40 @@ export default function CityDealsClient({ cityConfig, allCities, nearbyCities = 
 
       <div className="max-w-6xl mx-auto px-4 py-6">
         {/* Breadcrumb */}
-        <nav className="text-xs text-gray-400 mb-3 flex items-center gap-1.5">
+        <nav className="text-xs text-gray-400 mb-3 flex items-center gap-1.5 flex-wrap">
           <Link href="/" className="hover:text-blue-600 transition-colors">FreebieMe</Link>
           <span>›</span>
           <Link href="/" className="hover:text-blue-600 transition-colors">Cities</Link>
           <span>›</span>
-          <span className="text-gray-600 font-medium">{cityConfig.name}</span>
+          <Link href={`/deals/${cityConfig.slug}`} className="hover:text-blue-600 transition-colors">{cityConfig.name}</Link>
+          {defaultFoodCategory && (
+            <>
+              <span>›</span>
+              <span className="text-gray-600 font-medium capitalize">{defaultFoodCategory}</span>
+            </>
+          )}
         </nav>
+
         {/* Page header */}
         <div className="mb-4">
           <h1 className="text-2xl font-bold text-gray-900">
-            Free Food Deals in {cityConfig.display}
+            {defaultFoodCategory
+              ? `${defaultFoodCategory.charAt(0).toUpperCase() + defaultFoodCategory.slice(1)} Deals in ${cityConfig.display}`
+              : `Free Food Deals in ${cityConfig.display}`}
           </h1>
           <p className="text-gray-500 text-sm mt-1">
-            {loadingDeals ? 'Loading deals...' : dealsError ? 'Failed to load deals.' : (
+            {loadingDeals ? 'Loading deals...' : dealsError ? 'Failed to load deals.' : dealStats ? (
               <>
-                {cityDeals?.deal_count.toLocaleString()} deals found •{' '}
+                <span className="font-medium text-gray-700">{dealStats.groupCount}</span> unique deal{dealStats.groupCount !== 1 ? 's' : ''}{' '}
+                at <span className="font-medium text-gray-700">{dealStats.locationCount.toLocaleString()}</span> restaurant locations •{' '}
                 Updated {cityDeals && new Date(cityDeals.updated_at).toLocaleDateString('en-US', {
                   month: 'short', day: 'numeric', year: 'numeric',
                 })}
                 {locationStatus === 'found' && locationLabel && (
-                  <> • Showing deals nearest to <strong>{locationLabel}</strong></>
+                  <> • Nearest to <strong>{locationLabel}</strong></>
                 )}
               </>
-            )}
+            ) : null}
           </p>
         </div>
 
@@ -315,7 +296,6 @@ export default function CityDealsClient({ cityConfig, allCities, nearbyCities = 
           <div className="flex gap-6 flex-col lg:flex-row">
             {/* Sidebar filters */}
             <div className="lg:w-72 flex-shrink-0">
-              {/* Mobile filter toggle */}
               <button
                 className="lg:hidden w-full mb-3 py-2 px-4 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700 flex items-center justify-between shadow-sm"
                 onClick={() => setShowFilters(!showFilters)}
@@ -329,7 +309,7 @@ export default function CityDealsClient({ cityConfig, allCities, nearbyCities = 
                   onFiltersChange={setFilters}
                   hasLocation={locationStatus === 'found'}
                 />
-                {/* Quick stats */}
+                {/* Deal breakdown */}
                 <div className="mt-4 bg-white rounded-xl border border-gray-100 shadow-sm p-4">
                   <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">
                     Deal Breakdown
@@ -340,11 +320,12 @@ export default function CityDealsClient({ cityConfig, allCities, nearbyCities = 
                     { type: 'app_deal',        label: '📱 App Deals' },
                     { type: 'freebie',         label: '🆓 Freebies' },
                     { type: 'rewards_program', label: '⭐ Rewards' },
-                    { type: 'bogo',            label: '2️⃣ BOGO' },
                     { type: 'happy_hour',      label: '🕐 Happy Hour' },
+                    { type: 'bogo',            label: '2️⃣ BOGO' },
                     { type: 'discount',        label: '💰 Discounts' },
                   ].map(({ type, label }) => {
                     const count = cityDeals.deals.filter((d) => d.deal_type === type).length;
+                    if (count === 0) return null;
                     return (
                       <button
                         key={type}
@@ -357,26 +338,24 @@ export default function CityDealsClient({ cityConfig, allCities, nearbyCities = 
                     );
                   })}
                 </div>
-              {/* Nearby cities */}
-              {nearbyCities.length > 0 && (
-                <div className="mt-4 bg-white rounded-xl border border-gray-100 shadow-sm p-4">
-                  <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">
-                    Nearby Cities
-                  </h3>
-                  {nearbyCities.map((nearby) => (
-                    <button
-                      key={nearby.slug}
-                      onClick={() => router.push(`/deals/${nearby.slug}`)}
-                      className="w-full flex items-center justify-between py-1.5 text-sm hover:text-blue-600 transition-colors"
-                    >
-                      <span className="text-gray-700">{nearby.name}</span>
-                      <span className="text-gray-400 text-xs">
-                        {Math.round(nearby.distFromCurrent)} mi
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              )}
+                {/* Nearby cities */}
+                {nearbyCities.length > 0 && (
+                  <div className="mt-4 bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+                    <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">
+                      Nearby Cities
+                    </h3>
+                    {nearbyCities.map((nearby) => (
+                      <button
+                        key={nearby.slug}
+                        onClick={() => router.push(`/deals/${nearby.slug}`)}
+                        className="w-full flex items-center justify-between py-1.5 text-sm hover:text-blue-600 transition-colors"
+                      >
+                        <span className="text-gray-700">{nearby.name}</span>
+                        <span className="text-gray-400 text-xs">{Math.round(nearby.distFromCurrent)} mi</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -388,6 +367,7 @@ export default function CityDealsClient({ cityConfig, allCities, nearbyCities = 
                 userLat={userLat}
                 userLng={userLng}
                 updatedAt={cityDeals.updated_at}
+                cityName={cityConfig.name}
               />
             </div>
           </div>
@@ -398,9 +378,11 @@ export default function CityDealsClient({ cityConfig, allCities, nearbyCities = 
           <div className="flex flex-wrap justify-center gap-x-6 gap-y-1 text-xs text-gray-400 mb-3">
             <Link href="/" className="hover:text-blue-600 transition-colors">🍔 FreebieMe Home</Link>
             <span>•</span>
-            <span>Free restaurant deals &amp; freebies across {allCities.length} US cities</span>
+            <Link href={`/deals/${cityConfig.slug}`} className="hover:text-blue-600 transition-colors">
+              All deals in {cityConfig.name}
+            </Link>
             <span>•</span>
-            <span>Always free to use</span>
+            <span>Free restaurant deals &amp; freebies across {allCities.length} US cities</span>
           </div>
           <p className="text-xs text-gray-300">
             Deals subject to change · Always verify at the restaurant · FreebieMe is not affiliated with any restaurant chain

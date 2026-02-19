@@ -1,6 +1,7 @@
 'use client';
 
 import { DEAL_TYPE_LABELS } from '../lib/types';
+import { FOOD_CATEGORY_LABELS, TOP_FOOD_CATEGORIES } from '../lib/foodCategories';
 
 export interface Filters {
   dealType: string;
@@ -9,6 +10,7 @@ export interface Filters {
   nearMe: boolean;
   search: string;
   savedOnly: boolean;
+  foodCategory: string; // '' = all
 }
 
 interface FilterBarProps {
@@ -19,13 +21,14 @@ interface FilterBarProps {
 
 const DEAL_TYPES = ['all', ...Object.keys(DEAL_TYPE_LABELS)];
 
-const DEFAULT_FILTERS: Filters = {
+export const DEFAULT_FILTERS: Filters = {
   dealType: 'all',
   requiresApp: 'any',
   maxDistance: null,
   nearMe: false,
   search: '',
   savedOnly: false,
+  foodCategory: '',
 };
 
 function isFiltered(filters: Filters): boolean {
@@ -34,7 +37,8 @@ function isFiltered(filters: Filters): boolean {
     filters.maxDistance !== null ||
     filters.nearMe ||
     filters.savedOnly ||
-    filters.search.trim() !== '';
+    filters.search.trim() !== '' ||
+    filters.foodCategory !== '';
 }
 
 export default function FilterBar({ filters, onFiltersChange, hasLocation }: FilterBarProps) {
@@ -57,15 +61,48 @@ export default function FilterBar({ filters, onFiltersChange, hasLocation }: Fil
           </button>
         </div>
       )}
+
       {/* Search */}
       <div>
         <input
           type="text"
-          placeholder="Search chains, deals, locations..."
+          placeholder="Search burgers, pizza, coffee, chains..."
           value={filters.search}
           onChange={(e) => update({ search: e.target.value })}
           className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
+      </div>
+
+      {/* Food Category Quick Filters */}
+      <div>
+        <label className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5 block">
+          Food Category
+        </label>
+        <div className="flex flex-wrap gap-1.5">
+          <button
+            onClick={() => update({ foodCategory: '' })}
+            className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+              filters.foodCategory === ''
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            🍽️ All
+          </button>
+          {TOP_FOOD_CATEGORIES.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => update({ foodCategory: filters.foodCategory === cat ? '' : cat })}
+              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                filters.foodCategory === cat
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              {FOOD_CATEGORY_LABELS[cat] || cat}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Quick filter buttons row */}
