@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { CityConfig, CityDeals, distanceMiles } from '../../../lib/types';
 import FilterBar, { Filters } from '../../../components/FilterBar';
 import DealList from '../../../components/DealList';
+import { DealListSkeleton } from '../../../components/DealSkeleton';
 
 interface CityDealsClientProps {
   cityConfig: CityConfig;
@@ -242,11 +243,17 @@ export default function CityDealsClient({ cityConfig, allCities }: CityDealsClie
 
         {/* Loading state */}
         {loadingDeals && (
-          <div className="flex items-center justify-center py-24 text-gray-400">
-            <div className="text-center">
-              <div className="text-4xl mb-3">🍔</div>
-              <div className="text-sm">Loading deals...</div>
+          <div className="flex gap-6 flex-col lg:flex-row">
+            <div className="lg:w-72 flex-shrink-0">
+              <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 animate-pulse space-y-3">
+                <div className="h-10 bg-gray-100 rounded-lg" />
+                <div className="h-4 bg-gray-100 rounded w-24" />
+                <div className="flex flex-wrap gap-1.5">
+                  {[1,2,3,4].map(i => <div key={i} className="h-6 bg-gray-100 rounded-full w-16" />)}
+                </div>
+              </div>
             </div>
+            <div className="flex-1"><DealListSkeleton /></div>
           </div>
         )}
 
