@@ -1,0 +1,106 @@
+'use client';
+
+import { DEAL_TYPE_LABELS } from '../lib/types';
+
+export interface Filters {
+  dealType: string;
+  requiresApp: 'any' | 'yes' | 'no';
+  maxDistance: number | null;
+  search: string;
+}
+
+interface FilterBarProps {
+  filters: Filters;
+  onFiltersChange: (filters: Filters) => void;
+  hasLocation: boolean;
+}
+
+const DEAL_TYPES = ['all', ...Object.keys(DEAL_TYPE_LABELS)];
+
+export default function FilterBar({ filters, onFiltersChange, hasLocation }: FilterBarProps) {
+  const update = (patch: Partial<Filters>) =>
+    onFiltersChange({ ...filters, ...patch });
+
+  return (
+    <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 space-y-3">
+      {/* Search */}
+      <div>
+        <input
+          type="text"
+          placeholder="Search deals, restaurants..."
+          value={filters.search}
+          onChange={(e) => update({ search: e.target.value })}
+          className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        />
+      </div>
+
+      {/* Deal type filter */}
+      <div>
+        <label className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5 block">
+          Deal Type
+        </label>
+        <div className="flex flex-wrap gap-1.5">
+          {DEAL_TYPES.map((type) => (
+            <button
+              key={type}
+              onClick={() => update({ dealType: type })}
+              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                filters.dealType === type
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              {type === 'all' ? '🍽️ All Deals' : DEAL_TYPE_LABELS[type]}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* App requirement toggle */}
+      <div className="flex items-center gap-4">
+        <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+          App Required
+        </label>
+        <div className="flex gap-1.5">
+          {(['any', 'no', 'yes'] as const).map((val) => (
+            <button
+              key={val}
+              onClick={() => update({ requiresApp: val })}
+              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                filters.requiresApp === val
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              {val === 'any' ? 'Any' : val === 'yes' ? 'Yes' : 'No App'}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Distance filter (only if user location available) */}
+      {hasLocation && (
+        <div className="flex items-center gap-4">
+          <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+            Max Distance
+          </label>
+          <div className="flex gap-1.5">
+            {[null, 1, 3, 5, 10].map((dist) => (
+              <button
+                key={dist ?? 'any'}
+                onClick={() => update({ maxDistance: dist })}
+                className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                  filters.maxDistance === dist
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                {dist === null ? 'Any' : `${dist} mi`}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
