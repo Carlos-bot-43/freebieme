@@ -6,6 +6,7 @@ export interface Filters {
   dealType: string;
   requiresApp: 'any' | 'yes' | 'no';
   maxDistance: number | null;
+  nearMe: boolean;
   search: string;
 }
 
@@ -33,6 +34,21 @@ export default function FilterBar({ filters, onFiltersChange, hasLocation }: Fil
           className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
       </div>
+
+      {/* Near Me quick filter */}
+      {hasLocation && (
+        <button
+          onClick={() => update({ nearMe: !filters.nearMe, maxDistance: null })}
+          className={`w-full py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 ${
+            filters.nearMe
+              ? 'bg-green-600 text-white'
+              : 'bg-green-50 text-green-700 hover:bg-green-100 border border-green-200'
+          }`}
+        >
+          📍 Near Me (within 5 mi)
+          {filters.nearMe && <span className="text-xs opacity-75">✕ clear</span>}
+        </button>
+      )}
 
       {/* Deal type filter */}
       <div>
@@ -78,14 +94,14 @@ export default function FilterBar({ filters, onFiltersChange, hasLocation }: Fil
         </div>
       </div>
 
-      {/* Distance filter (only if user location available) */}
-      {hasLocation && (
-        <div className="flex items-center gap-4">
-          <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+      {/* Distance filter (only if user location available, not when nearMe is active) */}
+      {hasLocation && !filters.nearMe && (
+        <div>
+          <label className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5 block">
             Max Distance
           </label>
-          <div className="flex gap-1.5">
-            {[null, 1, 3, 5, 10].map((dist) => (
+          <div className="flex gap-1.5 flex-wrap">
+            {[null, 1, 3, 5, 10, 25].map((dist) => (
               <button
                 key={dist ?? 'any'}
                 onClick={() => update({ maxDistance: dist })}

@@ -16,6 +16,7 @@ const DEFAULT_FILTERS: Filters = {
   dealType: 'all',
   requiresApp: 'any',
   maxDistance: null,
+  nearMe: false,
   search: '',
 };
 

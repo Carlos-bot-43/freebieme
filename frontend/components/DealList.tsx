@@ -12,6 +12,8 @@ interface DealListProps {
 }
 
 export default function DealList({ deals, filters, userLat, userLng }: DealListProps) {
+  const hasLocation = !!(userLat && userLng);
+
   // Apply filters
   let filtered = deals;
 
@@ -39,30 +41,37 @@ export default function DealList({ deals, filters, userLat, userLng }: DealListP
     filtered = filtered.filter((d) => !d.requires_app);
   }
 
-  // Distance filter
-  if (filters.maxDistance !== null && userLat && userLng) {
+  // Near Me filter (≤5 miles)
+  if (filters.nearMe && hasLocation) {
+    filtered = filtered.filter((d) => {
+      if (!d.lat || !d.lng) return false;
+      return distanceMiles(userLat!, userLng!, d.lat, d.lng) <= 5;
+    });
+  }
+
+  // Max distance filter
+  if (filters.maxDistance !== null && hasLocation) {
     filtered = filtered.filter((d) => {
       if (!d.lat || !d.lng) return true;
-      const dist = distanceMiles(userLat, userLng, d.lat, d.lng);
+      const dist = distanceMiles(userLat!, userLng!, d.lat, d.lng);
       return dist <= (filters.maxDistance as number);
     });
   }
 
   // Sort: if user has location, sort by distance; else by confidence
-  if (userLat && userLng) {
-    filtered = filtered.sort((a, b) => {
-      const da = a.lat && a.lng ? distanceMiles(userLat, userLng, a.lat, a.lng) : 999;
-      const db = b.lat && b.lng ? distanceMiles(userLat, userLng, b.lat, b.lng) : 999;
+  const sorted = [...filtered].sort((a, b) => {
+    if (hasLocation) {
+      const da = a.lat && a.lng ? distanceMiles(userLat!, userLng!, a.lat, a.lng) : 999;
+      const db = b.lat && b.lng ? distanceMiles(userLat!, userLng!, b.lat, b.lng) : 999;
       return da - db;
-    });
-  } else {
-    filtered = filtered.sort((a, b) => b.confidence_score - a.confidence_score);
-  }
+    }
+    return b.confidence_score - a.confidence_score;
+  });
 
-  // Deduplicate: don't show 10 deals for the same Starbucks in a row
-  // Group by location, then interleave by chain
+  // Deduplicate: don't show 10 deals for the same chain in a row
+  // Group by chain, then interleave
   const byChain: Record<string, Deal[]> = {};
-  for (const deal of filtered) {
+  for (const deal of sorted) {
     if (!byChain[deal.chain_slug]) byChain[deal.chain_slug] = [];
     byChain[deal.chain_slug].push(deal);
   }
@@ -79,6 +88,11 @@ export default function DealList({ deals, filters, userLat, userLng }: DealListP
 
   const displayed = interleaved.slice(0, 200); // Cap at 200 for performance
 
+  // Count deals within 10 miles
+  const nearbyCount = hasLocation
+    ? deals.filter((d) => d.lat && d.lng && distanceMiles(userLat!, userLng!, d.lat, d.lng) <= 10).length
+    : 0;
+
   if (displayed.length === 0) {
     return (
       <div className="text-center py-12 text-gray-500">
@@ -91,12 +105,20 @@ export default function DealList({ deals, filters, userLat, userLng }: DealListP
 
   return (
     <div>
+      {hasLocation && nearbyCount > 0 && (
+        <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 mb-4 flex items-center gap-2">
+          <span className="text-green-600 text-lg">📍</span>
+          <span className="text-sm font-medium text-green-800">
+            {nearbyCount.toLocaleString()} deal{nearbyCount !== 1 ? 's' : ''} within 10 miles of you
+          </span>
+        </div>
+      )}
       <p className="text-sm text-gray-500 mb-3">
         Showing <span className="font-medium text-gray-700">{displayed.length}</span> of{' '}
         <span className="font-medium text-gray-700">{filtered.length}</span> deals
-        {userLat && userLng ? ', sorted by distance' : ', sorted by confidence'}
+        {hasLocation ? ', sorted by distance' : ', sorted by confidence'}
       </p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4">
         {displayed.map((deal) => (
           <DealCard
             key={deal.deal_id}

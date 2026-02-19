@@ -8,6 +8,19 @@ interface DealCardProps {
   userLng?: number;
 }
 
+function getDistanceBadge(distance: number): { text: string; className: string } {
+  if (distance < 1) {
+    return { text: `${(distance * 5280 / 1000 * 1000 / 5280).toFixed(1)} mi`, className: 'bg-green-100 text-green-700' };
+  }
+  if (distance <= 5) {
+    return { text: `${distance.toFixed(1)} mi`, className: 'bg-green-100 text-green-700' };
+  }
+  if (distance <= 10) {
+    return { text: `${distance.toFixed(1)} mi`, className: 'bg-yellow-100 text-yellow-700' };
+  }
+  return { text: `${distance.toFixed(1)} mi`, className: 'bg-gray-100 text-gray-500' };
+}
+
 export default function DealCard({ deal, userLat, userLng }: DealCardProps) {
   const typeLabel = DEAL_TYPE_LABELS[deal.deal_type] || DEAL_TYPE_LABELS.other;
   const typeColor = DEAL_TYPE_COLORS[deal.deal_type] || DEAL_TYPE_COLORS.other;
@@ -16,6 +29,8 @@ export default function DealCard({ deal, userLat, userLng }: DealCardProps) {
     userLat && userLng && deal.lat && deal.lng
       ? distanceMiles(userLat, userLng, deal.lat, deal.lng)
       : null;
+
+  const distanceBadge = distance !== null ? getDistanceBadge(distance) : null;
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow duration-200">
@@ -29,9 +44,9 @@ export default function DealCard({ deal, userLat, userLng }: DealCardProps) {
             <span className="text-xs text-gray-500 block truncate">{deal.address}</span>
           )}
         </div>
-        {distance !== null && (
-          <span className="text-xs text-gray-400 whitespace-nowrap flex-shrink-0">
-            {distance < 0.1 ? '< 0.1 mi' : `${distance.toFixed(1)} mi`}
+        {distanceBadge && (
+          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap flex-shrink-0 ${distanceBadge.className}`}>
+            📍 {distanceBadge.text}
           </span>
         )}
       </div>
@@ -67,6 +82,11 @@ export default function DealCard({ deal, userLat, userLng }: DealCardProps) {
           </span>
         )}
       </div>
+
+      {/* Description (short) */}
+      {deal.description && (
+        <p className="text-xs text-gray-500 mb-3 line-clamp-2">{deal.description}</p>
+      )}
 
       {/* Footer */}
       <div className="flex items-center justify-between">
