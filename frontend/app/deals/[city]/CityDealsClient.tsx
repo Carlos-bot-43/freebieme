@@ -179,47 +179,42 @@ export default function CityDealsClient({ cityConfig, allCities, nearbyCities = 
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3 flex-wrap">
-          <Link href="/" className="text-xl font-bold text-gray-900 hover:text-blue-700 transition-colors whitespace-nowrap">
-            🍔 FreebieMe
-          </Link>
-
-          {/* Location search in header */}
-          <form onSubmit={handleLocationSearch} className="flex gap-1.5 flex-1 min-w-48 max-w-xs">
+        <div className="max-w-6xl mx-auto px-4 py-2">
+          {/* Row 1: Logo + City selector */}
+          <div className="flex items-center gap-2 mb-2">
+            <Link href="/" className="text-lg font-bold text-gray-900 hover:text-blue-700 transition-colors whitespace-nowrap">
+              🍔 FreebieMe
+            </Link>
+            <div className="flex-1" />
+            <select
+              value={cityConfig.slug}
+              onChange={(e) => handleCityChange(e.target.value)}
+              className="text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 max-w-48"
+            >
+              {[...allCities].sort((a, b) => a.name.localeCompare(b.name)).map((city) => (
+                <option key={city.slug} value={city.slug}>
+                  {city.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          {/* Row 2: Location search */}
+          <form onSubmit={handleLocationSearch} className="flex gap-2">
             <input
               type="text"
               value={locationSearch}
               onChange={(e) => setLocationSearch(e.target.value)}
-              placeholder="ZIP code or city..."
-              className="flex-1 px-3 py-1.5 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-0"
+              placeholder="Search by ZIP or city to find nearest deals..."
+              className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-0"
             />
             <button
               type="submit"
               disabled={locationSearching}
-              className="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 whitespace-nowrap"
+              className="bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 whitespace-nowrap flex-shrink-0"
             >
-              {locationSearching ? '...' : '📍 Go'}
+              {locationSearching ? '...' : '📍'}
             </button>
           </form>
-
-          <div className="flex-1" />
-
-          <select
-            value={cityConfig.slug}
-            onChange={(e) => handleCityChange(e.target.value)}
-            className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            {[...allCities].sort((a, b) => a.name.localeCompare(b.name)).map((city) => (
-              <option key={city.slug} value={city.slug}>
-                {city.name}
-              </option>
-            ))}
-          </select>
-          {locationStatus === 'found' && (
-            <span className="text-xs text-green-600 flex items-center gap-1 whitespace-nowrap">
-              📍 {locationLabel || 'Location active'}
-            </span>
-          )}
         </div>
         {locationSearchError && (
           <div className="max-w-6xl mx-auto px-4 pb-2">
