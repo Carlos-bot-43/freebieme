@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
-import { getCities, getAvailableCities } from '../../../lib/data';
+import { getCities, getAvailableCities, getCityDealCount } from '../../../lib/data';
 import CityDealsClient from './CityDealsClient';
 
 interface PageProps {
@@ -24,12 +24,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return { title: 'City Not Found - FreebieMe' };
   }
 
+  const dealCount = getCityDealCount(city);
+  const countStr = dealCount > 0 ? `${dealCount.toLocaleString()} ` : '';
+
   return {
-    title: `Free Food Deals in ${cityConfig.name} | FreebieMe`,
-    description: `Find birthday freebies, app deals, and sign-up bonuses at restaurants in ${cityConfig.display}. Updated daily.`,
+    title: `${countStr}Free Food Deals in ${cityConfig.name} | FreebieMe`,
+    description: `Find ${countStr}birthday freebies, app deals, and sign-up bonuses at restaurants in ${cityConfig.display}. Sorted by distance. Always free to use.`,
     openGraph: {
       title: `Free Food Deals in ${cityConfig.name}`,
-      description: `Birthday freebies, app deals & more at restaurants near ${cityConfig.name}.`,
+      description: `${countStr}birthday freebies, app deals & sign-up bonuses near ${cityConfig.name}.`,
+    },
+    twitter: {
+      card: 'summary',
+      title: `Free Food in ${cityConfig.name} | FreebieMe`,
+      description: `${countStr}restaurant freebies & deals near ${cityConfig.name}.`,
     },
   };
 }
