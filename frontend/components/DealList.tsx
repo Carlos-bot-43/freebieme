@@ -92,7 +92,7 @@ export default function DealList({ deals, filters, userLat, userLng }: DealListP
     }
     const chains = Object.keys(byChain);
     const interleaved: Deal[] = [];
-    const maxLen = Math.max(...chains.map((c) => byChain[c].length));
+    const maxLen = chains.length > 0 ? Math.max(...chains.map((c) => byChain[c].length)) : 0;
     for (let i = 0; i < maxLen; i++) {
       for (const chain of chains) {
         if (byChain[chain][i]) interleaved.push(byChain[chain][i]);
