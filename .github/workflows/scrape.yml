@@ -3,7 +3,7 @@ name: FreebieMe Daily Scraper
 on:
   schedule:
     - cron: '0 9 * * *'   # 4 AM ET = 9 AM UTC daily
-  workflow_dispatch:        # Manual trigger from GitHub UI
+  workflow_dispatch:
     inputs:
       refresh_locations:
         description: 'Force refresh OSM locations'
@@ -13,7 +13,7 @@ on:
 jobs:
   scrape:
     runs-on: ubuntu-latest
-    timeout-minutes: 60     # Kill job if it runs too long
+    timeout-minutes: 60
 
     steps:
       - name: Checkout repo
@@ -27,7 +27,7 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: Install scraper dependencies
         run: npm ci
 
       - name: Cache Playwright browsers
@@ -51,26 +51,30 @@ jobs:
         env:
           NODE_ENV: production
 
-      - name: Commit and push JSON files
+      - name: Generate truncated public deal files
+        # Converts data/output/deals/ → frontend/public/data/deals/
+        # Only these 17MB of truncated files go into git — NOT the 241MB data/output/
+        run: node truncate-for-public.js
+
+      - name: Commit and push public deal files
         run: |
           git config --local user.email "scraper@freebieme.com"
           git config --local user.name "FreebieMe Bot"
-          git add data/output/
 
-          # Only commit if there are changes
+          # Only commit the public-facing truncated files, never data/output/
+          git add frontend/public/data/deals/
+
           if git diff --staged --quiet; then
-            echo "No changes to commit"
+            echo "No deal changes to commit"
           else
-            git commit -m "Daily scrape update $(date -u +%Y-%m-%d)"
-            # Force push to avoid bloating git history
+            git commit -m "Daily deal update $(date -u +%Y-%m-%d)"
             git push --force-with-lease
           fi
 
-      - name: Upload scrape artifacts on failure
+      - name: Upload scrape logs on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: scrape-logs-${{ github.run_id }}
-          path: |
-            data/output/meta.json
+          path: data/output/meta.json
           retention-days: 7
