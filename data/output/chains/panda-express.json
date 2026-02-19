@@ -1,0 +1,20 @@
+{
+  "chain_slug": "panda-express",
+  "deal_count": 1,
+  "updated_at": "2026-02-19T00:33:18.250Z",
+  "deals": [
+    {
+      "chain_slug": "panda-express",
+      "title": "Free entree on birthday",
+      "description": "Panda Rewards members get a free entree during their birthday month.",
+      "deal_type": "birthday",
+      "free_item": "entree",
+      "requires_app": true,
+      "requires_signup": true,
+      "is_recurring": true,
+      "confidence_score": 0.85,
+      "source": "baseline",
+      "source_url": "https://www.pandaexpress.com/rewards"
+    }
+  ]
+}

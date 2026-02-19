@@ -1,0 +1,20 @@
+{
+  "chain_slug": "sonic",
+  "deal_count": 1,
+  "updated_at": "2026-02-19T00:33:13.704Z",
+  "deals": [
+    {
+      "chain_slug": "sonic",
+      "title": "50% off drinks and slushes after 8 PM",
+      "description": "Sonic app users get half-price drinks and slushes every day after 8 PM.",
+      "deal_type": "app_deal",
+      "discount_percent": 50,
+      "requires_app": true,
+      "requires_signup": true,
+      "is_recurring": true,
+      "confidence_score": 0.9,
+      "source": "baseline",
+      "source_url": "https://www.sonicdrivein.com/app"
+    }
+  ]
+}

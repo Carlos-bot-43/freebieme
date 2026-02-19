@@ -1,0 +1,20 @@
+{
+  "chain_slug": "burger-king",
+  "deal_count": 1,
+  "updated_at": "2026-02-19T00:32:46.569Z",
+  "deals": [
+    {
+      "chain_slug": "burger-king",
+      "title": "Free Whopper on signup via app",
+      "description": "New Royal Perks members get a free Whopper when they sign up via the BK app.",
+      "deal_type": "signup_bonus",
+      "free_item": "Whopper",
+      "requires_app": true,
+      "requires_signup": true,
+      "is_recurring": false,
+      "confidence_score": 0.85,
+      "source": "baseline",
+      "source_url": "https://www.bk.com/rewards"
+    }
+  ]
+}

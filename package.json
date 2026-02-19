@@ -1,0 +1,22 @@
+{
+  "name": "freebieme",
+  "version": "1.0.0",
+  "description": "FreebieMe - Food deal aggregator with chain reward scrapers and OSM location data",
+  "main": "scraper/index.js",
+  "scripts": {
+    "scrape": "node scraper/index.js",
+    "scrape:chains": "node scraper/sources/chain-rewards.js",
+    "scrape:locations": "node scraper/sources/osm-locations.js",
+    "scrape:coupons": "node scraper/sources/coupon-sites.js",
+    "test": "node scraper/index.js --dry-run"
+  },
+  "keywords": ["food", "deals", "freebies", "restaurants", "coupons"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.13.5",
+    "cheerio": "^1.2.0",
+    "p-limit": "^7.3.0",
+    "playwright": "^1.58.2"
+  }
+}

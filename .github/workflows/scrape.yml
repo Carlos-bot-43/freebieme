@@ -1,0 +1,76 @@
+name: FreebieMe Daily Scraper
+
+on:
+  schedule:
+    - cron: '0 9 * * *'   # 4 AM ET = 9 AM UTC daily
+  workflow_dispatch:        # Manual trigger from GitHub UI
+    inputs:
+      refresh_locations:
+        description: 'Force refresh OSM locations'
+        required: false
+        default: 'false'
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60     # Kill job if it runs too long
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install chromium --with-deps
+
+      - name: Run scraper
+        run: |
+          ARGS=""
+          if [ "${{ github.event.inputs.refresh_locations }}" = "true" ]; then
+            ARGS="--refresh-locations"
+          fi
+          node scraper/index.js $ARGS
+        env:
+          NODE_ENV: production
+
+      - name: Commit and push JSON files
+        run: |
+          git config --local user.email "scraper@freebieme.com"
+          git config --local user.name "FreebieMe Bot"
+          git add data/output/
+
+          # Only commit if there are changes
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Daily scrape update $(date -u +%Y-%m-%d)"
+            # Force push to avoid bloating git history
+            git push --force-with-lease
+          fi
+
+      - name: Upload scrape artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scrape-logs-${{ github.run_id }}
+          path: |
+            data/output/meta.json
+          retention-days: 7
