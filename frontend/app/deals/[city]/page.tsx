@@ -72,5 +72,25 @@ export default async function CityDealsPage({ params }: PageProps) {
     .sort((a, b) => a.distFromCurrent - b.distFromCurrent)
     .slice(0, 4);
 
-  return <CityDealsClient cityConfig={cityConfig} allCities={availableCities} nearbyCities={nearbyCities} />;
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: `Free Food Deals in ${cityConfig.display}`,
+    description: `Find birthday freebies, app deals, and sign-up bonuses at restaurants in ${cityConfig.display}.`,
+    url: `https://freebieme.vercel.app/deals/${cityConfig.slug}`,
+    breadcrumb: {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'FreebieMe', item: 'https://freebieme.vercel.app' },
+        { '@type': 'ListItem', position: 2, name: `Deals in ${cityConfig.name}`, item: `https://freebieme.vercel.app/deals/${cityConfig.slug}` },
+      ],
+    },
+  };
+
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <CityDealsClient cityConfig={cityConfig} allCities={availableCities} nearbyCities={nearbyCities} />
+    </>
+  );
 }
