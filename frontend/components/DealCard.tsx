@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Deal, DEAL_TYPE_LABELS, DEAL_TYPE_COLORS, distanceMiles } from '../lib/types';
+import { toggleSavedDeal, isDealSaved } from '../lib/savedDeals';
 
 const DEAL_TYPE_BORDER: Record<string, string> = {
   birthday: 'border-l-pink-400',
@@ -30,6 +31,11 @@ function getDistanceBadge(distance: number): { text: string; className: string }
 
 export default function DealCard({ deal, userLat, userLng }: DealCardProps) {
   const [copied, setCopied] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    setSaved(isDealSaved(deal.deal_id));
+  }, [deal.deal_id]);
 
   const typeLabel = DEAL_TYPE_LABELS[deal.deal_type] || DEAL_TYPE_LABELS.other;
   const typeColor = DEAL_TYPE_COLORS[deal.deal_type] || DEAL_TYPE_COLORS.other;
@@ -48,8 +54,13 @@ export default function DealCard({ deal, userLat, userLng }: DealCardProps) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // Fallback: show code in alert
+      // Fallback
     }
+  };
+
+  const handleToggleSave = () => {
+    const nowSaved = toggleSavedDeal(deal.deal_id);
+    setSaved(nowSaved);
   };
 
   return (
@@ -130,7 +141,14 @@ export default function DealCard({ deal, userLat, userLng }: DealCardProps) {
 
       {/* Footer */}
       <div className="flex items-center justify-between mt-auto pt-2 border-t border-gray-50">
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleToggleSave}
+            title={saved ? 'Remove bookmark' : 'Save deal'}
+            className={`text-base transition-colors ${saved ? 'text-yellow-500' : 'text-gray-300 hover:text-yellow-400'}`}
+          >
+            {saved ? '★' : '☆'}
+          </button>
           <div className="flex gap-0.5">
             {[1, 2, 3, 4, 5].map(i => (
               <div
@@ -143,7 +161,7 @@ export default function DealCard({ deal, userLat, userLng }: DealCardProps) {
               />
             ))}
           </div>
-          <span className="text-xs text-gray-400 ml-1">
+          <span className="text-xs text-gray-400">
             {deal.confidence_score >= 0.9 ? 'Verified' : deal.confidence_score >= 0.7 ? 'Likely valid' : 'Unverified'}
           </span>
         </div>
