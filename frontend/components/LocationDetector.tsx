@@ -12,7 +12,7 @@ async function geocodeQuery(query: string): Promise<{ lat: number; lng: number; 
   try {
     const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&countrycodes=us&format=json&limit=1`;
     const res = await fetch(url, {
-      headers: { 'Accept-Language': 'en', 'User-Agent': 'FreebieMe/1.0' },
+      headers: { 'Accept-Language': 'en' },
     });
     const data = await res.json();
     if (!data.length) return null;

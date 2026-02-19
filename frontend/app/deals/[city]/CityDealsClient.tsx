@@ -31,7 +31,7 @@ async function geocodeQuery(query: string): Promise<{ lat: number; lng: number; 
   try {
     const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&countrycodes=us&format=json&limit=1`;
     const res = await fetch(url, {
-      headers: { 'Accept-Language': 'en', 'User-Agent': 'FreebieMe/1.0' },
+      headers: { 'Accept-Language': 'en' },
     });
     const data = await res.json();
     if (!data.length) return null;
@@ -99,8 +99,24 @@ export default function CityDealsClient({ cityConfig, allCities, nearbyCities = 
       });
   }, [cityConfig.slug]);
 
-  // Try to auto-detect location on mount
+  // Try to restore location from sessionStorage first, then auto-detect
   useEffect(() => {
+    // Check session storage for previous location
+    try {
+      const cached = sessionStorage.getItem('freebieme_location');
+      if (cached) {
+        const { lat, lng, label } = JSON.parse(cached);
+        setUserLat(lat);
+        setUserLng(lng);
+        setLocationStatus('found');
+        setLocationLabel(label || 'saved');
+        const { city: nearest } = findNearestCity(lat, lng, allCities);
+        if (nearest.slug !== cityConfig.slug) setSuggestedCity(nearest);
+        return;
+      }
+    } catch {}
+
+    // No cached location — try GPS
     if (navigator.geolocation) {
       setLocationStatus('detecting');
       navigator.geolocation.getCurrentPosition(
@@ -111,12 +127,11 @@ export default function CityDealsClient({ cityConfig, allCities, nearbyCities = 
           setUserLng(lng);
           setLocationStatus('found');
           setLocationLabel('GPS');
-
+          // Cache in sessionStorage
+          try { sessionStorage.setItem('freebieme_location', JSON.stringify({ lat, lng, label: 'GPS' })); } catch {}
           // Check if user is closer to a different city
           const { city: nearest } = findNearestCity(lat, lng, allCities);
-          if (nearest.slug !== cityConfig.slug) {
-            setSuggestedCity(nearest);
-          }
+          if (nearest.slug !== cityConfig.slug) setSuggestedCity(nearest);
         },
         () => setLocationStatus('error'),
         { timeout: 8000, maximumAge: 300000 }
@@ -150,6 +165,8 @@ export default function CityDealsClient({ cityConfig, allCities, nearbyCities = 
     setLocationStatus('found');
     setLocationLabel(locationSearch.trim());
     setLocationSearching(false);
+    // Cache in sessionStorage for navigation between city pages
+    try { sessionStorage.setItem('freebieme_location', JSON.stringify({ lat: result.lat, lng: result.lng, label: locationSearch.trim() })); } catch {}
 
     // Check if closer to different city
     const { city: nearest } = findNearestCity(result.lat, result.lng, allCities);
