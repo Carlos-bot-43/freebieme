@@ -297,6 +297,9 @@ export default function CityDealsClient({ cityConfig, allCities }: CityDealsClie
                     { type: 'app_deal',        label: '📱 App Deals' },
                     { type: 'freebie',         label: '🆓 Freebies' },
                     { type: 'rewards_program', label: '⭐ Rewards' },
+                    { type: 'bogo',            label: '2️⃣ BOGO' },
+                    { type: 'happy_hour',      label: '🕐 Happy Hour' },
+                    { type: 'discount',        label: '💰 Discounts' },
                   ].map(({ type, label }) => {
                     const count = cityDeals.deals.filter((d) => d.deal_type === type).length;
                     return (

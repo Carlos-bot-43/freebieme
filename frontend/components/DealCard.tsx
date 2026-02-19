@@ -3,6 +3,18 @@
 import { useState } from 'react';
 import { Deal, DEAL_TYPE_LABELS, DEAL_TYPE_COLORS, distanceMiles } from '../lib/types';
 
+const DEAL_TYPE_BORDER: Record<string, string> = {
+  birthday: 'border-l-pink-400',
+  signup_bonus: 'border-l-purple-400',
+  app_deal: 'border-l-blue-400',
+  bogo: 'border-l-orange-400',
+  happy_hour: 'border-l-yellow-400',
+  rewards_program: 'border-l-green-400',
+  freebie: 'border-l-emerald-400',
+  discount: 'border-l-red-400',
+  other: 'border-l-gray-300',
+};
+
 interface DealCardProps {
   deal: Deal;
   userLat?: number;
@@ -21,6 +33,7 @@ export default function DealCard({ deal, userLat, userLng }: DealCardProps) {
 
   const typeLabel = DEAL_TYPE_LABELS[deal.deal_type] || DEAL_TYPE_LABELS.other;
   const typeColor = DEAL_TYPE_COLORS[deal.deal_type] || DEAL_TYPE_COLORS.other;
+  const typeBorder = DEAL_TYPE_BORDER[deal.deal_type] || DEAL_TYPE_BORDER.other;
 
   const distance =
     userLat && userLng && deal.lat && deal.lng
@@ -40,7 +53,7 @@ export default function DealCard({ deal, userLat, userLng }: DealCardProps) {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow duration-200 flex flex-col">
+    <div className={`bg-white rounded-xl shadow-sm border border-gray-100 border-l-4 ${typeBorder} p-4 hover:shadow-md transition-shadow duration-200 flex flex-col`}>
       {/* Header row */}
       <div className="flex items-start justify-between gap-2 mb-2">
         <div className="flex-1 min-w-0">
