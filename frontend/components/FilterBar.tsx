@@ -18,12 +18,42 @@ interface FilterBarProps {
 
 const DEAL_TYPES = ['all', ...Object.keys(DEAL_TYPE_LABELS)];
 
+const DEFAULT_FILTERS: Filters = {
+  dealType: 'all',
+  requiresApp: 'any',
+  maxDistance: null,
+  nearMe: false,
+  search: '',
+};
+
+function isFiltered(filters: Filters): boolean {
+  return filters.dealType !== 'all' ||
+    filters.requiresApp !== 'any' ||
+    filters.maxDistance !== null ||
+    filters.nearMe ||
+    filters.search.trim() !== '';
+}
+
 export default function FilterBar({ filters, onFiltersChange, hasLocation }: FilterBarProps) {
   const update = (patch: Partial<Filters>) =>
     onFiltersChange({ ...filters, ...patch });
 
+  const filtered = isFiltered(filters);
+
   return (
     <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 space-y-3">
+      {/* Header with reset */}
+      {filtered && (
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-medium text-blue-600">Filters active</span>
+          <button
+            onClick={() => onFiltersChange(DEFAULT_FILTERS)}
+            className="text-xs text-gray-500 hover:text-gray-700 underline"
+          >
+            Reset all
+          </button>
+        </div>
+      )}
       {/* Search */}
       <div>
         <input
