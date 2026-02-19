@@ -73,3 +73,21 @@ export function getCityDealCount(citySlug: string): number {
     return 0;
   }
 }
+
+// Count unique deal groups across all cities (chain_slug + deal_type combinations)
+export function getUniqueDealGroupCount(): number {
+  try {
+    const dealsDir = getDealsDir();
+    if (!fs.existsSync(dealsDir)) return 0;
+    const groups = new Set<string>();
+    for (const file of fs.readdirSync(dealsDir).filter(f => f.endsWith('.json'))) {
+      const data: CityDeals = JSON.parse(fs.readFileSync(path.join(dealsDir, file), 'utf-8'));
+      for (const deal of (data.deals || [])) {
+        groups.add(`${deal.chain_slug}_${deal.deal_type}`);
+      }
+    }
+    return groups.size;
+  } catch {
+    return 0;
+  }
+}
