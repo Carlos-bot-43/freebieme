@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { getCities, getAvailableCities, getCityDealCount, getChainCount, getUniqueDealGroupCount } from '../lib/data';
+import { getCities, getAvailableCities, getCityDealCount, getChainCount, getUniqueDealGroupCount, getHotDealsPreview } from '../lib/data';
 import HomepageSearch from '../components/HomepageSearch';
 import CityGrid from '../components/CityGrid';
 import NearMePreview from '../components/NearMePreview';
@@ -32,6 +32,13 @@ const FOOTER_CATEGORY_CITIES: Record<string, { label: string; cities: string[] }
   breakfast: { label: 'Breakfast Deals', cities: ['new-york-ny', 'chicago-il', 'miami-fl', 'dallas-tx'] },
 };
 
+const CLAIM_BADGE: Record<string, { label: string; className: string }> = {
+  instant:          { label: '⚡ Right now',     className: 'bg-green-100 text-green-800' },
+  same_day_setup:   { label: '📲 Today',          className: 'bg-yellow-100 text-yellow-800' },
+  advance_required: { label: '📅 Plan ahead',     className: 'bg-orange-100 text-orange-800' },
+  birthday_only:    { label: '🎂 Birthday month', className: 'bg-pink-100 text-pink-800' },
+};
+
 export default function HomePage() {
   const cities = getCities();
   const availableCitySlugs = new Set(getAvailableCities());
@@ -49,6 +56,7 @@ export default function HomePage() {
 
   const chainCount = getChainCount();
   const uniqueGroupCount = getUniqueDealGroupCount();
+  const hotDeals = getHotDealsPreview(cities);
 
   const dealTypeHighlights = [
     { emoji: '🎂', title: 'Birthday Freebies', desc: 'Free food on your special day — no purchase required at most chains' },
@@ -115,6 +123,46 @@ export default function HomePage() {
           </div>
         </div>
       </div>
+
+      {/* 🔥 Hot Deals Right Now — teaser section, static at build time */}
+      {hotDeals.length > 0 && (
+        <div className="max-w-4xl mx-auto px-4 pb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-800">🔥 Hot Deals Right Now</h2>
+            <span className="text-xs text-gray-400">Updated regularly</span>
+          </div>
+          {/* Horizontally scrollable on mobile, grid on desktop */}
+          <div className="flex gap-3 overflow-x-auto pb-2 sm:grid sm:grid-cols-3 sm:overflow-visible">
+            {hotDeals.map((deal) => {
+              const badge = CLAIM_BADGE[deal.claimType];
+              return (
+                <Link
+                  key={deal.category}
+                  href={`/deals/${deal.citySlug}`}
+                  className="flex-shrink-0 w-56 sm:w-auto bg-white rounded-xl border border-gray-100 shadow-sm p-4 hover:shadow-md hover:border-blue-100 transition-all duration-200 block"
+                >
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-xl">{deal.emoji}</span>
+                    <span className="font-bold text-gray-900 text-sm truncate">{deal.chainName}</span>
+                  </div>
+                  <p className="text-sm font-semibold text-blue-700 mb-1.5 leading-snug line-clamp-2">
+                    {deal.valueSummary}
+                  </p>
+                  <div className="flex items-center justify-between gap-1">
+                    {badge && (
+                      <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium ${badge.className}`}>
+                        {badge.label}
+                      </span>
+                    )}
+                    <span className="text-xs text-gray-400 truncate ml-auto">{deal.cityName}</span>
+                  </div>
+                  <p className="text-xs text-blue-500 mt-2 font-medium">Get deal →</p>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* City grid */}
       <div id="cities" className="max-w-4xl mx-auto px-4 pb-6 scroll-mt-4">

@@ -74,6 +74,123 @@ export function getCityDealCount(citySlug: string): number {
   }
 }
 
+export interface HotDealPreview {
+  category: string;          // "burger" | "pizza" | "chicken" | "coffee" | "birthday" | "happy_hour"
+  citySlug: string;
+  cityName: string;
+  chainName: string;
+  emoji: string;
+  valueSummary: string;
+  claimType: string;
+}
+
+const HOT_DEAL_TARGETS: Array<{
+  category: string;
+  emoji: string;
+  preferCities: string[];
+  matchFn: (deal: { deal_type: string; food_tags?: string[]; claim_type: string; value_summary: string }) => boolean;
+}> = [
+  {
+    category: 'burger',
+    emoji: '🍔',
+    preferCities: ['new-york-ny', 'chicago-il', 'los-angeles-ca', 'houston-tx'],
+    matchFn: (d) =>
+      d.claim_type !== 'advance_required' &&
+      (d.food_tags || []).includes('burgers') &&
+      !['birthday', 'rewards_program'].includes(d.deal_type) &&
+      !!d.value_summary,
+  },
+  {
+    category: 'pizza',
+    emoji: '🍕',
+    preferCities: ['chicago-il', 'new-york-ny', 'los-angeles-ca', 'houston-tx'],
+    matchFn: (d) =>
+      d.claim_type !== 'advance_required' &&
+      (d.food_tags || []).includes('pizza') &&
+      !['birthday', 'rewards_program'].includes(d.deal_type) &&
+      !!d.value_summary,
+  },
+  {
+    category: 'chicken',
+    emoji: '🍗',
+    preferCities: ['los-angeles-ca', 'houston-tx', 'chicago-il', 'new-york-ny'],
+    matchFn: (d) =>
+      d.claim_type !== 'advance_required' &&
+      ((d.food_tags || []).includes('chicken') || (d.food_tags || []).includes('wings')) &&
+      !['birthday', 'rewards_program'].includes(d.deal_type) &&
+      !!d.value_summary,
+  },
+  {
+    category: 'coffee',
+    emoji: '☕',
+    preferCities: ['houston-tx', 'chicago-il', 'los-angeles-ca', 'new-york-ny'],
+    matchFn: (d) =>
+      d.claim_type !== 'advance_required' &&
+      ((d.food_tags || []).includes('coffee') || (d.food_tags || []).includes('drinks')) &&
+      !['birthday', 'rewards_program', 'happy_hour'].includes(d.deal_type) &&
+      !!d.value_summary,
+  },
+  {
+    category: 'birthday',
+    emoji: '🎂',
+    preferCities: ['chicago-il', 'houston-tx', 'los-angeles-ca', 'new-york-ny'],
+    matchFn: (d) =>
+      d.deal_type === 'birthday' &&
+      !!d.value_summary,
+  },
+  {
+    category: 'happy_hour',
+    emoji: '🕐',
+    preferCities: ['houston-tx', 'chicago-il', 'new-york-ny', 'los-angeles-ca'],
+    matchFn: (d) =>
+      d.deal_type === 'happy_hour' &&
+      d.claim_type === 'instant' &&
+      !!d.value_summary,
+  },
+];
+
+export function getHotDealsPreview(cityConfigs: CityConfig[]): HotDealPreview[] {
+  const dealsDir = getDealsDir();
+  const cityNameMap = new Map(cityConfigs.map((c) => [c.slug, c.name]));
+  const results: HotDealPreview[] = [];
+  const usedCities = new Set<string>();
+
+  for (const target of HOT_DEAL_TARGETS) {
+    let found = false;
+    for (const citySlug of target.preferCities) {
+      if (found) break;
+      // Allow duplicate cities only if we're running low on options
+      try {
+        const filePath = path.join(dealsDir, `${citySlug}.json`);
+        if (!fs.existsSync(filePath)) continue;
+        const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+        const seenChains = new Set<string>();
+        for (const deal of (data.deals || [])) {
+          const key = `${deal.chain_slug}_${deal.deal_type}`;
+          if (seenChains.has(key)) continue;
+          seenChains.add(key);
+          if (target.matchFn(deal)) {
+            results.push({
+              category: target.category,
+              citySlug,
+              cityName: cityNameMap.get(citySlug) || citySlug,
+              chainName: deal.location_name,
+              emoji: target.emoji,
+              valueSummary: deal.value_summary,
+              claimType: deal.claim_type,
+            });
+            usedCities.add(citySlug);
+            found = true;
+            break;
+          }
+        }
+      } catch { /* skip on error */ }
+    }
+  }
+
+  return results;
+}
+
 // Count unique deal groups across all cities (chain_slug + deal_type combinations)
 export function getUniqueDealGroupCount(): number {
   try {
