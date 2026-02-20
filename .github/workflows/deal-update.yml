@@ -35,6 +35,15 @@ jobs:
         run: node scraper/sources/coupon-aggregator.js
         continue-on-error: true   # Never fail pipeline over coupon scraping issues
 
+      # Step 2b: Seed working deal files from committed frontend data
+      # data/output/deals/ is gitignored — populate it from committed frontend files
+      # so inject-missing-deals.js and truncate-for-public.js have data to work with
+      - name: Seed working deal files
+        run: |
+          mkdir -p data/output/deals
+          cp frontend/public/data/deals/*.json data/output/deals/ 2>/dev/null || true
+          echo "Seeded $(ls data/output/deals/*.json 2>/dev/null | wc -l | tr -d ' ') city deal files"
+
       # Step 3: Inject missing deal templates
       - name: Inject missing deal templates
         run: node inject-missing-deals.js
