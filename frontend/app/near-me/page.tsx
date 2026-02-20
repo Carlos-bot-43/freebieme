@@ -100,8 +100,9 @@ export default function NearMePage() {
     const instant = all.filter(g => g.claim_type === 'instant' && (g.nearestDistance ?? 999) <= 10);
     // Today: signup bonus or app deal — claimable same visit
     const today = all.filter(g => g.claim_type === 'same_day_setup' && (g.nearestDistance ?? 999) <= 5);
-    // Plan ahead: birthday and advance-required deals (valuable but need prep)
-    const planAhead = all.filter(g => g.claim_type === 'birthday_only' || g.claim_type === 'advance_required').slice(0, 5);
+    // Plan ahead: birthday deals only (most valuable "plan ahead" deals with specific freebies)
+    // We exclude advance_required (rewards programs) as those are long-term, not "get free food soon"
+    const planAhead = all.filter(g => g.claim_type === 'birthday_only').slice(0, 5);
 
     return { instant, today, planAhead, allGroups: all };
   }, [cityDeals, userLat, userLng]);
@@ -195,6 +196,13 @@ export default function NearMePage() {
             {instant.length === 0 && (
               <div className="bg-yellow-50 border border-yellow-200 rounded-xl px-4 py-3 mb-6 text-sm text-yellow-800">
                 No instant deals available right now near you — happy hour may not be active.
+              </div>
+            )}
+
+            {/* No same-day deals fallback — only show if also no instant deals */}
+            {today.length === 0 && instant.length === 0 && (
+              <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 mb-6 text-sm text-blue-800">
+                No deals with fast setup found near you right now. Try the full city page to see all deals including birthday freebies and rewards programs.
               </div>
             )}
 
