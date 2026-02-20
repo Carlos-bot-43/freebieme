@@ -1,11 +1,12 @@
 {
-  "name": "FreebieMe - Free Food Deals",
+  "name": "FreebieMe — Free Food Deals",
   "short_name": "FreebieMe",
-  "description": "Find birthday freebies, app deals, and restaurant rewards near you",
+  "description": "Find free food deals near you — birthday freebies, app deals, happy hour and more.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f8fafc",
   "theme_color": "#2563eb",
+  "orientation": "portrait-primary",
   "icons": [
     {
       "src": "/favicon.ico",
@@ -13,7 +14,6 @@
       "type": "image/x-icon"
     }
   ],
-  "categories": ["food", "shopping"],
-  "lang": "en-US",
-  "dir": "ltr"
+  "categories": ["food", "shopping", "lifestyle"],
+  "lang": "en-US"
 }
