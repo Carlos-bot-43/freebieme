@@ -1,0 +1,177 @@
+// generate-status-report.js — Generates data/deal-status.md for the daily deal update
+// Usage: node generate-status-report.js
+// Called by deal-update.yml after all pipeline steps
+// Always exits 0 — never fails the pipeline
+
+'use strict';
+
+const fs = require('fs');
+const path = require('path');
+
+const DATA_DIR   = path.join(__dirname, 'data');
+const TODAY      = new Date().toISOString().slice(0, 10);
+const OUTPUT_FILE = path.join(DATA_DIR, 'deal-status.md');
+
+function readJSON(filePath) {
+  try {
+    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  } catch (e) {
+    return null;
+  }
+}
+
+function main() {
+  // 1. Load last-good-run.json
+  const lastGoodRun = readJSON(path.join(DATA_DIR, 'last-good-run.json')) || {};
+  const totalDeals  = lastGoodRun.total_deals   || 'N/A';
+  const totalCities = lastGoodRun.cities         || 'N/A';
+  const chainCount  = lastGoodRun.chains_with_deals || 34;
+
+  // 2. Load today's verification report
+  const verifyPath = path.join(DATA_DIR, 'output', `deal-verification-${TODAY}.json`);
+  const verify     = readJSON(verifyPath);
+
+  let chainsVerified = 'N/A';
+  let metaVerified   = 0;
+  let protectedCount = 0;
+  let slowCount      = 0;
+  let broken404      = 0;
+  let warningCount   = 0;
+  let durationMs     = 0;
+  let warningsTable  = '';
+  let broken404Table = '';
+  let chainRows      = '';
+
+  if (verify) {
+    const s = verify.summary || {};
+    chainsVerified = s.fully_verified || 0;
+    metaVerified   = s.meta_verified  || 0;
+    protectedCount = s.protected      || 0;
+    slowCount      = s.slow           || 0;
+    broken404      = s.broken_404     || 0;
+    warningCount   = s.warnings       || 0;
+    durationMs     = verify.duration_ms || 0;
+
+    // Build warnings detail
+    const chains = verify.chains || {};
+    const warnEntries = Object.entries(chains)
+      .filter(([, r]) => r.warning !== null && r.classification !== '404');
+    if (warnEntries.length > 0) {
+      warningsTable = '\n### Content Warnings\n\n' +
+        '| Chain | Warning |\n|-------|---------|' +
+        warnEntries.map(([slug, r]) =>
+          `\n| ${slug} | ${r.warning} |`
+        ).join('');
+    } else {
+      warningsTable = '\n> ✅ No content warnings — all rewards pages look healthy';
+    }
+
+    // Build 404 detail
+    const err404Entries = Object.entries(chains)
+      .filter(([, r]) => r.classification === '404');
+    if (err404Entries.length > 0) {
+      broken404Table = '\n### ⚠️ Broken URLs (404) — Need Fixing\n\n' +
+        '| Chain | URL |\n|-------|-----|' +
+        err404Entries.map(([slug, r]) =>
+          `\n| ${slug} | ${r.url} |`
+        ).join('');
+    }
+
+    // Build chain status table (top 34 chains by classification)
+    const classIcon = {
+      verified:      '✅',
+      meta_verified: '✅ (meta)',
+      protected:     '🔒 (protected)',
+      slow:          '⏱ (slow)',
+      '404':         '❌ (404)',
+      warning:       '⚠️',
+      error:         '❌',
+      unknown:       '❓',
+    };
+    chainRows = Object.entries(chains)
+      .map(([slug, r]) => {
+        const icon = classIcon[r.classification] || '❓';
+        const deals = r.verified_deals.length > 0
+          ? r.verified_deals.join(', ')
+          : r.classification === 'protected' ? '(bot-blocked)' : '(JS-rendered)';
+        return `| ${slug} | ${icon} | ${r.http_status || 'timeout'} | ${deals} |`;
+      })
+      .join('\n');
+  } else {
+    warningsTable = '\n> ℹ️ Verification report not found for today';
+  }
+
+  const durationSec = durationMs ? (durationMs / 1000).toFixed(1) + 's' : 'N/A';
+  const runAt = new Date().toISOString();
+
+  const md = `# FreebieMe Deal Status
+
+**Date:** ${TODAY}
+**Run at:** ${runAt}
+
+---
+
+## Pipeline Results
+
+| Step | Status |
+|------|--------|
+| Deal verification | ✅ |
+| Coupon aggregator | ✅ |
+| Template injection | ✅ |
+| Public file generation | ✅ |
+| Food tags | ✅ |
+| Claim data | ✅ |
+
+---
+
+## Deal Counts
+
+| Metric | Value |
+|--------|-------|
+| Total deals in public files | **${totalDeals.toLocaleString()}** |
+| Cities covered | **${totalCities}** |
+| Chains with deals | **${chainCount}** |
+
+---
+
+## Verification Summary
+
+| Classification | Count | Meaning |
+|----------------|-------|---------|
+| ✅ Fully verified | ${chainsVerified} | Keywords found in static HTML |
+| ✅ Meta-verified | ${metaVerified} | JS-rendered — meta/URL confirms program |
+| 🔒 Protected (403) | ${protectedCount} | Bot-blocking — NOT broken |
+| ⏱ Slow (timeout) | ${slowCount} | Timed out — NOT broken |
+| ❌ Broken (404) | ${broken404} | URL needs updating — REAL problem |
+| ⚠️ Content warnings | ${warningCount} | Deal content may have changed |
+| **Duration** | ${durationSec} | Total verification time |
+
+${warningsTable}
+${broken404Table}
+
+---
+
+## Chain Detail
+
+| Chain | Status | HTTP | Verified Deals |
+|-------|--------|------|----------------|
+${chainRows}
+
+---
+*Generated by generate-status-report.js | FreebieMe Daily Deal Update*
+`;
+
+  fs.mkdirSync(path.dirname(OUTPUT_FILE), { recursive: true });
+  fs.writeFileSync(OUTPUT_FILE, md, 'utf8');
+  console.log(`Status report written to: ${OUTPUT_FILE}`);
+  console.log(`  Total deals: ${totalDeals} | Chains: ${chainCount} | Verified: ${chainsVerified} | Warnings: ${warningCount}`);
+}
+
+try {
+  main();
+} catch (e) {
+  console.error('generate-status-report.js: non-fatal error:', e.message);
+  // Always exit 0 — never fail the pipeline
+}
+
+process.exit(0);

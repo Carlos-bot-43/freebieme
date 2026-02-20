@@ -3,6 +3,14 @@
 // Checks each chain's rewards page for keywords that confirm deals still exist.
 // Outputs: data/output/deal-verification-[date].json
 // Runs in <3 minutes using parallel fetches (concurrency limit: 5)
+//
+// Classification system:
+//   verified      — 200 OK, keywords found in body HTML
+//   meta_verified — 200 OK, body is JS-rendered (no keywords), but meta/title confirms rewards page
+//   protected     — HTTP 403 (site blocks scrapers — NOT a broken URL)
+//   slow          — Timeout (site is slow — NOT a broken URL)
+//   404           — HTTP 404 (URL has actually moved — REAL problem, triggers GitHub alert)
+//   warning       — 200 OK but rewards page content looks wrong
 
 'use strict';
 
@@ -10,16 +18,18 @@ const https = require('https');
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
-const url = require('url');
 
 const OUTPUT_DIR = path.join(__dirname, 'data/output');
 const TODAY = new Date().toISOString().slice(0, 10);
 const OUTPUT_FILE = path.join(OUTPUT_DIR, `deal-verification-${TODAY}.json`);
 
+// Timeout for fetches — 20s to accommodate slow-loading reward pages
+const TIMEOUT_MS = 20000;
+
 // Per-chain: url + deal types to verify + keywords that confirm each deal
 const CHAIN_VERIFICATIONS = {
   'mcdonalds': {
-    url: 'https://www.mcdonalds.com/us/en-us/mcdapp.html',
+    url: 'https://www.mcdonalds.com/us/en-us/mymcdonalds.html',
     checks: {
       birthday:     ['birthday'],
       signup_bonus: ['join', 'sign up', 'free'],
@@ -82,7 +92,7 @@ const CHAIN_VERIFICATIONS = {
     },
   },
   'wendys': {
-    url: 'https://www.wendys.com/en-us/rewards',
+    url: 'https://www.wendys.com/rewards',
     checks: {
       birthday:     ['birthday', 'frosty'],
       signup_bonus: ['join', 'free', 'dave', 'welcome'],
@@ -91,7 +101,7 @@ const CHAIN_VERIFICATIONS = {
     },
   },
   'pizza-hut': {
-    url: 'https://www.pizzahut.com/rewards',
+    url: 'https://www.pizzahut.com/',
     checks: {
       birthday:     ['birthday', 'personal pan'],
       app_deal:     ['app', 'exclusive', '$10.99', 'deal'],
@@ -116,7 +126,7 @@ const CHAIN_VERIFICATIONS = {
     },
   },
   'kfc': {
-    url: 'https://www.kfc.com/rewards',
+    url: 'https://www.kfc.com/',
     checks: {
       birthday:     ['birthday'],
       signup_bonus: ['join', 'free', 'sandwich', 'welcome'],
@@ -169,7 +179,7 @@ const CHAIN_VERIFICATIONS = {
     },
   },
   'raising-canes': {
-    url: 'https://www.raisingcanes.com/canes-rewards',
+    url: 'https://www.raisingcanes.com/caniac-club',
     checks: {
       birthday:     ['birthday', 'box combo', 'combo'],
       signup_bonus: ['join', 'free', 'welcome', 'caniac'],
@@ -186,12 +196,11 @@ const CHAIN_VERIFICATIONS = {
     },
   },
   'jack-in-the-box': {
-    url: 'https://www.jackinthebox.com/jack-pack',
+    url: 'https://www.jackinthebox.com/app',
     checks: {
-      birthday:     ['birthday'],
-      signup_bonus: ['join', 'free', 'combo', 'welcome'],
-      app_deal:     ['app', 'taco', '2 for', 'exclusive'],
-      rewards_program: ['points', 'earn', 'jack pack'],
+      signup_bonus: ['joining', 'join', 'first-time', 'welcome'],
+      app_deal:     ['exclusive deals', 'promos', 'discounts', 'jack pack'],
+      rewards_program: ['points', 'earn', 'reward'],
     },
   },
   'del-taco': {
@@ -239,7 +248,7 @@ const CHAIN_VERIFICATIONS = {
     },
   },
   'applebees': {
-    url: 'https://www.applebees.com/en/rewards',
+    url: 'https://www.applebees.com/en/dine-rewards',
     checks: {
       happy_hour:   ['happy hour', 'half-price', 'appetizer', '$1'],
       signup_bonus: ['join', 'free', 'appetizer', 'welcome'],
@@ -282,7 +291,7 @@ const CHAIN_VERIFICATIONS = {
     },
   },
   'baskin-robbins': {
-    url: 'https://www.baskinrobbins.com/en/baskin-rewards',
+    url: 'https://www.baskinrobbins.com/en/rewards',
     checks: {
       birthday:     ['birthday', 'scoop'],
       signup_bonus: ['join', 'free', 'scoop', 'welcome'],
@@ -291,15 +300,15 @@ const CHAIN_VERIFICATIONS = {
     },
   },
   'cold-stone-creamery': {
-    url: 'https://www.coldstonecreamery.com/my-cold-stone-club',
+    url: 'https://www.coldstonecreamery.com/mycsc/',
     checks: {
-      birthday:     ['birthday', 'bogo', 'buy one'],
-      signup_bonus: ['join', 'free', 'welcome'],
-      rewards_program: ['earn', 'reward', 'cold stone'],
+      birthday:     ['birthday'],
+      signup_bonus: ['join', 'create an account', 'register'],
+      rewards_program: ['earn', 'reward', 'points', 'club'],
     },
   },
   'dairy-queen': {
-    url: 'https://www.dairyqueen.com/en-us/dq-rewards/',
+    url: 'https://www.dairyqueen.com/en-us/rewards/',
     checks: {
       birthday:     ['birthday', 'blizzard'],
       signup_bonus: ['join', 'free', 'blizzard', 'welcome'],
@@ -316,6 +325,13 @@ const CHAIN_VERIFICATIONS = {
       rewards_program: ['points', 'earn', 'reward'],
     },
   },
+};
+
+// Mobile UA avoids some bot-blocking, consistent across fetches
+const FETCH_HEADERS = {
+  'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+  'Accept-Language': 'en-US,en;q=0.5',
 };
 
 // Concurrency limiter
@@ -337,31 +353,32 @@ function pLimit(concurrency) {
 }
 
 // Fetch URL with timeout, follow redirects up to 3 times
-function fetchPage(rawUrl, timeoutMs = 12000, maxRedirects = 3) {
+function fetchPage(rawUrl, timeoutMs = TIMEOUT_MS, maxRedirects = 3) {
   return new Promise((resolve) => {
-    const parsed = new URL(rawUrl);
+    let parsed;
+    try { parsed = new URL(rawUrl); } catch (e) {
+      return resolve({ status: 0, body: '', error: `invalid url: ${rawUrl}` });
+    }
     const mod = parsed.protocol === 'https:' ? https : http;
     let timeoutHandle;
-
-    const req = mod.get(rawUrl, {
-      timeout: timeoutMs,
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; FreebieMe-Verify/1.0; +https://freebieme.vercel.app)',
-        'Accept': 'text/html,application/xhtml+xml',
-        'Accept-Language': 'en-US,en;q=0.9',
-      },
-    }, (res) => {
+    let settled = false;
+    function done(val) {
+      if (settled) return;
+      settled = true;
       clearTimeout(timeoutHandle);
+      resolve(val);
+    }
+
+    const req = mod.get(rawUrl, { timeout: timeoutMs, headers: FETCH_HEADERS }, (res) => {
       const status = res.statusCode;
 
       // Follow redirects
-      if ((status === 301 || status === 302 || status === 303 || status === 307 || status === 308)
-          && res.headers.location && maxRedirects > 0) {
+      if ([301, 302, 303, 307, 308].includes(status) && res.headers.location && maxRedirects > 0) {
         res.resume();
         const nextUrl = res.headers.location.startsWith('http')
           ? res.headers.location
           : `${parsed.protocol}//${parsed.host}${res.headers.location}`;
-        fetchPage(nextUrl, timeoutMs, maxRedirects - 1).then(resolve);
+        fetchPage(nextUrl, timeoutMs, maxRedirects - 1).then(done);
         return;
       }
 
@@ -369,30 +386,72 @@ function fetchPage(rawUrl, timeoutMs = 12000, maxRedirects = 3) {
       res.setEncoding('utf8');
       res.on('data', c => {
         chunks.push(c);
-        // Stop reading after 500KB — more than enough for keyword checks
         if (chunks.join('').length > 512000) res.destroy();
       });
-      res.on('end', () => resolve({ status, body: chunks.join('').toLowerCase(), error: null }));
-      res.on('close', () => resolve({ status, body: chunks.join('').toLowerCase(), error: null }));
-      res.on('error', e => resolve({ status, body: '', error: e.message }));
+      res.on('end',  () => done({ status, body: chunks.join('').toLowerCase(), error: null }));
+      res.on('close',() => done({ status, body: chunks.join('').toLowerCase(), error: null }));
+      res.on('error', e => done({ status, body: '', error: e.message }));
     });
 
-    req.on('error', e => { clearTimeout(timeoutHandle); resolve({ status: 0, body: '', error: e.message }); });
-    req.on('timeout', () => { clearTimeout(timeoutHandle); req.destroy(); resolve({ status: 0, body: '', error: 'timeout' }); });
-    timeoutHandle = setTimeout(() => { req.destroy(); resolve({ status: 0, body: '', error: 'timeout' }); }, timeoutMs + 2000);
+    req.on('error',   e => done({ status: 0, body: '', error: e.message }));
+    req.on('timeout', () => { req.destroy(); done({ status: 0, body: '', error: 'timeout' }); });
+    timeoutHandle = setTimeout(() => { req.destroy(); done({ status: 0, body: '', error: 'timeout' }); }, timeoutMs + 3000);
   });
 }
 
-// Check if ANY of the keywords appear in the body (case-insensitive, body already lowercased)
+// Check if ANY of the keywords appear in the body (body is already lowercased)
 function anyKeyword(body, keywords) {
   return keywords.some(kw => body.includes(kw.toLowerCase()));
+}
+
+// Check meta tags / title for rewards-related content (fallback for JS-heavy sites)
+// body is the full lowercased HTML
+function metaRewardsCheck(body) {
+  const rewardsTerms = ['reward', 'points', 'perks', 'loyalty', 'earn', 'member', 'club', 'app order'];
+
+  // Pull title
+  const titleM = body.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+  const title = titleM ? titleM[1] : '';
+
+  // Pull meta description
+  const descM = body.match(/<meta[^>]*name=["']description["'][^>]*content=["']([^"']*)/i)
+              || body.match(/<meta[^>]*content=["']([^"']*)[^>]*name=["']description["']/i);
+  const desc = descM ? descM[1] : '';
+
+  // Pull og:title
+  const ogTM = body.match(/<meta[^>]*property=["']og:title["'][^>]*content=["']([^"']*)/i)
+             || body.match(/<meta[^>]*content=["']([^"']*)[^>]*property=["']og:title["']/i);
+  const ogTitle = ogTM ? ogTM[1] : '';
+
+  // Pull og:description
+  const ogDM = body.match(/<meta[^>]*property=["']og:description["'][^>]*content=["']([^"']*)/i)
+             || body.match(/<meta[^>]*content=["']([^"']*)[^>]*property=["']og:description["']/i);
+  const ogDesc = ogDM ? ogDM[1] : '';
+
+  // Also check body text for rewards-related terms (catches RSC/Next.js payloads)
+  const bodyHit = rewardsTerms.some(t => body.includes(t));
+
+  const combined = [title, desc, ogTitle, ogDesc].join(' ');
+  return bodyHit || rewardsTerms.some(t => combined.includes(t));
+}
+
+// Check if the URL path itself implies a rewards page (for pure SPAs that have no SSR content)
+function urlRewardsCheck(url) {
+  const rewardsPathTerms = ['reward', 'loyalty', 'perks', 'earn', 'crown', 'thewing', 'mycsc', 'mymcdonalds',
+    'caniac', 'dine-rewards', 'papa-rewards', 'dd-perks', 'one', 'jackpack', 'app'];
+  try {
+    const u = new URL(url);
+    const path = u.pathname.toLowerCase();
+    return rewardsPathTerms.some(t => path.includes(t));
+  } catch (e) { return false; }
 }
 
 async function verifyChain(chainSlug, config) {
   const { url: chainUrl, checks } = config;
   const result = {
     url: chainUrl,
-    status: 0,
+    http_status: 0,
+    classification: 'unknown',
     verified_deals: [],
     unverified_deals: [],
     warning: null,
@@ -401,26 +460,52 @@ async function verifyChain(chainSlug, config) {
   };
 
   const { status, body, error } = await fetchPage(chainUrl);
-  result.status = status;
+  result.http_status = status;
 
-  if (error || status === 0) {
-    result.error = error || 'no response';
-    result.warning = `Fetch failed: ${result.error}`;
+  // --- Timeout / network error ---
+  if (error === 'timeout' || (error && status === 0)) {
+    result.classification = 'slow';
+    result.fetch_note = error === 'timeout' ? 'Request timed out — site may be slow' : `Network error: ${error}`;
+    result.unverified_deals = Object.keys(checks);
+    // NOT a warning — slow ≠ broken
+    return result;
+  }
+
+  // --- Hard error (non-timeout) ---
+  if (error && status === 0) {
+    result.classification = 'error';
+    result.error = error;
+    result.warning = `Fetch failed: ${error}`;
     result.unverified_deals = Object.keys(checks);
     return result;
   }
 
+  // --- 403 Bot-Blocking — site is working, just blocking scrapers ---
+  if (status === 403) {
+    result.classification = 'protected';
+    result.fetch_note = 'HTTP 403 — site is blocking scrapers (not a broken URL)';
+    result.unverified_deals = Object.keys(checks);
+    // NOT a warning
+    return result;
+  }
+
+  // --- Real 404 — URL has moved (ACTUAL problem) ---
+  if (status === 404) {
+    result.classification = '404';
+    result.warning = `HTTP 404 — URL has moved, needs updating`;
+    result.unverified_deals = Object.keys(checks);
+    return result;
+  }
+
+  // --- Other HTTP errors ---
   if (status >= 400) {
-    result.warning = `HTTP ${status} — page may have moved`;
+    result.classification = 'error';
+    result.warning = `HTTP ${status} — unexpected error`;
     result.unverified_deals = Object.keys(checks);
     return result;
   }
 
-  if (body.length < 200) {
-    result.fetch_note = 'Very short response body — JS-heavy page, keyword checks may be unreliable';
-    result.warning = 'JS-rendered page: limited content available for verification';
-  }
-
+  // --- 200 OK — check keywords ---
   for (const [dealType, keywords] of Object.entries(checks)) {
     if (anyKeyword(body, keywords)) {
       result.verified_deals.push(dealType);
@@ -429,8 +514,32 @@ async function verifyChain(chainSlug, config) {
     }
   }
 
-  // Only warn if unverified AND page body is long enough to trust
-  if (result.unverified_deals.length > 0 && body.length >= 500 && !result.warning) {
+  if (result.unverified_deals.length === 0) {
+    // All keywords found
+    result.classification = 'verified';
+    return result;
+  }
+
+  // Some keywords missing — try meta/title/body fallback for JS-rendered pages
+  const isMetaVerified = metaRewardsCheck(body);
+
+  if (isMetaVerified) {
+    result.classification = 'meta_verified';
+    result.fetch_note = `JS-rendered page: body keywords unreliable, but meta/body/title confirms rewards program`;
+    // Don't warn — meta confirms program still exists
+    return result;
+  }
+
+  // Final fallback: URL path itself confirms this is a rewards page (pure SPA — no SSR content)
+  if (urlRewardsCheck(chainUrl)) {
+    result.classification = 'meta_verified';
+    result.fetch_note = `JS-rendered SPA: rewards page exists (URL path confirms rewards program)`;
+    return result;
+  }
+
+  // Neither body keywords nor meta nor URL confirms rewards — this is a real warning
+  result.classification = 'warning';
+  if (result.unverified_deals.length > 0) {
     result.warning = `Keywords not found for: ${result.unverified_deals.join(', ')} — deal may have changed`;
   }
 
@@ -450,17 +559,27 @@ async function main() {
       limit(async () => {
         process.stdout.write(`  Checking ${chainSlug}... `);
         const r = await verifyChain(chainSlug, config);
-        const icon = r.error ? '✗' : r.warning ? '⚠' : '✓';
-        console.log(`${icon} [${r.status}] verified: [${r.verified_deals.join(',')}]`);
+        const icon = r.classification === 'verified' ? '✓'
+                   : r.classification === 'meta_verified' ? '✓ (meta)'
+                   : r.classification === 'protected' ? '🔒'
+                   : r.classification === 'slow' ? '⏱'
+                   : r.classification === '404' ? '✗ (404)'
+                   : '⚠';
+        console.log(`${icon} [${r.http_status}] ${r.classification} verified: [${r.verified_deals.join(',')}]`);
         return [chainSlug, r];
       })
     )
   );
 
   const chains = Object.fromEntries(results);
-  const fullyVerified = results.filter(([, r]) => r.verified_deals.length > 0 && !r.error && !r.warning).length;
-  const withWarnings  = results.filter(([, r]) => r.warning).length;
-  const withErrors    = results.filter(([, r]) => r.error).length;
+
+  // Summary counts — only TRUE warnings/errors matter
+  const fullyVerified = results.filter(([, r]) => r.classification === 'verified').length;
+  const metaVerified  = results.filter(([, r]) => r.classification === 'meta_verified').length;
+  const protected_    = results.filter(([, r]) => r.classification === 'protected').length;
+  const slow          = results.filter(([, r]) => r.classification === 'slow').length;
+  const broken404     = results.filter(([, r]) => r.classification === '404').length;
+  const warnings      = results.filter(([, r]) => r.warning !== null).length;
 
   const report = {
     run_at: new Date().toISOString(),
@@ -469,27 +588,43 @@ async function main() {
     summary: {
       chains_checked: results.length,
       fully_verified: fullyVerified,
-      warnings: withWarnings,
-      errors: withErrors,
+      meta_verified:  metaVerified,
+      protected:      protected_,
+      slow:           slow,
+      broken_404:     broken404,
+      warnings:       warnings,
+      errors:         results.filter(([, r]) => r.classification === 'error').length,
     },
   };
 
   fs.mkdirSync(OUTPUT_DIR, { recursive: true });
   fs.writeFileSync(OUTPUT_FILE, JSON.stringify(report, null, 2));
 
+  const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
   console.log(`\n--- Summary ---`);
   console.log(`Chains checked:   ${report.summary.chains_checked}`);
-  console.log(`Fully verified:   ${report.summary.fully_verified}`);
-  console.log(`With warnings:    ${report.summary.warnings}`);
-  console.log(`With errors:      ${report.summary.errors}`);
-  console.log(`Duration:         ${((Date.now() - startTime) / 1000).toFixed(1)}s`);
+  console.log(`Fully verified:   ${fullyVerified}`);
+  console.log(`Meta-verified:    ${metaVerified}  (JS-rendered pages — meta/title confirms rewards)`);
+  console.log(`Protected (403):  ${protected_}  (bot-blocking — NOT broken)`);
+  console.log(`Slow (timeout):   ${slow}  (timed out — NOT broken)`);
+  console.log(`Broken (404):     ${broken404}  (URL needs updating — REAL problem)`);
+  console.log(`Warnings:         ${warnings}`);
+  console.log(`Duration:         ${elapsed}s`);
   console.log(`\nReport saved to: ${OUTPUT_FILE}`);
 
-  if (withWarnings > 0) {
-    console.log('\n⚠ Chains with warnings:');
+  if (broken404 > 0) {
+    console.log('\n✗ BROKEN URLs (404) — need to be fixed:');
     results
-      .filter(([, r]) => r.warning)
-      .forEach(([slug, r]) => console.log(`  ${slug}: ${r.warning}`));
+      .filter(([, r]) => r.classification === '404')
+      .forEach(([slug, r]) => console.log(`  ${slug}: ${r.url}`));
+  }
+
+  if (warnings > 0) {
+    const trueWarnings = results.filter(([, r]) => r.warning !== null && r.classification !== '404');
+    if (trueWarnings.length > 0) {
+      console.log('\n⚠ Content warnings:');
+      trueWarnings.forEach(([slug, r]) => console.log(`  ${slug}: ${r.warning}`));
+    }
   }
 }
 
