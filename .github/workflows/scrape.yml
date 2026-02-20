@@ -1,8 +1,8 @@
-name: FreebieMe Daily Scraper
+name: FreebieMe Daily Scraper (DISABLED — use deal-update.yml instead)
+# NOTE: This workflow has been disabled. Use deal-update.yml for daily runs.
+# This file is kept for reference only. Run manually if you want to test the Playwright scraper.
 
 on:
-  schedule:
-    - cron: '0 9 * * *'   # 4 AM ET = 9 AM UTC daily
   workflow_dispatch:
     inputs:
       refresh_locations:
