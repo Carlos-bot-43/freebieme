@@ -1,7 +1,7 @@
 # FreebieMe Deal Status
 
 **Date:** 2026-02-20
-**Run at:** 2026-02-20T22:01:56.776Z
+**Run at:** 2026-02-20T22:11:27.767Z
 
 ---
 
@@ -32,20 +32,16 @@
 
 | Classification | Count | Meaning |
 |----------------|-------|---------|
-| ✅ Fully verified | 15 | Keywords found in static HTML |
+| ✅ Fully verified | 18 | Keywords found in static HTML |
 | ✅ Meta-verified | 9 | JS-rendered — meta/URL confirms program |
-| 🔒 Protected (403) | 7 | Bot-blocking — NOT broken |
-| ⏱ Slow (timeout) | 2 | Timed out — NOT broken |
+| 🔒 Protected (403) | 6 | Bot-blocking — NOT broken |
+| ⏱ Slow (timeout) | 1 | Timed out — NOT broken |
 | ❌ Broken (404) | 0 | URL needs updating — REAL problem |
-| ⚠️ Content warnings | 1 | Deal content may have changed |
-| **Duration** | 20.3s | Total verification time |
+| ⚠️ Content warnings | 0 | Deal content may have changed |
+| **Duration** | 20.7s | Total verification time |
 
 
-### Content Warnings
-
-| Chain | Warning |
-|-------|---------|
-| red-lobster | Keywords not found for: birthday, app_deal — deal may have changed |
+> ✅ No content warnings — all rewards pages look healthy
 
 
 ---
@@ -57,7 +53,7 @@
 | mcdonalds | ✅ (meta) | 200 | signup_bonus, app_deal, rewards_program |
 | chipotle | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 | starbucks | ✅ | 200 | birthday, signup_bonus, app_deal, happy_hour, rewards_program |
-| subway | ⏱ (slow) | timeout | (JS-rendered) |
+| subway | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 | dunkin | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 | chick-fil-a | ✅ | 200 | birthday, signup_bonus, rewards_program |
 | burger-king | ✅ (meta) | 200 | app_deal |
@@ -83,10 +79,10 @@
 | chilis | ✅ (meta) | 200 | signup_bonus, rewards_program |
 | panera | 🔒 (protected) | 403 | (bot-blocked) |
 | olive-garden | ✅ (meta) | 200 | signup_bonus, rewards_program |
-| red-lobster | ⚠️ | 200 | signup_bonus, rewards_program |
+| red-lobster | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 | baskin-robbins | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 | cold-stone-creamery | ✅ | 200 | birthday, signup_bonus, rewards_program |
-| dairy-queen | 🔒 (protected) | 403 | (bot-blocked) |
+| dairy-queen | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 | taco-bell | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 
 ---
