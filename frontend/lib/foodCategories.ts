@@ -1,42 +1,3 @@
-// Map from chain slug to food categories
-// Loaded from chains.json at build time (server) or hardcoded here for client use
-export const CHAIN_FOOD_CATEGORIES: Record<string, string[]> = {
-  'mcdonalds': ['burgers', 'fries', 'breakfast', 'chicken'],
-  'burger-king': ['burgers', 'fries', 'breakfast'],
-  'wendys': ['burgers', 'fries', 'breakfast', 'chicken'],
-  'shake-shack': ['burgers', 'fries', 'shakes', 'ice-cream'],
-  'whataburger': ['burgers', 'fries', 'breakfast'],
-  'jack-in-the-box': ['burgers', 'tacos', 'fries', 'breakfast'],
-  'del-taco': ['tacos', 'mexican', 'burgers', 'fries'],
-  'dairy-queen': ['ice-cream', 'dessert', 'burgers', 'fries'],
-  'sonic': ['burgers', 'fries', 'hot-dogs', 'drinks', 'ice-cream'],
-  'chipotle': ['mexican', 'tacos', 'burritos'],
-  'taco-bell': ['tacos', 'mexican', 'burritos'],
-  'pizza-hut': ['pizza', 'wings'],
-  'dominos': ['pizza', 'wings', 'sandwiches'],
-  'papa-johns': ['pizza'],
-  'chick-fil-a': ['chicken', 'sandwiches', 'breakfast'],
-  'kfc': ['chicken', 'fries', 'breakfast'],
-  'popeyes': ['chicken', 'sandwiches', 'fries'],
-  'wingstop': ['wings', 'chicken', 'fries'],
-  'raising-canes': ['chicken', 'fries', 'sandwiches'],
-  'panda-express': ['chinese', 'asian', 'rice', 'noodles'],
-  'subway': ['sandwiches', 'subs'],
-  'jersey-mikes': ['sandwiches', 'subs'],
-  'panera': ['sandwiches', 'soup', 'salads', 'breakfast', 'coffee'],
-  'starbucks': ['coffee', 'drinks', 'breakfast'],
-  'dunkin': ['coffee', 'drinks', 'donuts', 'breakfast'],
-  'baskin-robbins': ['ice-cream', 'dessert'],
-  'cold-stone-creamery': ['ice-cream', 'dessert'],
-  'waffle-house': ['breakfast', 'waffles', 'eggs'],
-  'ihop': ['breakfast', 'pancakes', 'eggs', 'waffles'],
-  'dennys': ['breakfast', 'burgers', 'eggs', 'pancakes'],
-  'applebees': ['burgers', 'wings', 'casual-dining', 'drinks'],
-  'chilis': ['burgers', 'tacos', 'casual-dining', 'drinks'],
-  'olive-garden': ['italian', 'pasta', 'casual-dining'],
-  'red-lobster': ['seafood', 'casual-dining'],
-};
-
 export const FOOD_CATEGORY_LABELS: Record<string, string> = {
   'burgers': '🍔 Burgers',
   'pizza': '🍕 Pizza',
@@ -53,7 +14,7 @@ export const FOOD_CATEGORY_LABELS: Record<string, string> = {
   'seafood': '🦞 Seafood',
   'asian': '🥢 Asian',
   'dessert': '🍨 Dessert',
-  'casual-dining': '🍽️ Casual Dining',
+  'casual-dining': '🍽️ Dine-In',
   'drinks': '🥤 Drinks',
 };
 

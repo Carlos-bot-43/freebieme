@@ -140,7 +140,15 @@ export function groupDeals(deals: Deal[], userLat?: number, userLng?: number): D
 
   const result = Array.from(groups.values());
 
-  // Sort: by nearest distance if available, else by confidence_score desc
+  // Claim type priority — actionability-first ordering
+  const CLAIM_PRIORITY: Record<string, number> = {
+    instant: 0,          // Use right now — best
+    same_day_setup: 1,   // ~10 min setup — great
+    birthday_only: 2,    // Need birthday month — relevant but conditional
+    advance_required: 3, // Rewards programs — long-term, least urgent
+  };
+
+  // Sort: by nearest distance if available, else by actionability + confidence_score
   if (userLat && userLng) {
     result.sort((a, b) => {
       if (a.nearestDistance === null) return 1;
@@ -148,7 +156,12 @@ export function groupDeals(deals: Deal[], userLat?: number, userLng?: number): D
       return a.nearestDistance - b.nearestDistance;
     });
   } else {
-    result.sort((a, b) => b.confidence_score - a.confidence_score);
+    result.sort((a, b) => {
+      const pa = CLAIM_PRIORITY[a.claim_type] ?? 3;
+      const pb = CLAIM_PRIORITY[b.claim_type] ?? 3;
+      if (pa !== pb) return pa - pb; // Actionable deals first
+      return b.confidence_score - a.confidence_score; // Then by confidence
+    });
   }
 
   return result;
