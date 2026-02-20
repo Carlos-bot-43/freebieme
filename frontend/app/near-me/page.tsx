@@ -146,14 +146,35 @@ export default function NearMePage() {
           </div>
         )}
 
-        {/* Error state */}
+        {/* Error state — GPS denied or unavailable */}
         {step === 'error' && (
-          <div className="text-center py-12">
-            <div className="text-4xl mb-4">📍</div>
-            <p className="text-gray-700 font-medium mb-2">{errorMsg}</p>
-            <Link href="/" className="text-blue-600 text-sm hover:underline">
-              ← Browse all cities
-            </Link>
+          <div className="py-8">
+            <div className="text-center mb-6">
+              <div className="text-4xl mb-3">📍</div>
+              <p className="text-gray-700 font-medium mb-1">{errorMsg}</p>
+              <p className="text-sm text-gray-400">Pick a city below to see deals</p>
+            </div>
+            {/* Popular cities quick-pick */}
+            <div className="grid grid-cols-2 gap-2 mb-6">
+              {['new-york-ny', 'los-angeles-ca', 'chicago-il', 'houston-tx', 'miami-fl', 'dallas-tx', 'atlanta-ga', 'seattle-wa'].map((slug) => {
+                const city = cities.find(c => c.slug === slug);
+                if (!city) return null;
+                return (
+                  <Link
+                    key={slug}
+                    href={`/deals/${slug}`}
+                    className="block bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 hover:border-blue-300 hover:text-blue-700 hover:bg-blue-50 transition-colors text-center"
+                  >
+                    {city.name}
+                  </Link>
+                );
+              })}
+            </div>
+            <div className="text-center">
+              <Link href="/" className="text-sm text-blue-600 hover:underline">
+                ← See all 74 cities →
+              </Link>
+            </div>
           </div>
         )}
 
