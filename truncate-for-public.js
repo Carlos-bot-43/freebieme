@@ -1,6 +1,9 @@
 // Generates truncated city deal files for frontend/public/data/deals/
 // Limits to 1000 deals per city, with CHAIN+DEAL_TYPE DIVERSITY guaranteed.
 // Each city will include deals from ALL chain+deal_type combos (not just top chains).
+//
+// SELF-HEALING GUARD: if the new deal count drops >5% vs the previous run,
+// the script aborts and keeps existing files to prevent data loss from bad runs.
 
 const fs = require('fs');
 const path = require('path');
@@ -9,6 +12,31 @@ const { getClaimType, getClaimSteps, getValueSummary, HAPPY_HOUR_DATA } = requir
 
 const INPUT  = path.join(__dirname, 'data/output/deals');
 const OUTPUT = path.join(__dirname, 'frontend/public/data/deals');
+const DATA_DIR = path.join(__dirname, 'data');
+const LAST_GOOD_RUN_FILE = path.join(DATA_DIR, 'last-good-run.json');
+const DEAL_CHANGELOG_FILE = path.join(DATA_DIR, 'deal-changelog.json');
+
+// Count total deals in a directory of JSON city files
+function countDealsInDir(dir) {
+  let total = 0;
+  const chainCounts = {};
+  if (!fs.existsSync(dir)) return { total: 0, cities: 0, chainCounts: {}, cityCounts: {} };
+  const files = fs.readdirSync(dir).filter(f => f.endsWith('.json'));
+  const cityCounts = {};
+  for (const file of files) {
+    try {
+      const data = JSON.parse(fs.readFileSync(path.join(dir, file)));
+      const deals = data.deals || [];
+      total += deals.length;
+      cityCounts[file.replace('.json', '')] = deals.length;
+      for (const deal of deals) {
+        const slug = deal.chain_slug || 'unknown';
+        chainCounts[slug] = (chainCounts[slug] || 0) + 1;
+      }
+    } catch (e) { /* skip bad files */ }
+  }
+  return { total, cities: files.length, chainCounts, cityCounts };
+}
 
 const DEAL_TYPE_PRIORITY = {
   birthday: 0, signup_bonus: 1, freebie: 2,
@@ -28,6 +56,15 @@ function dealScore(deal) {
 
 fs.mkdirSync(OUTPUT, { recursive: true });
 
+// --- Self-healing guard: snapshot the current OUTPUT state BEFORE we write ---
+const prevState = countDealsInDir(OUTPUT);
+const prevTotal = prevState.total;
+if (prevTotal > 0) {
+  console.log(`Previous deal count: ${prevTotal} deals across ${prevState.cities} cities`);
+}
+
+// Collect all new file outputs in memory first — don't write until guard passes
+const pendingWrites = []; // { file, content, dealCount }
 let total = 0;
 
 for (const file of fs.readdirSync(INPUT).filter(f => f.endsWith('.json'))) {
@@ -35,7 +72,7 @@ for (const file of fs.readdirSync(INPUT).filter(f => f.endsWith('.json'))) {
   const deals = data.deals || [];
 
   if (deals.length === 0) {
-    fs.writeFileSync(path.join(OUTPUT, file), JSON.stringify({ ...data, deals: [], deal_count: 0 }));
+    pendingWrites.push({ file, content: JSON.stringify({ ...data, deals: [], deal_count: 0 }), dealCount: 0 });
     continue;
   }
 
@@ -152,7 +189,8 @@ for (const file of fs.readdirSync(INPUT).filter(f => f.endsWith('.json'))) {
   data.deal_count = stripped.length;
   data.truncated_to = LIMIT;
 
-  fs.writeFileSync(path.join(OUTPUT, file), JSON.stringify(data));
+  // Buffer the write — don't commit to disk yet
+  pendingWrites.push({ file, content: JSON.stringify(data), dealCount: stripped.length });
   total += selected.length;
 
   // Show chain diversity in output
@@ -161,4 +199,105 @@ for (const file of fs.readdirSync(INPUT).filter(f => f.endsWith('.json'))) {
   console.log(`${file}: ${selected.length} deals | ${chainSet.size} chains | ${chainTypeSet.size} chain+type combos`);
 }
 
-console.log(`\nTotal: ${total} deals across ${fs.readdirSync(OUTPUT).length} cities`);
+// === SELF-HEALING GUARD ===
+const newTotal = total;
+const DROP_THRESHOLD = 0.05; // 5%
+
+if (prevTotal > 0 && newTotal < prevTotal * (1 - DROP_THRESHOLD)) {
+  const dropPct = (((prevTotal - newTotal) / prevTotal) * 100).toFixed(1);
+  console.error(`\nERROR: Deal count dropped from ${prevTotal} to ${newTotal} (${dropPct}% decrease, threshold is ${DROP_THRESHOLD * 100}%).`);
+  console.error('Keeping existing files. Investigate the input data before re-running.');
+
+  // Log which cities had big drops
+  const prevCityCounts = prevState.cityCounts || {};
+  const newCityCounts = {};
+  for (const { file, dealCount } of pendingWrites) {
+    newCityCounts[file.replace('.json', '')] = dealCount;
+  }
+  const bigDrops = Object.entries(newCityCounts)
+    .filter(([city, n]) => prevCityCounts[city] && n < prevCityCounts[city] * 0.8)
+    .map(([city, n]) => `  ${city}: ${prevCityCounts[city]} → ${n}`);
+  if (bigDrops.length > 0) {
+    console.error('Cities with >20% deal loss:');
+    bigDrops.forEach(l => console.error(l));
+  }
+  process.exit(1);
+}
+
+// Guard passed — write all files
+for (const { file, content } of pendingWrites) {
+  fs.writeFileSync(path.join(OUTPUT, file), content);
+}
+console.log(`\nTotal: ${total} deals across ${pendingWrites.length} cities`);
+
+// Also write empty cities (zero deals)
+const emptyCount = fs.readdirSync(OUTPUT).length - pendingWrites.length;
+if (emptyCount < 0) {
+  // New cities added, no problem
+}
+
+// === UPDATE last-good-run.json ===
+const chainsWithDeals = new Set();
+for (const { content } of pendingWrites) {
+  try {
+    const data = JSON.parse(content);
+    for (const deal of (data.deals || [])) {
+      if (deal.chain_slug) chainsWithDeals.add(deal.chain_slug);
+    }
+  } catch (e) {}
+}
+
+const lastGoodRun = {
+  run_at: new Date().toISOString(),
+  total_deals: total,
+  cities: pendingWrites.length,
+  chains_with_deals: chainsWithDeals.size,
+};
+fs.mkdirSync(DATA_DIR, { recursive: true });
+fs.writeFileSync(LAST_GOOD_RUN_FILE, JSON.stringify(lastGoodRun, null, 2));
+console.log(`\nLast good run saved: ${total} deals, ${pendingWrites.length} cities, ${chainsWithDeals.size} chains`);
+
+// === UPDATE deal-changelog.json ===
+try {
+  const today = new Date().toISOString().slice(0, 10);
+  let changelog = [];
+  if (fs.existsSync(DEAL_CHANGELOG_FILE)) {
+    try { changelog = JSON.parse(fs.readFileSync(DEAL_CHANGELOG_FILE)); } catch (e) {}
+  }
+
+  // Compute simple diff vs previous run
+  const prevCityMap = {};
+  if (prevState.cityCounts) {
+    Object.assign(prevCityMap, prevState.cityCounts);
+  }
+  const newCityMap = {};
+  for (const { file, dealCount } of pendingWrites) {
+    newCityMap[file.replace('.json', '')] = dealCount;
+  }
+
+  const dealsAdded = [];
+  const dealsRemoved = [];
+  for (const [city, newCount] of Object.entries(newCityMap)) {
+    const prevCount = prevCityMap[city] || 0;
+    if (newCount > prevCount) dealsAdded.push({ city, added: newCount - prevCount });
+    else if (newCount < prevCount) dealsRemoved.push({ city, removed: prevCount - newCount });
+  }
+
+  const entry = {
+    date: today,
+    deals_added: dealsAdded,
+    deals_removed: dealsRemoved,
+    deals_changed: [],
+    total_after: total,
+    prev_total: prevTotal,
+  };
+
+  changelog.push(entry);
+  // Keep only last 30 entries
+  if (changelog.length > 30) changelog = changelog.slice(-30);
+
+  fs.writeFileSync(DEAL_CHANGELOG_FILE, JSON.stringify(changelog, null, 2));
+  console.log(`Changelog updated (${changelog.length} entries, last 30 kept).`);
+} catch (e) {
+  console.warn('Changelog update failed (non-fatal):', e.message);
+}

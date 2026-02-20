@@ -1,0 +1,39 @@
+[
+  {
+    "date": "2026-02-20",
+    "deals_added": [
+      {
+        "city": "albuquerque-nm",
+        "added": 54
+      },
+      {
+        "city": "fresno-ca",
+        "added": 70
+      },
+      {
+        "city": "memphis-tn",
+        "added": 24
+      },
+      {
+        "city": "new-orleans-la",
+        "added": 19
+      },
+      {
+        "city": "oklahoma-city-ok",
+        "added": 66
+      },
+      {
+        "city": "orlando-fl",
+        "added": 93
+      },
+      {
+        "city": "tucson-az",
+        "added": 43
+      }
+    ],
+    "deals_removed": [],
+    "deals_changed": [],
+    "total_after": 72551,
+    "prev_total": 72182
+  }
+]
