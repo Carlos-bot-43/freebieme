@@ -42,6 +42,44 @@ function formatHHTime(timeStr: string): string {
   return m === 0 ? `${hour} ${period}` : `${hour}:${m.toString().padStart(2, '0')} ${period}`;
 }
 
+// Robust happy hour day parser — handles all known and future day string patterns
+function isHappyHourActiveToday(dayStr: string): boolean {
+  const todayIdx = new Date().getDay(); // 0=Sun, 1=Mon...6=Sat
+  const s = dayStr.toLowerCase().trim();
+
+  if (s.includes('every day') || s.includes('daily')) return true;
+  if (s.includes('weekdays') || s.includes('weekday')) return todayIdx >= 1 && todayIdx <= 5;
+  if (s.includes('weekends') || s.includes('weekend')) return todayIdx === 0 || todayIdx === 6;
+  // Seasonal/select = unknown schedule → show as possibly active (don't hide)
+  if (s.includes('select') || s.includes('seasonal')) return true;
+
+  const DAY_IDX: Record<string, number> = {
+    sun: 0, mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6,
+  };
+
+  // Handle ranges like "Mon–Fri", "Mon-Fri", "Fri–Sun"
+  const rangeMatch = s.match(/([a-z]{3})[\s\u2013\-]+([a-z]{3})/);
+  if (rangeMatch) {
+    const startDay = DAY_IDX[rangeMatch[1].slice(0, 3)];
+    const endDay = DAY_IDX[rangeMatch[2].slice(0, 3)];
+    if (startDay !== undefined && endDay !== undefined) {
+      if (startDay <= endDay) {
+        return todayIdx >= startDay && todayIdx <= endDay;
+      } else {
+        // Wraps (e.g. Fri–Sun covers Fri=5, Sat=6, Sun=0)
+        return todayIdx >= startDay || todayIdx <= endDay;
+      }
+    }
+  }
+
+  // Single named day (e.g. "Friday", "Fri")
+  for (const [name, idx] of Object.entries(DAY_IDX)) {
+    if (s.startsWith(name)) return todayIdx === idx;
+  }
+
+  return true; // Unknown pattern → assume valid to avoid hiding real deals
+}
+
 interface DealGroupCardProps {
   group: DealGroup;
   userLat?: number;
@@ -88,13 +126,8 @@ export default function DealGroupCard({ group, userLat, userLng, cityName, updat
       const [endH, endM] = group.happy_hour_end!.split(':').map(Number);
       const dayStr = group.happy_hour_days || '';
 
-      // Check if today is a valid day
-      const todayIdx = now.getDay(); // 0=Sun, 1=Mon ... 6=Sat
-      const isWeekday = todayIdx >= 1 && todayIdx <= 5;
-      const validToday =
-        dayStr.includes('every day') ||
-        (dayStr.includes('Mon') && isWeekday) ||
-        dayStr.includes('select'); // seasonal = treat as unknown/possible
+      // Check if today is a valid day using robust parser
+      const validToday = isHappyHourActiveToday(dayStr);
 
       if (!validToday) {
         setHhStatus('closed');
@@ -130,6 +163,14 @@ export default function DealGroupCard({ group, userLat, userLng, cityName, updat
   const typeColor = DEAL_TYPE_COLORS[group.deal_type] || DEAL_TYPE_COLORS.other;
   const typeBorder = DEAL_TYPE_BORDER[group.deal_type] || DEAL_TYPE_BORDER.other;
   const claimConfig = group.claim_type ? CLAIM_TYPE_CONFIG[group.claim_type] : null;
+
+  // "New This Month" badge — show if updatedAt is in the current calendar month
+  const isNewThisMonth = (() => {
+    if (!updatedAt) return false;
+    const updated = new Date(updatedAt);
+    const now = new Date();
+    return updated.getMonth() === now.getMonth() && updated.getFullYear() === now.getFullYear();
+  })();
 
   const hasLocation = !!(userLat && userLng);
 
@@ -187,6 +228,11 @@ export default function DealGroupCard({ group, userLat, userLng, cityName, updat
             <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${typeColor}`}>
               {typeLabel}
             </span>
+            {isNewThisMonth && (
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-sky-100 text-sky-700">
+                🆕 New
+              </span>
+            )}
             {claimConfig && (
               <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${claimConfig.className}`}>
                 {claimConfig.label}
@@ -245,14 +291,20 @@ export default function DealGroupCard({ group, userLat, userLng, cityName, updat
 
       {/* Happy hour live status banner */}
       {hhStatus && (
-        <div className={`rounded-lg px-3 py-1.5 mb-2 text-xs font-medium ${
-          hhStatus === 'active'   ? 'bg-green-50 text-green-800 border border-green-200' :
-          hhStatus === 'upcoming' ? 'bg-yellow-50 text-yellow-800 border border-yellow-200' :
-                                    'bg-gray-50 text-gray-500 border border-gray-200'
-        }`}>
-          {hhStatus === 'active'   && `🟢 Happy Hour is ON now · ${hhCountdown}`}
-          {hhStatus === 'upcoming' && `🟡 ${hhCountdown}`}
-          {hhStatus === 'closed'   && `⚫ Happy hour is over for today · ${hhCountdown}`}
+        <div className="mb-2">
+          <div className={`rounded-lg px-3 py-1.5 text-xs font-medium ${
+            hhStatus === 'active'   ? 'bg-green-50 text-green-800 border border-green-200' :
+            hhStatus === 'upcoming' ? 'bg-yellow-50 text-yellow-800 border border-yellow-200' :
+                                      'bg-gray-50 text-gray-500 border border-gray-200'
+          }`}>
+            {hhStatus === 'active'   && `🟢 Happy Hour is ON now · ${hhCountdown}`}
+            {hhStatus === 'upcoming' && `🟡 ${hhCountdown}`}
+            {hhStatus === 'closed'   && `⚫ Happy hour is over for today · ${hhCountdown}`}
+          </div>
+          {/* Timezone disclaimer — only when active or upcoming */}
+          {(hhStatus === 'active' || hhStatus === 'upcoming') && (
+            <p className="text-xs text-gray-400 mt-0.5 pl-1">⏰ Times are local to each restaurant</p>
+          )}
         </div>
       )}
 
