@@ -30,6 +30,7 @@ export const TOP_FOOD_CATEGORIES = [
   'sandwiches',     // Subway, Jersey Mike's, Panera, Chick-fil-A
   'wings',          // Wingstop, Pizza Hut (wings deals)
   'casual-dining',  // Applebee's, Chili's, Olive Garden, Red Lobster
+  'drinks',         // Sonic half-price drinks, Starbucks, Dunkin' happy hour
 ];
 
 // Fuzzy search: map common user search terms to food categories
