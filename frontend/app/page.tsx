@@ -180,29 +180,22 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* 4A: Email capture */}
-      {/* TODO: Replace "xpwzrjqe" with your actual Formspree form ID from https://formspree.io */}
+      {/* Email capture — coming soon */}
       <div className="max-w-md mx-auto px-4 mt-2 mb-10">
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 text-center">
           <div className="text-3xl mb-3">📬</div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-1">Get weekly deal alerts</h2>
-          <p className="text-sm text-gray-500 mb-4">New freebies and limited-time deals delivered to your inbox</p>
-          <form action="https://formspree.io/f/xpwzrjqe" method="POST" className="flex gap-2">
-            <input
-              type="email"
-              name="email"
-              placeholder="your@email.com"
-              required
-              className="flex-1 px-4 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <button
-              type="submit"
-              className="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-blue-700 transition-colors"
-            >
-              Subscribe
-            </button>
-          </form>
-          <p className="text-xs text-gray-400 mt-2">No spam. Unsubscribe anytime.</p>
+          <h2 className="text-lg font-semibold text-gray-900 mb-1">Deal alerts — coming soon</h2>
+          <p className="text-sm text-gray-500 mb-4">
+            We&apos;re building weekly email alerts for new freebies and limited-time deals.
+            In the meantime, bookmark this page and check back regularly!
+          </p>
+          <Link
+            href="/near-me"
+            className="inline-block bg-blue-600 text-white px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-blue-700 transition-colors"
+          >
+            📍 Find free food near me →
+          </Link>
+          <p className="text-xs text-gray-400 mt-2">No account needed · Always free</p>
         </div>
       </div>
 

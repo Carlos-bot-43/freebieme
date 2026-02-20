@@ -92,16 +92,18 @@ export default function NearMePage() {
   }, [step, nearestCity]);
 
   // Compute groups filtered to actionable deals, sorted by distance
-  const { instant, today, allGroups } = useMemo(() => {
-    if (!cityDeals || userLat === null || userLng === null) return { instant: [], today: [], allGroups: [] };
+  const { instant, today, planAhead, allGroups } = useMemo(() => {
+    if (!cityDeals || userLat === null || userLng === null) return { instant: [], today: [], planAhead: [], allGroups: [] };
     const all = groupDeals(cityDeals.deals, userLat, userLng);
 
     // Instant: can use right now (happy hour + walk-in)
     const instant = all.filter(g => g.claim_type === 'instant' && (g.nearestDistance ?? 999) <= 10);
     // Today: signup bonus or app deal — claimable same visit
     const today = all.filter(g => g.claim_type === 'same_day_setup' && (g.nearestDistance ?? 999) <= 5);
+    // Plan ahead: birthday and advance-required deals (valuable but need prep)
+    const planAhead = all.filter(g => g.claim_type === 'birthday_only' || g.claim_type === 'advance_required').slice(0, 5);
 
-    return { instant, today, allGroups: all };
+    return { instant, today, planAhead, allGroups: all };
   }, [cityDeals, userLat, userLng]);
 
   const displayedToday = showAll ? today : today.slice(0, 6);
@@ -219,14 +221,29 @@ export default function NearMePage() {
               </section>
             )}
 
+            {/* 🎂 PLAN AHEAD section — birthday + advance-required deals */}
+            {planAhead.length > 0 && (
+              <section className="mb-8">
+                <h2 className="text-sm font-semibold text-pink-700 uppercase tracking-wide mb-3 flex items-center gap-2">
+                  <span className="bg-pink-100 px-2 py-0.5 rounded-full">🎂 Plan Ahead</span>
+                  <span className="text-gray-400 font-normal normal-case">Register now, free food later</span>
+                </h2>
+                <div className="space-y-2">
+                  {planAhead.map(group => (
+                    <NearMeDealCard key={group.group_id} group={group} userLat={userLat!} userLng={userLng!} />
+                  ))}
+                </div>
+              </section>
+            )}
+
             {/* Browse all link */}
             <div className="border-t border-gray-200 pt-6 text-center">
-              <p className="text-sm text-gray-500 mb-3">Want birthday freebies and rewards too?</p>
+              <p className="text-sm text-gray-500 mb-3">See all deals including rewards programs →</p>
               <Link
                 href={`/deals/${nearestCity.slug}`}
                 className="inline-block bg-blue-600 text-white px-6 py-3 rounded-xl font-medium text-sm hover:bg-blue-700 transition-colors"
               >
-                See all {allGroups.length} deals in {nearestCity.name} →
+                All {allGroups.length} deals in {nearestCity.name} →
               </Link>
             </div>
           </>

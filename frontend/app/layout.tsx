@@ -8,19 +8,21 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://freebieme.vercel.app'),
   title: "FreebieMe - Free Food Deals Near You",
-  description: "Find birthday freebies, app deals, sign-up bonuses, and restaurant rewards near you — at 50+ US cities. Updated regularly.",
+  description: "Find birthday freebies, app deals, sign-up bonuses, and restaurant rewards near you — at 34+ chains across 74 US cities. Updated regularly.",
   keywords: ["free food", "restaurant deals", "birthday freebies", "food coupons", "app deals", "free meals", "Starbucks birthday", "Chick-fil-A rewards"],
   openGraph: {
     title: "FreebieMe - Free Food Deals Near You",
     description: "Birthday freebies, app deals & sign-up bonuses at restaurants near you — always free.",
     type: "website",
     siteName: "FreebieMe",
+    url: "https://freebieme.vercel.app",
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "FreebieMe - Free Food Deals Near You",
-    description: "Birthday freebies, app deals & sign-up bonuses at 50+ US cities. Always free.",
+    description: "Birthday freebies, app deals & sign-up bonuses at 34+ chains across 74 US cities. Always free.",
   },
   robots: {
     index: true,
