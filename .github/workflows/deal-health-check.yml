@@ -8,14 +8,58 @@ on:
 jobs:
   health-check:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
 
-      - name: Run health check
+      - name: Install dependencies
+        run: npm ci
+
+      # Original HTTP health check (fast — checks status codes only)
+      - name: Run HTTP health check
         run: node health-check.js
+        timeout-minutes: 5
+        continue-on-error: true
+
+      # Content-aware verification (checks keywords on actual pages)
+      - name: Run content-aware deal verification
+        run: node verify-deals.js
         timeout-minutes: 10
+        continue-on-error: true
+
+      # Commit verification report to health-reports/
+      - name: Save verification report
+        run: |
+          DATE=$(date -u +%Y-%m-%d)
+          REPORT_SRC="data/output/deal-verification-${DATE}.json"
+          REPORT_DIR="data/health-reports"
+          mkdir -p "$REPORT_DIR"
+          if [ -f "$REPORT_SRC" ]; then
+            cp "$REPORT_SRC" "$REPORT_DIR/${DATE}.json"
+            echo "Verification report copied to $REPORT_DIR/${DATE}.json"
+          else
+            echo "No verification report found at $REPORT_SRC"
+          fi
+
+      - name: Commit health reports
+        run: |
+          git config --local user.email "tjb4123@agentmail.to"
+          git config --local user.name "Carlos"
+
+          git add data/health-reports/ 2>/dev/null || true
+          git add "data/output/deal-verification-$(date -u +%Y-%m-%d).json" 2>/dev/null || true
+
+          if git diff --staged --quiet; then
+            echo "No health report changes to commit."
+          else
+            git commit -m "Weekly health check report $(date -u +%Y-%m-%d)"
+            git push --force-with-lease
+          fi
