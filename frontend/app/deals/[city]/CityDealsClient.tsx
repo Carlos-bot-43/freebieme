@@ -113,7 +113,7 @@ export default function CityDealsClient({
     return () => { cancelled = true; };
   }, [cityConfig.slug]);
 
-  // Restore location from sessionStorage or auto-detect GPS
+  // Restore location from sessionStorage (auto-use cached); GPS only on explicit user action
   useEffect(() => {
     try {
       const cached = sessionStorage.getItem('freebieme_location');
@@ -123,29 +123,29 @@ export default function CityDealsClient({
         setLocationStatus('found'); setLocationLabel(label || 'saved');
         const { city: nearest } = findNearestCity(lat, lng, allCities);
         if (nearest.slug !== cityConfig.slug) setSuggestedCity(nearest);
-        return;
       }
+      // No GPS auto-request — user must tap the button below
     } catch {}
-
-    if (navigator.geolocation) {
-      setLocationStatus('detecting');
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const lat = pos.coords.latitude;
-          const lng = pos.coords.longitude;
-          setUserLat(lat); setUserLng(lng);
-          setLocationStatus('found'); setLocationLabel('GPS');
-          try { sessionStorage.setItem('freebieme_location', JSON.stringify({ lat, lng, label: 'GPS' })); } catch {}
-          const { city: nearest } = findNearestCity(lat, lng, allCities);
-          if (nearest.slug !== cityConfig.slug) setSuggestedCity(nearest);
-        },
-        () => setLocationStatus('error'),
-        { timeout: 8000, maximumAge: 300000 }
-      );
-    } else {
-      setLocationStatus('error');
-    }
   }, [cityConfig.slug, allCities]);
+
+  // Handler for the explicit "Use my location" button
+  const handleRequestGPS = () => {
+    if (!navigator.geolocation) { setLocationStatus('error'); return; }
+    setLocationStatus('detecting');
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        setUserLat(lat); setUserLng(lng);
+        setLocationStatus('found'); setLocationLabel('GPS');
+        try { sessionStorage.setItem('freebieme_location', JSON.stringify({ lat, lng, label: 'GPS' })); } catch {}
+        const { city: nearest } = findNearestCity(lat, lng, allCities);
+        if (nearest.slug !== cityConfig.slug) setSuggestedCity(nearest);
+      },
+      () => setLocationStatus('error'),
+      { timeout: 8000, maximumAge: 300000 }
+    );
+  };
 
   const handleCityChange = (slug: string) => router.push(`/deals/${slug}`);
 
@@ -354,6 +354,25 @@ export default function CityDealsClient({
                   hasLocation={locationStatus === 'found'}
                   defaultFoodCategory={defaultFoodCategory}
                 />
+                {/* GPS button — only shown when user hasn't yet shared location */}
+                {locationStatus === 'idle' && (
+                  <button
+                    onClick={handleRequestGPS}
+                    className="mt-3 w-full flex items-center justify-center gap-1.5 text-xs text-blue-600 border border-blue-200 rounded-xl py-2 px-3 bg-blue-50 hover:bg-blue-100 transition-colors font-medium"
+                  >
+                    📍 Use my location for distances
+                  </button>
+                )}
+                {locationStatus === 'detecting' && (
+                  <div className="mt-3 text-xs text-center text-gray-400 py-2">
+                    📍 Getting your location...
+                  </div>
+                )}
+                {locationStatus === 'found' && (
+                  <div className="mt-3 text-xs text-center text-green-600 py-1">
+                    📍 Sorting by distance from {locationLabel}
+                  </div>
+                )}
                 {/* Deal breakdown */}
                 <div className="mt-4 bg-white rounded-xl border border-gray-100 shadow-sm p-4">
                   <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">
