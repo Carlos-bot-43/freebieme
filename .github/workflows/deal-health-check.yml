@@ -9,6 +9,9 @@ jobs:
   health-check:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    permissions:
+      contents: write   # needed to commit health reports back to repo
+      issues: write     # needed for alert-broken-chains.js
     steps:
       - uses: actions/checkout@v4
         with:
