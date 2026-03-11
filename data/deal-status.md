@@ -1,7 +1,7 @@
 # FreebieMe Deal Status
 
-**Date:** 2026-03-10
-**Run at:** 2026-03-10T09:50:53.663Z
+**Date:** 2026-03-11
+**Run at:** 2026-03-11T09:47:43.455Z
 
 ---
 
@@ -33,21 +33,16 @@
 | Classification | Count | Meaning |
 |----------------|-------|---------|
 | ✅ Fully verified | 19 | Keywords found in static HTML |
-| ✅ Meta-verified | 7 | JS-rendered — meta/URL confirms program |
+| ✅ Meta-verified | 8 | JS-rendered — meta/URL confirms program |
 | 🔒 Protected (403) | 6 | Bot-blocking — NOT broken |
 | ⏱ Slow (timeout) | 1 | Timed out — NOT broken |
-| ❌ Broken (404) | 1 | URL needs updating — REAL problem |
-| ⚠️ Content warnings | 1 | Deal content may have changed |
-| **Duration** | 20.8s | Total verification time |
+| ❌ Broken (404) | 0 | URL needs updating — REAL problem |
+| ⚠️ Content warnings | 0 | Deal content may have changed |
+| **Duration** | 20.4s | Total verification time |
 
 
 > ✅ No content warnings — all rewards pages look healthy
 
-### ⚠️ Broken URLs (404) — Need Fixing
-
-| Chain | URL |
-|-------|-----|
-| olive-garden | https://www.olivegarden.com/specials/eclub |
 
 ---
 
@@ -83,7 +78,7 @@
 | applebees | 🔒 (protected) | 403 | (bot-blocked) |
 | chilis | ✅ (meta) | 200 | signup_bonus, rewards_program |
 | panera | 🔒 (protected) | 403 | (bot-blocked) |
-| olive-garden | ❌ (404) | 404 | (JS-rendered) |
+| olive-garden | ✅ (meta) | 200 | signup_bonus, rewards_program |
 | red-lobster | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 | baskin-robbins | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 | cold-stone-creamery | ✅ | 200 | birthday, signup_bonus, rewards_program |
