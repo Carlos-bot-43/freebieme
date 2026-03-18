@@ -5,6 +5,9 @@ import HomepageSearch from '../components/HomepageSearch';
 import CityGrid from '../components/CityGrid';
 import NearMePreview from '../components/NearMePreview';
 import BirthdayBanner from '../components/BirthdayBanner';
+import EmailCapture from '../components/EmailCapture';
+import MealKitBanner from '../components/MealKitBanner';
+import CBVBanner from '../components/CBVBanner';
 
 export const dynamic = 'force-static';
 
@@ -228,23 +231,27 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Email capture — coming soon */}
-      <div className="max-w-md mx-auto px-4 mt-2 mb-10">
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 text-center">
-          <div className="text-3xl mb-3">📬</div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-1">Deal alerts — coming soon</h2>
+      {/* Meal kit affiliate — "More ways to save" */}
+      <div className="max-w-md mx-auto px-4 mb-6">
+        <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-3">More ways to save on food</h2>
+        <MealKitBanner showAll={true} />
+      </div>
+
+      {/* Email capture — birthday deal reminder */}
+      <div className="max-w-md mx-auto px-4 mt-2 mb-6">
+        <div className="bg-white rounded-2xl border border-pink-100 shadow-sm p-6 text-center">
+          <div className="text-3xl mb-3">🎂</div>
+          <h2 className="text-lg font-semibold text-gray-900 mb-1">Get your birthday freebies reminder</h2>
           <p className="text-sm text-gray-500 mb-4">
-            We&apos;re building weekly email alerts for new freebies and limited-time deals.
-            In the meantime, bookmark this page and check back regularly!
+            We&apos;ll email you the full list of free food you qualify for in your birthday month — 20+ chains, nothing to miss.
           </p>
-          <Link
-            href="/near-me"
-            className="inline-block bg-blue-600 text-white px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-blue-700 transition-colors"
-          >
-            📍 Find free food near me →
-          </Link>
-          <p className="text-xs text-gray-400 mt-2">No account needed · Always free</p>
+          <EmailCapture context="homepage" />
         </div>
+      </div>
+
+      {/* CBV crosslink */}
+      <div className="max-w-md mx-auto px-4 mb-10">
+        <CBVBanner />
       </div>
 
       {/* 6D: Improved footer with SEO category links and about section */}

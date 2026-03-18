@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { CityConfig, CityDeals, groupDeals, distanceMiles, DealGroup } from '../../lib/types';
 import BirthdayBanner from '../../components/BirthdayBanner';
+import CBVBanner from '../../components/CBVBanner';
 
 // Minimal city data baked in (avoids a separate fetch)
 import citiesData from '../../lib/cities-static.json';
@@ -274,6 +275,11 @@ export default function NearMePage() {
               >
                 All {allGroups.length} deals in {nearestCity.name} →
               </Link>
+            </div>
+
+            {/* CBV crosslink */}
+            <div className="mt-6">
+              <CBVBanner />
             </div>
           </>
         )}

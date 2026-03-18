@@ -23,6 +23,8 @@ function formatCategoryTitle(slug: string): string {
 }
 import DealList from '../../../components/DealList';
 import { DealListSkeleton } from '../../../components/DealSkeleton';
+import MealKitBanner from '../../../components/MealKitBanner';
+import CBVBanner from '../../../components/CBVBanner';
 
 interface NearbyCity extends CityConfig {
   distFromCurrent: number;
@@ -420,6 +422,17 @@ export default function CityDealsClient({
                     ))}
                   </div>
                 )}
+                {/* Meal kit affiliate in sidebar */}
+                <div className="mt-4">
+                  <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
+                    More food savings
+                  </h3>
+                  <MealKitBanner showAll={false} />
+                </div>
+                {/* CBV crosslink */}
+                <div className="mt-4">
+                  <CBVBanner />
+                </div>
               </div>
             </div>
 

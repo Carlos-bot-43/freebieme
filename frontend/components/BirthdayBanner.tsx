@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { getBirthdayMonth, setBirthdayMonth, isBirthdayMonth } from '../lib/birthdayMonth';
+import EmailCapture from './EmailCapture';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -83,6 +84,10 @@ export default function BirthdayBanner() {
             {m}
           </button>
         ))}
+      </div>
+      <div className="mt-4 pt-4 border-t border-gray-100">
+        <p className="text-xs text-gray-500 mb-2 text-center">Get an email reminder before your birthday month?</p>
+        <EmailCapture context="birthday_banner" />
       </div>
     </div>
   );
