@@ -12,11 +12,11 @@ import CBVBanner from '../components/CBVBanner';
 export const dynamic = 'force-static';
 
 export const metadata: Metadata = {
-  title: 'FreebieMe — Free Food Deals Near You | Burgers, Pizza, Chicken & More',
-  description: 'FreebieMe — Find free burgers, pizza, chicken and more near you. Birthday freebies, app deals and sign-up bonuses at 34+ restaurant chains across 74 US cities.',
+  title: 'FreebieMe — Free Food Deals Near You | Burgers, Pizza, Chicken, Donuts & More',
+  description: 'FreebieMe — Find free burgers, pizza, chicken, donuts and more near you. Birthday freebies, app deals and sign-up bonuses at 37+ restaurant chains across 74 US cities.',
   openGraph: {
     title: 'FreebieMe — Free Food Deals Near You',
-    description: 'Find free burgers, pizza, chicken and more. Birthday freebies, app deals and sign-up bonuses at 34+ chains across 74 US cities.',
+    description: 'Find free burgers, pizza, chicken, donuts and more. Birthday freebies, app deals and sign-up bonuses at 37+ chains across 74 US cities.',
     images: [{ url: 'https://freebieme.vercel.app/opengraph-image', width: 1200, height: 630 }],
   },
   twitter: {
@@ -76,7 +76,7 @@ export default function HomePage() {
       <div className="max-w-3xl mx-auto px-4 pt-12 pb-8 text-center">
         <div className="text-5xl mb-3">🍔</div>
         <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-2 tracking-tight">
-          Free food near you
+          Free food deals near you
         </h1>
         <p className="text-gray-500 mb-8 text-lg">
           Birthday freebies, app deals, happy hour and more — at {chainCount}+ chains near you

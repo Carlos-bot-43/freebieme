@@ -37,6 +37,9 @@ const CHAIN_AVAILABILITY = {
   'waffle-house': ['ga', 'al', 'sc', 'nc', 'tn', 'fl', 'ms', 'la', 'ar', 'va', 'ky', 'oh', 'tx', 'ok'],
   'sonic': ['tx', 'ok', 'ks', 'mo', 'ar', 'la', 'ms', 'al', 'ga', 'fl', 'tn', 'ky', 'oh', 'in', 'ne', 'co', 'nm', 'az'],
   'wingstop': ['tx', 'ca', 'fl', 'ga', 'il', 'ny', 'la', 'al', 'ms', 'tn', 'sc', 'nc', 'md', 'va', 'pa', 'nv', 'az'],
+  // New chains added 2026-03-26
+  'tim-hortons': ['ny', 'oh', 'mi', 'pa', 'ma', 'ct', 'nj', 'ky', 'tn', 'fl', 'ga', 'il', 'in', 'mn', 'mo', 'nc', 'va', 'md', 'tx', 'co', 'wa'],
+  // five-guys and krispy-kreme are available everywhere (no restriction)
 };
 
 // Store count estimate by population (per chain)
@@ -45,7 +48,7 @@ function estimateStoreCount(population, chain) {
   const baseCount = Math.max(1, Math.min(30, Math.round(population / 50000)));
   // Adjust by chain type (fast food = more stores, sit-down = fewer)
   const sitDownChains = ['olive-garden', 'red-lobster', 'applebees', 'chilis', 'ihop', 'dennys', 'waffle-house'];
-  const rareChains = ['shake-shack', 'cold-stone-creamery'];
+  const rareChains = ['shake-shack', 'cold-stone-creamery', 'krispy-kreme', 'tim-hortons', 'five-guys'];
   if (rareChains.includes(chain.slug)) return Math.max(1, Math.round(baseCount * 0.3));
   if (sitDownChains.includes(chain.slug)) return Math.max(1, Math.round(baseCount * 0.5));
   return baseCount;

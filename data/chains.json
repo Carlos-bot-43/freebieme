@@ -957,5 +957,97 @@
       "burgers",
       "fries"
     ]
+  },
+  {
+    "slug": "five-guys",
+    "name": "Five Guys",
+    "rewards_url": "https://www.fiveguys.com/fans/loyalty-program",
+    "cuisine": [
+      "burgers",
+      "fast-food"
+    ],
+    "osm_name_variants": [
+      "Five Guys",
+      "Five Guys Burgers and Fries",
+      "Five Guys Burgers & Fries"
+    ],
+    "scrape_method": "playwright",
+    "selectors": {
+      "deal_containers": "[class*='reward'], [class*='loyalty']",
+      "fallback_keywords": [
+        "free",
+        "reward",
+        "birthday",
+        "points"
+      ]
+    },
+    "food_categories": [
+      "burgers",
+      "fries",
+      "hot-dogs"
+    ]
+  },
+  {
+    "slug": "tim-hortons",
+    "name": "Tim Hortons",
+    "rewards_url": "https://www.timhortons.com/tims-rewards",
+    "cuisine": [
+      "coffee",
+      "cafe",
+      "fast-food"
+    ],
+    "osm_name_variants": [
+      "Tim Hortons",
+      "Tim Horton's",
+      "Tims"
+    ],
+    "scrape_method": "playwright",
+    "selectors": {
+      "deal_containers": "[class*='reward'], [class*='tims']",
+      "fallback_keywords": [
+        "free",
+        "roll",
+        "birthday",
+        "tims",
+        "points"
+      ]
+    },
+    "food_categories": [
+      "coffee",
+      "breakfast",
+      "donuts",
+      "drinks"
+    ]
+  },
+  {
+    "slug": "krispy-kreme",
+    "name": "Krispy Kreme",
+    "rewards_url": "https://www.krispykreme.com/rewards",
+    "cuisine": [
+      "donuts",
+      "bakery",
+      "coffee"
+    ],
+    "osm_name_variants": [
+      "Krispy Kreme",
+      "Krispy Kreme Doughnuts"
+    ],
+    "scrape_method": "playwright",
+    "selectors": {
+      "deal_containers": "[class*='reward'], [class*='perk']",
+      "fallback_keywords": [
+        "free",
+        "doughnut",
+        "birthday",
+        "dozen",
+        "reward"
+      ]
+    },
+    "food_categories": [
+      "donuts",
+      "dessert",
+      "coffee",
+      "breakfast"
+    ]
   }
 ]
