@@ -1049,5 +1049,40 @@
       "coffee",
       "breakfast"
     ]
+  },
+  {
+    "slug": "noodles-and-company",
+    "name": "Noodles & Company",
+    "rewards_url": "https://www.noodles.com/rewards",
+    "cuisine": [
+      "pasta",
+      "fast-casual",
+      "asian",
+      "american"
+    ],
+    "osm_name_variants": [
+      "Noodles & Company",
+      "Noodles and Company",
+      "Noodles"
+    ],
+    "scrape_method": "playwright",
+    "selectors": {
+      "deal_containers": "[class*='reward'], [class*='perk']",
+      "fallback_keywords": [
+        "free",
+        "birthday",
+        "points",
+        "earn",
+        "entr\u00e9e",
+        "entree"
+      ]
+    },
+    "food_categories": [
+      "pasta",
+      "noodles",
+      "asian",
+      "american",
+      "salads"
+    ]
   }
 ]
