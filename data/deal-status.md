@@ -1,7 +1,7 @@
 # FreebieMe Deal Status
 
-**Date:** 2026-03-25
-**Run at:** 2026-03-25T09:58:21.115Z
+**Date:** 2026-03-28
+**Run at:** 2026-03-28T09:42:30.680Z
 
 ---
 
@@ -22,9 +22,9 @@
 
 | Metric | Value |
 |--------|-------|
-| Total deals in public files | **72,551** |
-| Cities covered | **74** |
-| Chains with deals | **34** |
+| Total deals in public files | **78,487** |
+| Cities covered | **79** |
+| Chains with deals | **38** |
 
 ---
 
@@ -38,7 +38,7 @@
 | ⏱ Slow (timeout) | 1 | Timed out — NOT broken |
 | ❌ Broken (404) | 0 | URL needs updating — REAL problem |
 | ⚠️ Content warnings | 0 | Deal content may have changed |
-| **Duration** | 20.9s | Total verification time |
+| **Duration** | 20.5s | Total verification time |
 
 
 > ✅ No content warnings — all rewards pages look healthy
