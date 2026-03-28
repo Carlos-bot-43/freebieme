@@ -1,13 +1,5 @@
 [
   {
-    "date": "2026-02-24",
-    "deals_added": [],
-    "deals_removed": [],
-    "deals_changed": [],
-    "total_after": 72551,
-    "prev_total": 72551
-  },
-  {
     "date": "2026-02-25",
     "deals_added": [],
     "deals_removed": [],
@@ -238,5 +230,331 @@
     "deals_changed": [],
     "total_after": 72551,
     "prev_total": 72551
+  },
+  {
+    "date": "2026-03-28",
+    "deals_added": [
+      {
+        "city": "akron-oh",
+        "added": 1000
+      },
+      {
+        "city": "albuquerque-nm",
+        "added": 89
+      },
+      {
+        "city": "aurora-co",
+        "added": 1000
+      },
+      {
+        "city": "bakersfield-ca",
+        "added": 1000
+      },
+      {
+        "city": "fresno-ca",
+        "added": 80
+      },
+      {
+        "city": "memphis-tn",
+        "added": 61
+      },
+      {
+        "city": "new-orleans-la",
+        "added": 122
+      },
+      {
+        "city": "orlando-fl",
+        "added": 69
+      },
+      {
+        "city": "riverside-ca",
+        "added": 1000
+      },
+      {
+        "city": "stockton-ca",
+        "added": 1000
+      },
+      {
+        "city": "tucson-az",
+        "added": 100
+      }
+    ],
+    "deals_removed": [
+      {
+        "city": "atlanta-ga",
+        "removed": 90
+      },
+      {
+        "city": "austin-tx",
+        "removed": 90
+      },
+      {
+        "city": "baltimore-md",
+        "removed": 90
+      },
+      {
+        "city": "baton-rouge-la",
+        "removed": 44
+      },
+      {
+        "city": "birmingham-al",
+        "removed": 52
+      },
+      {
+        "city": "boise-id",
+        "removed": 40
+      },
+      {
+        "city": "boston-ma",
+        "removed": 90
+      },
+      {
+        "city": "buffalo-ny",
+        "removed": 82
+      },
+      {
+        "city": "cape-coral-fl",
+        "removed": 58
+      },
+      {
+        "city": "charlotte-nc",
+        "removed": 90
+      },
+      {
+        "city": "chattanooga-tn",
+        "removed": 44
+      },
+      {
+        "city": "chicago-il",
+        "removed": 90
+      },
+      {
+        "city": "cincinnati-oh",
+        "removed": 90
+      },
+      {
+        "city": "cleveland-oh",
+        "removed": 90
+      },
+      {
+        "city": "colorado-springs-co",
+        "removed": 58
+      },
+      {
+        "city": "columbia-sc",
+        "removed": 42
+      },
+      {
+        "city": "columbus-oh",
+        "removed": 90
+      },
+      {
+        "city": "corpus-christi-tx",
+        "removed": 32
+      },
+      {
+        "city": "dallas-tx",
+        "removed": 90
+      },
+      {
+        "city": "denver-co",
+        "removed": 90
+      },
+      {
+        "city": "detroit-mi",
+        "removed": 90
+      },
+      {
+        "city": "el-paso-tx",
+        "removed": 66
+      },
+      {
+        "city": "fort-worth-tx",
+        "removed": 90
+      },
+      {
+        "city": "greenville-sc",
+        "removed": 48
+      },
+      {
+        "city": "hartford-ct",
+        "removed": 82
+      },
+      {
+        "city": "houston-tx",
+        "removed": 90
+      },
+      {
+        "city": "huntsville-al",
+        "removed": 26
+      },
+      {
+        "city": "indianapolis-in",
+        "removed": 90
+      },
+      {
+        "city": "jackson-ms",
+        "removed": 30
+      },
+      {
+        "city": "jacksonville-fl",
+        "removed": 90
+      },
+      {
+        "city": "kansas-city-mo",
+        "removed": 90
+      },
+      {
+        "city": "knoxville-tn",
+        "removed": 66
+      },
+      {
+        "city": "las-vegas-nv",
+        "removed": 60
+      },
+      {
+        "city": "little-rock-ar",
+        "removed": 40
+      },
+      {
+        "city": "los-angeles-ca",
+        "removed": 60
+      },
+      {
+        "city": "louisville-ky",
+        "removed": 88
+      },
+      {
+        "city": "lubbock-tx",
+        "removed": 24
+      },
+      {
+        "city": "mcallen-tx",
+        "removed": 66
+      },
+      {
+        "city": "miami-fl",
+        "removed": 90
+      },
+      {
+        "city": "minneapolis-mn",
+        "removed": 90
+      },
+      {
+        "city": "mobile-al",
+        "removed": 22
+      },
+      {
+        "city": "nashville-tn",
+        "removed": 90
+      },
+      {
+        "city": "new-york-ny",
+        "removed": 90
+      },
+      {
+        "city": "oklahoma-city-ok",
+        "removed": 23
+      },
+      {
+        "city": "omaha-ne",
+        "removed": 50
+      },
+      {
+        "city": "philadelphia-pa",
+        "removed": 90
+      },
+      {
+        "city": "phoenix-az",
+        "removed": 60
+      },
+      {
+        "city": "pittsburgh-pa",
+        "removed": 90
+      },
+      {
+        "city": "portland-or",
+        "removed": 60
+      },
+      {
+        "city": "providence-ri",
+        "removed": 60
+      },
+      {
+        "city": "raleigh-nc",
+        "removed": 88
+      },
+      {
+        "city": "reno-nv",
+        "removed": 26
+      },
+      {
+        "city": "richmond-va",
+        "removed": 86
+      },
+      {
+        "city": "rochester-ny",
+        "removed": 78
+      },
+      {
+        "city": "sacramento-ca",
+        "removed": 60
+      },
+      {
+        "city": "salt-lake-city-ut",
+        "removed": 54
+      },
+      {
+        "city": "san-antonio-tx",
+        "removed": 90
+      },
+      {
+        "city": "san-francisco-ca",
+        "removed": 60
+      },
+      {
+        "city": "san-jose-ca",
+        "removed": 60
+      },
+      {
+        "city": "sarasota-fl",
+        "removed": 62
+      },
+      {
+        "city": "seattle-wa",
+        "removed": 90
+      },
+      {
+        "city": "spokane-wa",
+        "removed": 44
+      },
+      {
+        "city": "st-louis-mo",
+        "removed": 90
+      },
+      {
+        "city": "tampa-fl",
+        "removed": 90
+      },
+      {
+        "city": "tulsa-ok",
+        "removed": 50
+      },
+      {
+        "city": "virginia-beach-va",
+        "removed": 90
+      },
+      {
+        "city": "washington-dc",
+        "removed": 60
+      },
+      {
+        "city": "wichita-ks",
+        "removed": 32
+      }
+    ],
+    "deals_changed": [],
+    "total_after": 78487,
+    "prev_total": 77629
   }
 ]

@@ -100,7 +100,7 @@ export default async function CityDealsPage({ params }: PageProps) {
         name: `What free food deals are available in ${cityConfig.name}?`,
         acceptedAnswer: {
           '@type': 'Answer',
-          text: `FreebieMe tracks birthday freebies, app deals, and sign-up bonuses at 34+ restaurant chains in ${cityConfig.display}, including McDonald's, Chipotle, Starbucks, Chick-fil-A, and more.`,
+          text: `FreebieMe tracks birthday freebies, app deals, and sign-up bonuses at 41+ restaurant chains in ${cityConfig.display}, including McDonald's, Chipotle, Starbucks, Chick-fil-A, Buffalo Wild Wings, Firehouse Subs, Little Caesars, and more.`,
         },
       },
       {
@@ -116,7 +116,185 @@ export default async function CityDealsPage({ params }: PageProps) {
         name: `What restaurants offer birthday freebies in ${cityConfig.name}?`,
         acceptedAnswer: {
           '@type': 'Answer',
-          text: `Restaurants offering birthday freebies in ${cityConfig.name} include Starbucks (free drink), Chipotle (free entrée), Dairy Queen (free Blizzard), IHOP (free pancakes), Denny's (free Grand Slam), Baskin-Robbins (free scoop), and more.`,
+          text: `Restaurants offering birthday freebies in ${cityConfig.name} include Starbucks (free drink), Chipotle (free entrée), Dairy Queen (free Blizzard), IHOP (free pancakes), Denny's (free Grand Slam), Baskin-Robbins (free scoop), Firehouse Subs (free medium sub), Wingstop (free 6 wings), Buffalo Wild Wings (free appetizer), and more.`,
+        },
+      },
+      {
+        '@type': 'Question',
+        name: `Does Buffalo Wild Wings have a birthday freebie in ${cityConfig.name}?`,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: `Yes — Buffalo Wild Wings Blazin' Rewards members get a free appetizer or dessert during their birthday month at participating locations in ${cityConfig.name}. Sign up for the BWW app to activate.`,
+        },
+      },
+      {
+        '@type': 'Question',
+        name: `Does Firehouse Subs have a birthday freebie in ${cityConfig.name}?`,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: `Yes — Firehouse Rewards members get a free medium sub on their birthday at Firehouse Subs locations in ${cityConfig.name}. Sign up at firehousesubs.com/rewards at least 7 days before your birthday.`,
+        },
+      },
+    ],
+  };
+
+  // Restaurant + Offer ItemList schema for rich results
+  // Helps Google surface "Chick-fil-A birthday freebie near me" type queries
+  const restaurantOffersSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: `Free Food Deals at Restaurants in ${cityConfig.display}`,
+    description: `Birthday freebies, signup bonuses, and app deals at restaurants in ${cityConfig.display}`,
+    url: `https://freebieme.vercel.app/deals/${cityConfig.slug}`,
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        item: {
+          '@type': 'FoodEstablishment',
+          name: "McDonald's",
+          servesCuisine: 'American, Fast Food',
+          hasOfferCatalog: {
+            '@type': 'OfferCatalog',
+            name: "McDonald's Free Food Deals",
+            itemListElement: [
+              {
+                '@type': 'Offer',
+                name: 'Free Birthday Reward',
+                description: "MyMcDonald's Rewards members get a free birthday reward during their birthday month.",
+                url: 'https://www.mcdonalds.com/us/en-us/mymcdonalds-rewards.html',
+                price: '0',
+                priceCurrency: 'USD',
+                availability: 'https://schema.org/InStock',
+                eligibleCustomerType: 'https://schema.org/RewardCustomer',
+              },
+            ],
+          },
+        },
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        item: {
+          '@type': 'FoodEstablishment',
+          name: 'Chick-fil-A',
+          servesCuisine: 'American, Chicken, Fast Food',
+          hasOfferCatalog: {
+            '@type': 'OfferCatalog',
+            name: 'Chick-fil-A Free Food Deals',
+            itemListElement: [
+              {
+                '@type': 'Offer',
+                name: 'Chick-fil-A One Birthday Reward',
+                description: 'Chick-fil-A One members receive a free reward item on their birthday.',
+                url: 'https://www.chick-fil-a.com/one',
+                price: '0',
+                priceCurrency: 'USD',
+                availability: 'https://schema.org/InStock',
+                eligibleCustomerType: 'https://schema.org/RewardCustomer',
+              },
+            ],
+          },
+        },
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        item: {
+          '@type': 'FoodEstablishment',
+          name: 'Starbucks',
+          servesCuisine: 'Coffee, Cafe',
+          hasOfferCatalog: {
+            '@type': 'OfferCatalog',
+            name: 'Starbucks Free Food Deals',
+            itemListElement: [
+              {
+                '@type': 'Offer',
+                name: 'Free Birthday Drink',
+                description: 'Starbucks Rewards members get a free drink or food item on their birthday.',
+                url: 'https://www.starbucks.com/rewards',
+                price: '0',
+                priceCurrency: 'USD',
+                availability: 'https://schema.org/InStock',
+                eligibleCustomerType: 'https://schema.org/RewardCustomer',
+              },
+            ],
+          },
+        },
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
+        item: {
+          '@type': 'FoodEstablishment',
+          name: 'Buffalo Wild Wings',
+          servesCuisine: 'American, Wings, Sports Bar',
+          hasOfferCatalog: {
+            '@type': 'OfferCatalog',
+            name: 'Buffalo Wild Wings Free Food Deals',
+            itemListElement: [
+              {
+                '@type': 'Offer',
+                name: 'Free Birthday Appetizer',
+                description: "Blazin' Rewards members get a free appetizer or dessert during their birthday month.",
+                url: 'https://www.buffalowildwings.com/rewards',
+                price: '0',
+                priceCurrency: 'USD',
+                availability: 'https://schema.org/InStock',
+                eligibleCustomerType: 'https://schema.org/RewardCustomer',
+              },
+            ],
+          },
+        },
+      },
+      {
+        '@type': 'ListItem',
+        position: 5,
+        item: {
+          '@type': 'FoodEstablishment',
+          name: 'Firehouse Subs',
+          servesCuisine: 'Subs, Sandwiches',
+          hasOfferCatalog: {
+            '@type': 'OfferCatalog',
+            name: 'Firehouse Subs Free Food Deals',
+            itemListElement: [
+              {
+                '@type': 'Offer',
+                name: 'Free Birthday Medium Sub',
+                description: 'Firehouse Rewards members get a free medium sub on their birthday.',
+                url: 'https://www.firehousesubs.com/rewards',
+                price: '0',
+                priceCurrency: 'USD',
+                availability: 'https://schema.org/InStock',
+                eligibleCustomerType: 'https://schema.org/RewardCustomer',
+              },
+            ],
+          },
+        },
+      },
+      {
+        '@type': 'ListItem',
+        position: 6,
+        item: {
+          '@type': 'FoodEstablishment',
+          name: 'Chipotle Mexican Grill',
+          servesCuisine: 'Mexican, Fast Casual',
+          hasOfferCatalog: {
+            '@type': 'OfferCatalog',
+            name: 'Chipotle Free Food Deals',
+            itemListElement: [
+              {
+                '@type': 'Offer',
+                name: 'Free Birthday Entrée',
+                description: 'Chipotle Rewards members get a free entrée during their birthday month.',
+                url: 'https://www.chipotle.com/rewards',
+                price: '0',
+                priceCurrency: 'USD',
+                availability: 'https://schema.org/InStock',
+                eligibleCustomerType: 'https://schema.org/RewardCustomer',
+              },
+            ],
+          },
         },
       },
     ],
@@ -126,6 +304,7 @@ export default async function CityDealsPage({ params }: PageProps) {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(restaurantOffersSchema) }} />
       <CityDealsClient cityConfig={cityConfig} allCities={availableCities} nearbyCities={nearbyCities} />
     </>
   );

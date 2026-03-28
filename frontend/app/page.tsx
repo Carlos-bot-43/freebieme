@@ -13,10 +13,10 @@ export const dynamic = 'force-static';
 
 export const metadata: Metadata = {
   title: 'FreebieMe — Free Food Deals Near You | Burgers, Pizza, Chicken, Donuts & More',
-  description: 'FreebieMe — Find free burgers, pizza, chicken, donuts and more near you. Birthday freebies, app deals and sign-up bonuses at 37+ restaurant chains across 74 US cities.',
+  description: 'FreebieMe — Find free burgers, pizza, chicken, donuts and more near you. Birthday freebies, app deals and sign-up bonuses at 41+ restaurant chains across 79 US cities.',
   openGraph: {
     title: 'FreebieMe — Free Food Deals Near You',
-    description: 'Find free burgers, pizza, chicken, donuts and more. Birthday freebies, app deals and sign-up bonuses at 37+ chains across 74 US cities.',
+    description: 'Find free burgers, pizza, chicken, donuts and more. Birthday freebies, app deals and sign-up bonuses at 41+ chains across 79 US cities.',
     images: [{ url: 'https://freebieme.vercel.app/opengraph-image', width: 1200, height: 630 }],
   },
   twitter: {
@@ -70,7 +70,76 @@ export default function HomePage() {
     { emoji: '🆓', title: 'Freebies', desc: 'Limited-time free items — check back often for new offers' },
   ];
 
+  // Schema.org JSON-LD for homepage
+  const websiteSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'FreebieMe',
+    url: 'https://freebieme.vercel.app',
+    description: `Find free food deals, birthday freebies, app deals, and sign-up bonuses at ${chainCount}+ restaurant chains across 79 US cities.`,
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: 'https://freebieme.vercel.app/deals/{search_term_string}',
+      },
+      'query-input': 'required name=search_term_string',
+    },
+  };
+
+  const organizationSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'FreebieMe',
+    url: 'https://freebieme.vercel.app',
+    description: 'FreebieMe aggregates free food deals, birthday freebies, and restaurant reward programs across the US.',
+    sameAs: [],
+  };
+
+  const faqHomepageSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is FreebieMe?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: `FreebieMe is a free food deal aggregator that tracks birthday freebies, app deals, sign-up bonuses, and rewards programs at ${chainCount}+ restaurant chains across 79 US cities.`,
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How do I get free food at restaurants?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'The easiest ways to get free food at restaurants are: (1) Sign up for restaurant rewards apps like Chipotle Rewards, McDonald\'s MyMcDonald\'s Rewards, and Starbucks Rewards — many give free items just for joining. (2) Register your birthday to get birthday freebies — over 20 chains give free food on your birthday. (3) Use the FreebieMe near-me feature to find deals sorted by distance.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Which restaurants give free food on your birthday?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Restaurants that give free food on your birthday include: Starbucks (free drink), Chipotle (free entrée), Dairy Queen (free Blizzard), IHOP (free pancakes), Denny\'s (free Grand Slam), Baskin-Robbins (free scoop), Krispy Kreme (free dozen), Firehouse Subs (free medium sub), Wingstop (free 6 wings), and more.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Do I need to create an account to use FreebieMe?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'No. FreebieMe is completely free to use and requires no sign-up. Browse all restaurant deals by city without creating any account.',
+        },
+      },
+    ],
+  };
+
   return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqHomepageSchema) }} />
     <main className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Hero */}
       <div className="max-w-3xl mx-auto px-4 pt-12 pb-8 text-center">
@@ -319,5 +388,6 @@ export default function HomePage() {
         </div>
       </footer>
     </main>
+    </>
   );
 }

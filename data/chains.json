@@ -1084,5 +1084,98 @@
       "american",
       "salads"
     ]
+  },
+  {
+    "slug": "buffalo-wild-wings",
+    "name": "Buffalo Wild Wings",
+    "rewards_url": "https://www.buffalowildwings.com/rewards",
+    "cuisine": [
+      "wings",
+      "sports-bar",
+      "american"
+    ],
+    "osm_name_variants": [
+      "Buffalo Wild Wings",
+      "Buffalo Wild Wings Grill & Bar",
+      "BWW",
+      "B-Dubs"
+    ],
+    "scrape_method": "playwright",
+    "selectors": {
+      "deal_containers": "[class*='reward'], [class*='perk'], [class*='loyalty']",
+      "fallback_keywords": [
+        "free",
+        "birthday",
+        "points",
+        "reward",
+        "wing"
+      ]
+    },
+    "food_categories": [
+      "wings",
+      "burgers",
+      "american",
+      "sports-bar"
+    ]
+  },
+  {
+    "slug": "little-caesars",
+    "name": "Little Caesars",
+    "rewards_url": "https://littlecaesars.com/en-us/order/portal/",
+    "cuisine": [
+      "pizza",
+      "fast-food"
+    ],
+    "osm_name_variants": [
+      "Little Caesars",
+      "Little Caesar's",
+      "Little Caesars Pizza"
+    ],
+    "scrape_method": "playwright",
+    "selectors": {
+      "deal_containers": "[class*='deal'], [class*='promo'], [class*='offer']",
+      "fallback_keywords": [
+        "free",
+        "hot-n-ready",
+        "deal",
+        "portal",
+        "extra"
+      ]
+    },
+    "food_categories": [
+      "pizza",
+      "breadsticks",
+      "wings"
+    ]
+  },
+  {
+    "slug": "firehouse-subs",
+    "name": "Firehouse Subs",
+    "rewards_url": "https://www.firehousesubs.com/rewards",
+    "cuisine": [
+      "subs",
+      "sandwiches",
+      "fast-casual"
+    ],
+    "osm_name_variants": [
+      "Firehouse Subs",
+      "Firehouse Sub"
+    ],
+    "scrape_method": "playwright",
+    "selectors": {
+      "deal_containers": "[class*='reward'], [class*='loyalty']",
+      "fallback_keywords": [
+        "free",
+        "birthday",
+        "medium",
+        "reward",
+        "sub"
+      ]
+    },
+    "food_categories": [
+      "subs",
+      "sandwiches",
+      "sides"
+    ]
   }
 ]
