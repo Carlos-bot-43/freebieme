@@ -1,7 +1,7 @@
 # FreebieMe Deal Status
 
-**Date:** 2026-04-05
-**Run at:** 2026-04-05T09:42:44.542Z
+**Date:** 2026-04-06
+**Run at:** 2026-04-06T10:13:16.697Z
 
 ---
 
@@ -32,13 +32,13 @@
 
 | Classification | Count | Meaning |
 |----------------|-------|---------|
-| ✅ Fully verified | 18 | Keywords found in static HTML |
+| ✅ Fully verified | 17 | Keywords found in static HTML |
 | ✅ Meta-verified | 9 | JS-rendered — meta/URL confirms program |
 | 🔒 Protected (403) | 6 | Bot-blocking — NOT broken |
-| ⏱ Slow (timeout) | 1 | Timed out — NOT broken |
+| ⏱ Slow (timeout) | 2 | Timed out — NOT broken |
 | ❌ Broken (404) | 0 | URL needs updating — REAL problem |
 | ⚠️ Content warnings | 0 | Deal content may have changed |
-| **Duration** | 20.4s | Total verification time |
+| **Duration** | 22.3s | Total verification time |
 
 
 > ✅ No content warnings — all rewards pages look healthy
@@ -70,7 +70,7 @@
 | raising-canes | 🔒 (protected) | 403 | (bot-blocked) |
 | whataburger | ✅ (meta) | 200 | signup_bonus, app_deal |
 | jack-in-the-box | ✅ | 200 | signup_bonus, app_deal, rewards_program |
-| del-taco | ✅ | 200 | birthday, signup_bonus, bogo, app_deal, rewards_program |
+| del-taco | ⏱ (slow) | timeout | (JS-rendered) |
 | shake-shack | 🔒 (protected) | 403 | (bot-blocked) |
 | waffle-house | ✅ | 200 | birthday, discount |
 | ihop | 🔒 (protected) | 403 | (bot-blocked) |
