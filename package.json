@@ -8,6 +8,11 @@
     "scrape:chains": "node scraper/sources/chain-rewards.js",
     "scrape:locations": "node scraper/sources/osm-locations.js",
     "scrape:coupons": "node scraper/sources/coupon-sites.js",
+    "build:normalized": "node scripts/build-normalized.js",
+    "build:public": "node scripts/build-public.js",
+    "build": "npm run build:normalized && npm run build:public",
+    "verify": "node verify-deals.js",
+    "status": "node generate-status-report.js",
     "test": "node scraper/index.js --dry-run"
   },
   "keywords": ["food", "deals", "freebies", "restaurants", "coupons"],

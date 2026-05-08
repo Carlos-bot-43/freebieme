@@ -64,6 +64,16 @@ jobs:
       - name: Apply claim data
         run: node apply-claim-data.js
 
+      # Step 5b: Build the normalized DB + slim public DB from the freshly-generated
+      # per-city JSON. Source-of-truth shifts to data/normalized/db.json; the slim
+      # public DB at frontend/public/data/db.json (~220 KB) feeds the new chain pages
+      # and /api/deals. Per-city files stay for backward compat with /deals/[city].
+      - name: Build normalized DB
+        run: npm run build:normalized
+
+      - name: Publish slim DB + index
+        run: npm run build:public
+
       # Step 6: Generate daily status report (Node script — avoids heredoc fragility)
       - name: Generate deal status report
         run: node generate-status-report.js
@@ -81,8 +91,11 @@ jobs:
           git config --local user.email "tjb4123@agentmail.to"
           git config --local user.name "Carlos"
 
-          # Stage public deal files, status report, and verification report
+          # Stage public deal files, normalized DB, status report, and verification report
           git add frontend/public/data/deals/
+          git add frontend/public/data/db.json 2>/dev/null || true
+          git add frontend/public/data/index.json 2>/dev/null || true
+          git add data/normalized/db.json 2>/dev/null || true
           git add data/deal-status.md
           git add data/last-good-run.json 2>/dev/null || true
           git add data/deal-changelog.json 2>/dev/null || true

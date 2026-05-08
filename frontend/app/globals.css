@@ -1,26 +1,39 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Soft-modern palette: warm cream surface, near-black ink, warm accent. */
+  --background: #FAF7F2;     /* warm off-white */
+  --foreground: #1C1917;     /* stone-900 */
+  --surface: #FFFFFF;        /* card surface */
+  --surface-muted: #F5F1EA;  /* subtler cream */
+  --border: #E7E5E4;         /* stone-200 */
+  --accent: #EA580C;         /* orange-600 */
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01", "cv11"; /* nicer numerals + 'l' tail in Geist */
+  -webkit-font-smoothing: antialiased;
 }
+
+/* Reduce CLS on details/summary toggles */
+details summary { list-style: none; cursor: pointer; }
+details summary::-webkit-details-marker { display: none; }
+
+/* Simple in/out animations for the birthday-reminder sheet */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { transform: translateY(16px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.animate-in { animation: fadeIn 150ms ease-out; }
+.animate-in > div { animation: slideUp 200ms ease-out; }
+
+/* Selection color matches the warm accent */
+::selection { background: #FED7AA; color: #1C1917; }

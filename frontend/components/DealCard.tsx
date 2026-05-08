@@ -1,20 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Deal, DEAL_TYPE_LABELS, DEAL_TYPE_COLORS, distanceMiles } from '../lib/types';
+import { Deal, DEAL_TYPE_LABELS, distanceMiles } from '../lib/types';
+import { confidenceBucket, freshnessLabel } from '../lib/normalized-types';
 import { toggleSavedDeal, isDealSaved } from '../lib/savedDeals';
-
-const DEAL_TYPE_BORDER: Record<string, string> = {
-  birthday: 'border-l-pink-400',
-  signup_bonus: 'border-l-purple-400',
-  app_deal: 'border-l-blue-400',
-  bogo: 'border-l-orange-400',
-  happy_hour: 'border-l-yellow-400',
-  rewards_program: 'border-l-green-400',
-  freebie: 'border-l-emerald-400',
-  discount: 'border-l-red-400',
-  other: 'border-l-gray-300',
-};
 
 interface DealCardProps {
   deal: Deal;
@@ -23,14 +12,21 @@ interface DealCardProps {
   updatedAt?: string;
 }
 
-function getDistanceBadge(distance: number): { text: string; className: string } {
-  const text = distance < 0.1 ? '< 0.1 mi' : `${distance.toFixed(1)} mi`;
-  if (distance <= 5) return { text, className: 'bg-green-100 text-green-700' };
-  if (distance <= 10) return { text, className: 'bg-yellow-100 text-yellow-700' };
-  return { text, className: 'bg-gray-100 text-gray-500' };
-}
+const TRUST_LABEL: Record<string, string> = {
+  verified: 'Verified',
+  likely: 'Likely',
+  unverified: 'Unverified',
+};
+
+const CLAIM_HINT: Record<string, string> = {
+  instant: 'Use right now',
+  same_day_setup: 'Set up in minutes',
+  advance_required: 'Plan ahead',
+  birthday_only: 'Birthday only',
+};
 
 export default function DealCard({ deal, userLat, userLng, updatedAt }: DealCardProps) {
+  const [showSteps, setShowSteps] = useState(false);
   const [copied, setCopied] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -38,149 +34,154 @@ export default function DealCard({ deal, userLat, userLng, updatedAt }: DealCard
     setSaved(isDealSaved(deal.deal_id));
   }, [deal.deal_id]);
 
-  const typeLabel = DEAL_TYPE_LABELS[deal.deal_type] || DEAL_TYPE_LABELS.other;
-  const typeColor = DEAL_TYPE_COLORS[deal.deal_type] || DEAL_TYPE_COLORS.other;
-  const typeBorder = DEAL_TYPE_BORDER[deal.deal_type] || DEAL_TYPE_BORDER.other;
-
   const distance =
     userLat && userLng && deal.lat && deal.lng
       ? distanceMiles(userLat, userLng, deal.lat, deal.lng)
       : null;
 
-  const distanceBadge = distance !== null ? getDistanceBadge(distance) : null;
+  const bucket = confidenceBucket(deal.confidence_score ?? 0);
+  const fresh = freshnessLabel(deal.last_verified_at);
+  const trustDot =
+    bucket === 'verified' ? 'bg-emerald-500' : bucket === 'likely' ? 'bg-amber-400' : 'bg-stone-300';
 
   const handleCopyCode = async (code: string) => {
     try {
       await navigator.clipboard.writeText(code);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // Fallback
-    }
+    } catch {}
   };
 
-  const handleToggleSave = () => {
-    const nowSaved = toggleSavedDeal(deal.deal_id);
-    setSaved(nowSaved);
-  };
+  const headline = deal.value_summary || deal.title;
+  const hasExtraDescription =
+    deal.description && deal.description.trim() && deal.description !== deal.title && deal.description !== headline;
+  const hasSteps = deal.claim_steps && deal.claim_steps.length > 0;
+
+  // Tags shown subtly at the bottom — only what's *constraint-relevant*, not decorative.
+  const tags: string[] = [];
+  if (deal.requires_app) tags.push('App');
+  else if (deal.requires_signup) tags.push('Sign up');
+  if (deal.claim_type && CLAIM_HINT[deal.claim_type]) tags.push(CLAIM_HINT[deal.claim_type]);
+  if (DEAL_TYPE_LABELS[deal.deal_type]) tags.push(DEAL_TYPE_LABELS[deal.deal_type]);
 
   return (
-    <div className={`bg-white rounded-xl shadow-sm border border-gray-100 border-l-4 ${typeBorder} p-4 hover:shadow-md transition-shadow duration-200 flex flex-col`}>
-      {/* Header row */}
-      <div className="flex items-start justify-between gap-2 mb-2">
-        <div className="flex-1 min-w-0">
-          <span className="font-semibold text-gray-900 text-sm leading-tight block">
-            {deal.location_name}
-          </span>
-          {deal.address && (
-            <span className="text-xs text-gray-400 block truncate">{deal.address}</span>
+    <article className="bg-white rounded-2xl border border-stone-100 hover:border-stone-200 transition-colors p-6">
+      {/* ─── Brand row — chain prominent ──────────────────────────────── */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="text-[11px] font-semibold text-stone-900 uppercase tracking-[0.16em]">
+          {deal.location_name}
+        </div>
+        <div className="flex items-center gap-3 text-xs text-stone-400">
+          {distance !== null && (
+            <span className="font-medium text-stone-500">
+              {distance < 0.1 ? '< 0.1' : distance.toFixed(1)} mi
+            </span>
+          )}
+          {deal.valid_until && (
+            <>
+              {distance !== null && <span className="text-stone-200">·</span>}
+              <span className="text-orange-600 font-medium">
+                ends {new Date(deal.valid_until).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+              </span>
+            </>
           )}
         </div>
-        {distanceBadge && (
-          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap flex-shrink-0 ${distanceBadge.className}`}>
-            📍 {distanceBadge.text}
-          </span>
-        )}
       </div>
 
-      {/* Deal title */}
-      <h3 className="text-gray-900 font-medium text-sm mb-2 leading-snug">
-        {deal.title}
+      {/* ─── Hero: deal value (dominant) ──────────────────────────────── */}
+      <h3 className="text-[22px] sm:text-2xl font-semibold text-stone-900 leading-[1.15] tracking-tight mb-1">
+        {headline}
       </h3>
-
-      {/* Badges row */}
-      <div className="flex flex-wrap gap-1.5 mb-2">
-        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${typeColor}`}>
-          {typeLabel}
-        </span>
-        {deal.requires_app && (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700">
-            📱 App
-          </span>
-        )}
-        {deal.requires_signup && !deal.requires_app && (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700">
-            ✍️ Sign Up
-          </span>
-        )}
-        {deal.free_item && (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700">
-            🆓 {deal.free_item}
-          </span>
-        )}
-        {deal.discount_percent && !deal.free_item && (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700">
-            {deal.discount_percent}% off
-          </span>
-        )}
-        {deal.discount_amount && !deal.free_item && !deal.discount_percent && (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700">
-            ${deal.discount_amount} off
-          </span>
-        )}
-      </div>
-
-      {/* Description (short) */}
-      {deal.description && deal.description !== deal.title && (
-        <p className="text-xs text-gray-500 mb-2 line-clamp-2 flex-1">{deal.description}</p>
+      {hasExtraDescription && (
+        <p className="text-sm text-stone-500 leading-relaxed mb-4">{deal.description}</p>
       )}
+      {!hasExtraDescription && <div className="mb-5" />}
 
-      {/* Coupon code */}
+      {/* ─── Coupon code (if present) ─────────────────────────────────── */}
       {deal.coupon_code && (
-        <div className="flex items-center gap-2 mb-2">
-          <code className="bg-yellow-50 border border-yellow-200 text-yellow-800 text-xs px-2 py-1 rounded font-mono font-bold flex-1 truncate">
+        <div className="flex items-center gap-2 mb-4">
+          <code className="flex-1 bg-amber-50 border border-amber-200 text-amber-800 text-xs px-3 py-2 rounded-lg font-mono font-medium truncate">
             {deal.coupon_code}
           </code>
           <button
             onClick={() => handleCopyCode(deal.coupon_code!)}
-            className="text-xs text-blue-600 hover:text-blue-800 whitespace-nowrap font-medium px-2 py-1 rounded hover:bg-blue-50 transition-colors"
+            className="text-xs font-medium text-stone-600 hover:text-stone-900 px-3 py-2 rounded-lg border border-stone-200 hover:border-stone-300 transition-colors"
           >
-            {copied ? '✅ Copied!' : '📋 Copy'}
+            {copied ? 'Copied' : 'Copy'}
           </button>
         </div>
       )}
 
-      {/* Footer */}
-      <div className="flex items-center justify-between mt-auto pt-2 border-t border-gray-50">
-        <div className="flex items-center gap-2">
-          <button
-            onClick={handleToggleSave}
-            title={saved ? 'Remove bookmark' : 'Save deal'}
-            className={`text-base transition-colors ${saved ? 'text-yellow-500' : 'text-gray-300 hover:text-yellow-400'}`}
-          >
-            {saved ? '★' : '☆'}
-          </button>
-          <div className="flex gap-0.5">
-            {[1, 2, 3, 4, 5].map(i => (
-              <div
-                key={i}
-                className={`w-1.5 h-1.5 rounded-full ${
-                  i <= Math.round(deal.confidence_score * 5)
-                    ? 'bg-green-400'
-                    : 'bg-gray-200'
-                }`}
-              />
-            ))}
-          </div>
-          <span className="text-xs text-gray-400">
-            {deal.confidence_score >= 0.9 ? 'Verified' : deal.confidence_score >= 0.7 ? 'Likely valid' : 'Unverified'}
-          </span>
-          {updatedAt && (
-            <span className="text-xs text-gray-300" title={`Data updated ${updatedAt}`}>
-              · {new Date(updatedAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
-            </span>
-          )}
-        </div>
+      {/* ─── Always-visible primary CTA ──────────────────────────────── */}
+      <div className="flex items-center gap-2">
         <a
           href={deal.source_url}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-xs text-blue-600 hover:text-blue-800 font-medium hover:underline"
-          onClick={(e) => e.stopPropagation()}
+          className="flex-1 inline-flex items-center justify-center gap-2 bg-stone-900 hover:bg-stone-800 text-white text-sm font-medium py-3 rounded-xl transition-colors"
         >
-          Get deal →
+          Get it
+          <span aria-hidden>→</span>
         </a>
+        <button
+          onClick={() => {
+            const nowSaved = toggleSavedDeal(deal.deal_id);
+            setSaved(nowSaved);
+          }}
+          title={saved ? 'Saved' : 'Save for later'}
+          aria-label={saved ? 'Remove from saved' : 'Save for later'}
+          className={`px-4 py-3 rounded-xl border transition-colors ${
+            saved
+              ? 'bg-amber-50 border-amber-200 text-amber-600'
+              : 'border-stone-200 text-stone-400 hover:text-stone-700 hover:border-stone-300'
+          }`}
+        >
+          {saved ? '★' : '☆'}
+        </button>
       </div>
-    </div>
+
+      {/* ─── Optional: how-to-claim toggle ────────────────────────────── */}
+      {hasSteps && (
+        <div className="mt-4">
+          <button
+            onClick={() => setShowSteps(s => !s)}
+            className="text-xs font-medium text-stone-500 hover:text-stone-900 transition-colors"
+          >
+            How to claim {showSteps ? '↑' : '↓'}
+          </button>
+          {showSteps && (
+            <ol className="mt-3 text-sm text-stone-600 space-y-1.5 pl-5 list-decimal marker:text-stone-300">
+              {deal.claim_steps.map((s, i) => <li key={i}>{s}</li>)}
+            </ol>
+          )}
+        </div>
+      )}
+
+      {/* ─── Subtle tag row (bottom) ──────────────────────────────────── */}
+      <div className="mt-5 pt-4 border-t border-stone-50 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-stone-400">
+        <span className="inline-flex items-center gap-1.5">
+          <span className={`w-1.5 h-1.5 rounded-full ${trustDot}`} />
+          {TRUST_LABEL[bucket]}
+        </span>
+        {fresh && (
+          <>
+            <span className="text-stone-200">·</span>
+            <span>checked {fresh}</span>
+          </>
+        )}
+        {tags.map((t, i) => (
+          <span key={t + i} className="inline-flex items-center">
+            <span className="text-stone-200 mr-3">·</span>
+            <span>{t}</span>
+          </span>
+        ))}
+      </div>
+
+      {updatedAt && (
+        <p className="text-[10px] text-stone-300 mt-3">
+          Data refreshed {new Date(updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+        </p>
+      )}
+    </article>
   );
 }
