@@ -33,6 +33,13 @@ export interface Deal {
   happy_hour_end?: string;     // "16:00"
   happy_hour_days?: string;    // "every day" | "Mon–Fri"
   happy_hour_note?: string;
+  // Normalized-schema additions — optional for back-compat with older city files.
+  last_verified_at?: string;
+  first_seen_at?: string;
+  verification_method?: 'baseline' | 'http' | 'content' | 'meta' | 'reddit' | 'slickdeals' | 'newsletter' | 'user-reported';
+  recurrence?: 'once' | 'weekly' | 'annual' | 'ongoing';
+  valid_until?: string | null;
+  source_type?: string;
 }
 
 export interface CityDeals {

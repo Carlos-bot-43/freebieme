@@ -2,7 +2,25 @@
 
 import { useState, useEffect } from 'react';
 import { Deal, DEAL_TYPE_LABELS, DEAL_TYPE_COLORS, distanceMiles } from '../lib/types';
+import { confidenceBucket, freshnessLabel } from '../lib/normalized-types';
 import { toggleSavedDeal, isDealSaved } from '../lib/savedDeals';
+
+const CONFIDENCE_BADGE: Record<string, { label: string; className: string; title: string }> = {
+  verified:   { label: '✓ Verified',   className: 'bg-green-50 text-green-700 border-green-200',    title: 'Confirmed against the source page' },
+  likely:     { label: '~ Likely',     className: 'bg-amber-50 text-amber-700 border-amber-200',    title: 'Detected via metadata — generally reliable' },
+  unverified: { label: '? Unverified', className: 'bg-gray-50 text-gray-600 border-gray-200',       title: 'Lower-confidence match' },
+};
+
+const VERIFICATION_TITLE: Record<string, string> = {
+  baseline: 'Hand-curated baseline',
+  content: 'Verified by scraping the live page',
+  meta: 'Detected via page metadata',
+  http: 'HTTP-only check',
+  reddit: 'Sourced from r/freebies',
+  slickdeals: 'Sourced from Slickdeals',
+  newsletter: 'Sourced from a brand newsletter',
+  'user-reported': 'Reported by a user',
+};
 
 const DEAL_TYPE_BORDER: Record<string, string> = {
   birthday: 'border-l-pink-400',
@@ -142,7 +160,7 @@ export default function DealCard({ deal, userLat, userLng, updatedAt }: DealCard
 
       {/* Footer */}
       <div className="flex items-center justify-between mt-auto pt-2 border-t border-gray-50">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <button
             onClick={handleToggleSave}
             title={saved ? 'Remove bookmark' : 'Save deal'}
@@ -150,24 +168,39 @@ export default function DealCard({ deal, userLat, userLng, updatedAt }: DealCard
           >
             {saved ? '★' : '☆'}
           </button>
-          <div className="flex gap-0.5">
-            {[1, 2, 3, 4, 5].map(i => (
-              <div
-                key={i}
-                className={`w-1.5 h-1.5 rounded-full ${
-                  i <= Math.round(deal.confidence_score * 5)
-                    ? 'bg-green-400'
-                    : 'bg-gray-200'
-                }`}
-              />
-            ))}
-          </div>
-          <span className="text-xs text-gray-400">
-            {deal.confidence_score >= 0.9 ? 'Verified' : deal.confidence_score >= 0.7 ? 'Likely valid' : 'Unverified'}
-          </span>
-          {updatedAt && (
-            <span className="text-xs text-gray-300" title={`Data updated ${updatedAt}`}>
-              · {new Date(updatedAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+          {(() => {
+            const bucket = confidenceBucket(deal.confidence_score ?? 0);
+            const badge = CONFIDENCE_BADGE[bucket];
+            const verificationTitle = deal.verification_method
+              ? VERIFICATION_TITLE[deal.verification_method] ?? badge.title
+              : badge.title;
+            return (
+              <span
+                title={verificationTitle}
+                className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold border ${badge.className}`}
+              >
+                {badge.label}
+              </span>
+            );
+          })()}
+          {(() => {
+            const fresh = freshnessLabel(deal.last_verified_at) ?? (updatedAt ? new Date(updatedAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : null);
+            if (!fresh) return null;
+            return (
+              <span
+                className="text-[10px] text-gray-400"
+                title={deal.last_verified_at ? `Last verified ${new Date(deal.last_verified_at).toLocaleString()}` : `Data updated ${updatedAt}`}
+              >
+                · checked {fresh}
+              </span>
+            );
+          })()}
+          {deal.valid_until && (
+            <span
+              className="text-[10px] text-orange-600 font-medium"
+              title={`Offer expires ${new Date(deal.valid_until).toLocaleDateString()}`}
+            >
+              · expires {new Date(deal.valid_until).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
             </span>
           )}
         </div>
