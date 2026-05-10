@@ -1,7 +1,7 @@
 # FreebieMe Deal Status
 
-**Date:** 2026-05-09
-**Run at:** 2026-05-09T10:08:33.959Z
+**Date:** 2026-05-10
+**Run at:** 2026-05-10T10:18:15.050Z
 
 ---
 
@@ -34,18 +34,14 @@
 |----------------|-------|---------|
 | ✅ Fully verified | 18 | Keywords found in static HTML |
 | ✅ Meta-verified | 8 | JS-rendered — meta/URL confirms program |
-| 🔒 Protected (403) | 6 | Bot-blocking — NOT broken |
+| 🔒 Protected (403) | 7 | Bot-blocking — NOT broken |
 | ⏱ Slow (timeout) | 1 | Timed out — NOT broken |
 | ❌ Broken (404) | 0 | URL needs updating — REAL problem |
-| ⚠️ Content warnings | 1 | Deal content may have changed |
-| **Duration** | 20.5s | Total verification time |
+| ⚠️ Content warnings | 0 | Deal content may have changed |
+| **Duration** | 20.9s | Total verification time |
 
 
-### Content Warnings
-
-| Chain | Warning |
-|-------|---------|
-| chipotle | HTTP 503 — unexpected error |
+> ✅ No content warnings — all rewards pages look healthy
 
 
 ---
@@ -55,7 +51,7 @@
 | Chain | Status | HTTP | Verified Deals |
 |-------|--------|------|----------------|
 | mcdonalds | ✅ (meta) | 200 | signup_bonus, app_deal, rewards_program |
-| chipotle | ❌ | 503 | (JS-rendered) |
+| chipotle | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 | starbucks | ✅ | 200 | birthday, signup_bonus, app_deal, happy_hour, rewards_program |
 | subway | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 | dunkin | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
@@ -68,7 +64,7 @@
 | kfc | 🔒 (protected) | 403 | (bot-blocked) |
 | popeyes | ✅ (meta) | 200 | (JS-rendered) |
 | sonic | ✅ | 200 | happy_hour, signup_bonus, app_deal, rewards_program |
-| panda-express | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
+| panda-express | 🔒 (protected) | 403 | (bot-blocked) |
 | wingstop | ✅ (meta) | 200 | birthday, app_deal, rewards_program |
 | jersey-mikes | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 | raising-canes | 🔒 (protected) | 403 | (bot-blocked) |
