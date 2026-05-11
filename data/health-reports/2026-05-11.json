@@ -1,0 +1,524 @@
+{
+  "run_at": "2026-05-11T14:40:45.556Z",
+  "duration_ms": 20182,
+  "chains": {
+    "mcdonalds": {
+      "url": "https://www.mcdonalds.com/us/en-us/mymcdonalds.html",
+      "http_status": 200,
+      "classification": "meta_verified",
+      "verified_deals": [
+        "signup_bonus",
+        "app_deal",
+        "rewards_program"
+      ],
+      "unverified_deals": [
+        "birthday"
+      ],
+      "warning": null,
+      "error": null,
+      "fetch_note": "JS-rendered page: body keywords unreliable, but meta/body/title confirms rewards program"
+    },
+    "chipotle": {
+      "url": "https://www.chipotle.com/rewards",
+      "http_status": 200,
+      "classification": "verified",
+      "verified_deals": [
+        "birthday",
+        "signup_bonus",
+        "app_deal",
+        "rewards_program"
+      ],
+      "unverified_deals": [],
+      "warning": null,
+      "error": null,
+      "fetch_note": null
+    },
+    "starbucks": {
+      "url": "https://www.starbucks.com/rewards",
+      "http_status": 200,
+      "classification": "verified",
+      "verified_deals": [
+        "birthday",
+        "signup_bonus",
+        "app_deal",
+        "happy_hour",
+        "rewards_program"
+      ],
+      "unverified_deals": [],
+      "warning": null,
+      "error": null,
+      "fetch_note": null
+    },
+    "subway": {
+      "url": "https://www.subway.com/en-US/MyWayRewards",
+      "http_status": 200,
+      "classification": "verified",
+      "verified_deals": [
+        "birthday",
+        "signup_bonus",
+        "app_deal",
+        "rewards_program"
+      ],
+      "unverified_deals": [],
+      "warning": null,
+      "error": null,
+      "fetch_note": null
+    },
+    "dunkin": {
+      "url": "https://www.dunkindonuts.com/en/dd-perks",
+      "http_status": 200,
+      "classification": "verified",
+      "verified_deals": [
+        "birthday",
+        "signup_bonus",
+        "app_deal",
+        "rewards_program"
+      ],
+      "unverified_deals": [],
+      "warning": null,
+      "error": null,
+      "fetch_note": null
+    },
+    "chick-fil-a": {
+      "url": "https://www.chick-fil-a.com/one",
+      "http_status": 200,
+      "classification": "verified",
+      "verified_deals": [
+        "birthday",
+        "signup_bonus",
+        "rewards_program"
+      ],
+      "unverified_deals": [],
+      "warning": null,
+      "error": null,
+      "fetch_note": null
+    },
+    "burger-king": {
+      "url": "https://www.bk.com/rewards",
+      "http_status": 200,
+      "classification": "meta_verified",
+      "verified_deals": [
+        "app_deal"
+      ],
+      "unverified_deals": [
+        "birthday",
+        "signup_bonus",
+        "rewards_program"
+      ],
+      "warning": null,
+      "error": null,
+      "fetch_note": "JS-rendered SPA: rewards page exists (URL path confirms rewards program)"
+    },
+    "wendys": {
+      "url": "https://www.wendys.com/rewards",
+      "http_status": 200,
+      "classification": "verified",
+      "verified_deals": [
+        "birthday",
+        "signup_bonus",
+        "app_deal",
+        "rewards_program"
+      ],
+      "unverified_deals": [],
+      "warning": null,
+      "error": null,
+      "fetch_note": null
+    },
+    "pizza-hut": {
+      "url": "https://www.pizzahut.com/",
+      "http_status": 0,
+      "classification": "slow",
+      "verified_deals": [],
+      "unverified_deals": [
+        "birthday",
+        "app_deal",
+        "rewards_program"
+      ],
+      "warning": null,
+      "error": null,
+      "fetch_note": "Request timed out — site may be slow"
+    },
+    "dominos": {
+      "url": "https://www.dominos.com/en/pages/rewards/",
+      "http_status": 200,
+      "classification": "verified",
+      "verified_deals": [
+        "signup_bonus",
+        "app_deal",
+        "rewards_program"
+      ],
+      "unverified_deals": [],
+      "warning": null,
+      "error": null,
+      "fetch_note": null
+    },
+    "papa-johns": {
+      "url": "https://www.papajohns.com/papa-rewards",
+      "http_status": 200,
+      "classification": "meta_verified",
+      "verified_deals": [
+        "app_deal"
+      ],
+      "unverified_deals": [
+        "birthday",
+        "signup_bonus",
+        "rewards_program"
+      ],
+      "warning": null,
+      "error": null,
+      "fetch_note": "JS-rendered page: body keywords unreliable, but meta/body/title confirms rewards program"
+    },
+    "kfc": {
+      "url": "https://www.kfc.com/",
+      "http_status": 403,
+      "classification": "protected",
+      "verified_deals": [],
+      "unverified_deals": [
+        "birthday",
+        "signup_bonus",
+        "rewards_program"
+      ],
+      "warning": null,
+      "error": null,
+      "fetch_note": "HTTP 403 — site is blocking scrapers (not a broken URL)"
+    },
+    "popeyes": {
+      "url": "https://www.popeyes.com/rewards",
+      "http_status": 200,
+      "classification": "meta_verified",
+      "verified_deals": [],
+      "unverified_deals": [
+        "birthday",
+        "signup_bonus",
+        "app_deal",
+        "rewards_program"
+      ],
+      "warning": null,
+      "error": null,
+      "fetch_note": "JS-rendered SPA: rewards page exists (URL path confirms rewards program)"
+    },
+    "sonic": {
+      "url": "https://www.sonicdrivein.com/rewards",
+      "http_status": 200,
+      "classification": "verified",
+      "verified_deals": [
+        "happy_hour",
+        "signup_bonus",
+        "app_deal",
+        "rewards_program"
+      ],
+      "unverified_deals": [],
+      "warning": null,
+      "error": null,
+      "fetch_note": null
+    },
+    "panda-express": {
+      "url": "https://www.pandaexpress.com/rewards",
+      "http_status": 403,
+      "classification": "protected",
+      "verified_deals": [],
+      "unverified_deals": [
+        "birthday",
+        "signup_bonus",
+        "app_deal",
+        "rewards_program"
+      ],
+      "warning": null,
+      "error": null,
+      "fetch_note": "HTTP 403 — site is blocking scrapers (not a broken URL)"
+    },
+    "wingstop": {
+      "url": "https://www.wingstop.com/thewing",
+      "http_status": 200,
+      "classification": "meta_verified",
+      "verified_deals": [
+        "birthday",
+        "app_deal",
+        "rewards_program"
+      ],
+      "unverified_deals": [
+        "bogo"
+      ],
+      "warning": null,
+      "error": null,
+      "fetch_note": "JS-rendered SPA: rewards page exists (URL path confirms rewards program)"
+    },
+    "jersey-mikes": {
+      "url": "https://www.jerseymikes.com/rewards",
+      "http_status": 200,
+      "classification": "verified",
+      "verified_deals": [
+        "birthday",
+        "signup_bonus",
+        "app_deal",
+        "rewards_program"
+      ],
+      "unverified_deals": [],
+      "warning": null,
+      "error": null,
+      "fetch_note": null
+    },
+    "raising-canes": {
+      "url": "https://www.raisingcanes.com/caniac-club",
+      "http_status": 403,
+      "classification": "protected",
+      "verified_deals": [],
+      "unverified_deals": [
+        "birthday",
+        "signup_bonus",
+        "rewards_program"
+      ],
+      "warning": null,
+      "error": null,
+      "fetch_note": "HTTP 403 — site is blocking scrapers (not a broken URL)"
+    },
+    "whataburger": {
+      "url": "https://www.whataburger.com/whataburger-rewards",
+      "http_status": 200,
+      "classification": "meta_verified",
+      "verified_deals": [
+        "signup_bonus",
+        "app_deal"
+      ],
+      "unverified_deals": [
+        "birthday",
+        "rewards_program"
+      ],
+      "warning": null,
+      "error": null,
+      "fetch_note": "JS-rendered SPA: rewards page exists (URL path confirms rewards program)"
+    },
+    "jack-in-the-box": {
+      "url": "https://www.jackinthebox.com/app",
+      "http_status": 200,
+      "classification": "verified",
+      "verified_deals": [
+        "signup_bonus",
+        "app_deal",
+        "rewards_program"
+      ],
+      "unverified_deals": [],
+      "warning": null,
+      "error": null,
+      "fetch_note": null
+    },
+    "del-taco": {
+      "url": "https://www.deltaco.com/rewards",
+      "http_status": 200,
+      "classification": "verified",
+      "verified_deals": [
+        "birthday",
+        "signup_bonus",
+        "bogo",
+        "app_deal",
+        "rewards_program"
+      ],
+      "unverified_deals": [],
+      "warning": null,
+      "error": null,
+      "fetch_note": null
+    },
+    "shake-shack": {
+      "url": "https://www.shakeshack.com/app/",
+      "http_status": 403,
+      "classification": "protected",
+      "verified_deals": [],
+      "unverified_deals": [
+        "birthday",
+        "signup_bonus",
+        "app_deal",
+        "rewards_program"
+      ],
+      "warning": null,
+      "error": null,
+      "fetch_note": "HTTP 403 — site is blocking scrapers (not a broken URL)"
+    },
+    "waffle-house": {
+      "url": "https://www.wafflehouse.com",
+      "http_status": 200,
+      "classification": "verified",
+      "verified_deals": [
+        "birthday",
+        "discount"
+      ],
+      "unverified_deals": [],
+      "warning": null,
+      "error": null,
+      "fetch_note": null
+    },
+    "ihop": {
+      "url": "https://www.ihop.com/en/ihop-rewards",
+      "http_status": 403,
+      "classification": "protected",
+      "verified_deals": [],
+      "unverified_deals": [
+        "birthday",
+        "signup_bonus",
+        "app_deal",
+        "rewards_program"
+      ],
+      "warning": null,
+      "error": null,
+      "fetch_note": "HTTP 403 — site is blocking scrapers (not a broken URL)"
+    },
+    "dennys": {
+      "url": "https://www.dennys.com/rewards",
+      "http_status": 200,
+      "classification": "verified",
+      "verified_deals": [
+        "birthday",
+        "signup_bonus",
+        "app_deal",
+        "rewards_program"
+      ],
+      "unverified_deals": [],
+      "warning": null,
+      "error": null,
+      "fetch_note": null
+    },
+    "applebees": {
+      "url": "https://www.applebees.com/en/dine-rewards",
+      "http_status": 403,
+      "classification": "protected",
+      "verified_deals": [],
+      "unverified_deals": [
+        "happy_hour",
+        "signup_bonus",
+        "bogo",
+        "rewards_program"
+      ],
+      "warning": null,
+      "error": null,
+      "fetch_note": "HTTP 403 — site is blocking scrapers (not a broken URL)"
+    },
+    "chilis": {
+      "url": "https://www.chilis.com/rewards",
+      "http_status": 200,
+      "classification": "meta_verified",
+      "verified_deals": [
+        "signup_bonus",
+        "rewards_program"
+      ],
+      "unverified_deals": [
+        "happy_hour"
+      ],
+      "warning": null,
+      "error": null,
+      "fetch_note": "JS-rendered page: body keywords unreliable, but meta/body/title confirms rewards program"
+    },
+    "panera": {
+      "url": "https://www.panerabread.com/en-us/mypanera.html",
+      "http_status": 403,
+      "classification": "protected",
+      "verified_deals": [],
+      "unverified_deals": [
+        "birthday",
+        "signup_bonus",
+        "app_deal",
+        "rewards_program"
+      ],
+      "warning": null,
+      "error": null,
+      "fetch_note": "HTTP 403 — site is blocking scrapers (not a broken URL)"
+    },
+    "olive-garden": {
+      "url": "https://www.olivegarden.com/specials/eclub",
+      "http_status": 200,
+      "classification": "meta_verified",
+      "verified_deals": [
+        "signup_bonus",
+        "rewards_program"
+      ],
+      "unverified_deals": [
+        "birthday"
+      ],
+      "warning": null,
+      "error": null,
+      "fetch_note": "JS-rendered page: body keywords unreliable, but meta/body/title confirms rewards program"
+    },
+    "red-lobster": {
+      "url": "https://www.redlobster.com/fresh-catch-club",
+      "http_status": 200,
+      "classification": "verified",
+      "verified_deals": [
+        "birthday",
+        "signup_bonus",
+        "app_deal",
+        "rewards_program"
+      ],
+      "unverified_deals": [],
+      "warning": null,
+      "error": null,
+      "fetch_note": null
+    },
+    "baskin-robbins": {
+      "url": "https://www.baskinrobbins.com/en/rewards",
+      "http_status": 200,
+      "classification": "verified",
+      "verified_deals": [
+        "birthday",
+        "signup_bonus",
+        "app_deal",
+        "rewards_program"
+      ],
+      "unverified_deals": [],
+      "warning": null,
+      "error": null,
+      "fetch_note": null
+    },
+    "cold-stone-creamery": {
+      "url": "https://www.coldstonecreamery.com/mycsc/",
+      "http_status": 200,
+      "classification": "verified",
+      "verified_deals": [
+        "birthday",
+        "signup_bonus",
+        "rewards_program"
+      ],
+      "unverified_deals": [],
+      "warning": null,
+      "error": null,
+      "fetch_note": null
+    },
+    "dairy-queen": {
+      "url": "https://www.dairyqueen.com/en-us/rewards/",
+      "http_status": 200,
+      "classification": "verified",
+      "verified_deals": [
+        "birthday",
+        "signup_bonus",
+        "app_deal",
+        "rewards_program"
+      ],
+      "unverified_deals": [],
+      "warning": null,
+      "error": null,
+      "fetch_note": null
+    },
+    "taco-bell": {
+      "url": "https://www.tacobell.com/rewards",
+      "http_status": 200,
+      "classification": "verified",
+      "verified_deals": [
+        "birthday",
+        "signup_bonus",
+        "app_deal",
+        "rewards_program"
+      ],
+      "unverified_deals": [],
+      "warning": null,
+      "error": null,
+      "fetch_note": null
+    }
+  },
+  "summary": {
+    "chains_checked": 34,
+    "fully_verified": 18,
+    "meta_verified": 8,
+    "protected": 7,
+    "slow": 1,
+    "broken_404": 0,
+    "warnings": 0,
+    "errors": 0
+  }
+}
