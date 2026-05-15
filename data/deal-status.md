@@ -1,7 +1,7 @@
 # FreebieMe Deal Status
 
-**Date:** 2026-05-14
-**Run at:** 2026-05-14T11:15:57.704Z
+**Date:** 2026-05-15
+**Run at:** 2026-05-15T11:23:27.853Z
 
 ---
 
@@ -32,13 +32,13 @@
 
 | Classification | Count | Meaning |
 |----------------|-------|---------|
-| ✅ Fully verified | 19 | Keywords found in static HTML |
-| ✅ Meta-verified | 7 | JS-rendered — meta/URL confirms program |
+| ✅ Fully verified | 20 | Keywords found in static HTML |
+| ✅ Meta-verified | 6 | JS-rendered — meta/URL confirms program |
 | 🔒 Protected (403) | 6 | Bot-blocking — NOT broken |
 | ⏱ Slow (timeout) | 1 | Timed out — NOT broken |
 | ❌ Broken (404) | 1 | URL needs updating — REAL problem |
 | ⚠️ Content warnings | 1 | Deal content may have changed |
-| **Duration** | 20.6s | Total verification time |
+| **Duration** | 20.4s | Total verification time |
 
 
 > ✅ No content warnings — all rewards pages look healthy
@@ -81,7 +81,7 @@
 | ihop | 🔒 (protected) | 403 | (bot-blocked) |
 | dennys | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 | applebees | 🔒 (protected) | 403 | (bot-blocked) |
-| chilis | ✅ (meta) | 200 | signup_bonus, rewards_program |
+| chilis | ✅ | 200 | happy_hour, signup_bonus, rewards_program |
 | panera | 🔒 (protected) | 403 | (bot-blocked) |
 | olive-garden | ❌ (404) | 404 | (JS-rendered) |
 | red-lobster | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
