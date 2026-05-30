@@ -1,7 +1,7 @@
 # FreebieMe Deal Status
 
-**Date:** 2026-05-29
-**Run at:** 2026-05-29T12:16:58.512Z
+**Date:** 2026-05-30
+**Run at:** 2026-05-30T10:48:52.073Z
 
 ---
 
@@ -32,13 +32,13 @@
 
 | Classification | Count | Meaning |
 |----------------|-------|---------|
-| ✅ Fully verified | 20 | Keywords found in static HTML |
+| ✅ Fully verified | 19 | Keywords found in static HTML |
 | ✅ Meta-verified | 7 | JS-rendered — meta/URL confirms program |
 | 🔒 Protected (403) | 6 | Bot-blocking — NOT broken |
-| ⏱ Slow (timeout) | 1 | Timed out — NOT broken |
+| ⏱ Slow (timeout) | 2 | Timed out — NOT broken |
 | ❌ Broken (404) | 0 | URL needs updating — REAL problem |
 | ⚠️ Content warnings | 0 | Deal content may have changed |
-| **Duration** | 20.8s | Total verification time |
+| **Duration** | 22.9s | Total verification time |
 
 
 > ✅ No content warnings — all rewards pages look healthy
@@ -53,7 +53,7 @@
 | mcdonalds | ✅ (meta) | 200 | signup_bonus, app_deal, rewards_program |
 | chipotle | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 | starbucks | ✅ | 200 | birthday, signup_bonus, app_deal, happy_hour, rewards_program |
-| subway | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
+| subway | ⏱ (slow) | timeout | (JS-rendered) |
 | dunkin | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 | chick-fil-a | ✅ | 200 | birthday, signup_bonus, rewards_program |
 | burger-king | ✅ (meta) | 200 | app_deal |
