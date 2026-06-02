@@ -1,7 +1,7 @@
 # FreebieMe Deal Status
 
-**Date:** 2026-06-01
-**Run at:** 2026-06-01T15:24:38.085Z
+**Date:** 2026-06-02
+**Run at:** 2026-06-02T12:44:37.691Z
 
 ---
 
@@ -32,13 +32,13 @@
 
 | Classification | Count | Meaning |
 |----------------|-------|---------|
-| ✅ Fully verified | 19 | Keywords found in static HTML |
+| ✅ Fully verified | 18 | Keywords found in static HTML |
 | ✅ Meta-verified | 6 | JS-rendered — meta/URL confirms program |
-| 🔒 Protected (403) | 6 | Bot-blocking — NOT broken |
+| 🔒 Protected (403) | 7 | Bot-blocking — NOT broken |
 | ⏱ Slow (timeout) | 2 | Timed out — NOT broken |
 | ❌ Broken (404) | 1 | URL needs updating — REAL problem |
 | ⚠️ Content warnings | 1 | Deal content may have changed |
-| **Duration** | 20.5s | Total verification time |
+| **Duration** | 20.6s | Total verification time |
 
 
 > ✅ No content warnings — all rewards pages look healthy
@@ -77,7 +77,7 @@
 | jack-in-the-box | ✅ | 200 | signup_bonus, app_deal, rewards_program |
 | del-taco | ✅ | 200 | birthday, signup_bonus, bogo, app_deal, rewards_program |
 | shake-shack | 🔒 (protected) | 403 | (bot-blocked) |
-| waffle-house | ✅ | 200 | birthday, discount |
+| waffle-house | 🔒 (protected) | 403 | (bot-blocked) |
 | ihop | 🔒 (protected) | 403 | (bot-blocked) |
 | dennys | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 | applebees | 🔒 (protected) | 403 | (bot-blocked) |
