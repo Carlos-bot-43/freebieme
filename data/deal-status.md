@@ -1,7 +1,7 @@
 # FreebieMe Deal Status
 
-**Date:** 2026-06-17
-**Run at:** 2026-06-17T12:53:21.149Z
+**Date:** 2026-06-18
+**Run at:** 2026-06-18T12:28:38.067Z
 
 ---
 
@@ -32,13 +32,13 @@
 
 | Classification | Count | Meaning |
 |----------------|-------|---------|
-| ✅ Fully verified | 17 | Keywords found in static HTML |
-| ✅ Meta-verified | 4 | JS-rendered — meta/URL confirms program |
-| 🔒 Protected (403) | 10 | Bot-blocking — NOT broken |
+| ✅ Fully verified | 18 | Keywords found in static HTML |
+| ✅ Meta-verified | 6 | JS-rendered — meta/URL confirms program |
+| 🔒 Protected (403) | 7 | Bot-blocking — NOT broken |
 | ⏱ Slow (timeout) | 2 | Timed out — NOT broken |
 | ❌ Broken (404) | 1 | URL needs updating — REAL problem |
 | ⚠️ Content warnings | 1 | Deal content may have changed |
-| **Duration** | 20.8s | Total verification time |
+| **Duration** | 20.4s | Total verification time |
 
 
 > ✅ No content warnings — all rewards pages look healthy
@@ -61,17 +61,17 @@
 | subway | ⏱ (slow) | timeout | (JS-rendered) |
 | dunkin | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 | chick-fil-a | ✅ | 200 | birthday, signup_bonus, rewards_program |
-| burger-king | 🔒 (protected) | 403 | (bot-blocked) |
+| burger-king | ✅ (meta) | 200 | app_deal |
 | wendys | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 | pizza-hut | ⏱ (slow) | timeout | (JS-rendered) |
 | dominos | ✅ | 200 | signup_bonus, app_deal, rewards_program |
 | papa-johns | ✅ (meta) | 200 | app_deal |
 | kfc | 🔒 (protected) | 403 | (bot-blocked) |
-| popeyes | 🔒 (protected) | 403 | (bot-blocked) |
+| popeyes | ✅ (meta) | 200 | (JS-rendered) |
 | sonic | ✅ | 200 | happy_hour, signup_bonus, app_deal, rewards_program |
 | panda-express | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 | wingstop | ✅ (meta) | 200 | birthday, app_deal, rewards_program |
-| jersey-mikes | 🔒 (protected) | 403 | (bot-blocked) |
+| jersey-mikes | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 | raising-canes | 🔒 (protected) | 403 | (bot-blocked) |
 | whataburger | ✅ (meta) | 200 | signup_bonus, app_deal |
 | jack-in-the-box | ✅ | 200 | signup_bonus, app_deal, rewards_program |
