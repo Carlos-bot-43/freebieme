@@ -1,7 +1,7 @@
 # FreebieMe Deal Status
 
-**Date:** 2026-06-19
-**Run at:** 2026-06-19T12:50:18.867Z
+**Date:** 2026-06-20
+**Run at:** 2026-06-20T11:21:10.697Z
 
 ---
 
@@ -34,11 +34,11 @@
 |----------------|-------|---------|
 | ✅ Fully verified | 17 | Keywords found in static HTML |
 | ✅ Meta-verified | 6 | JS-rendered — meta/URL confirms program |
-| 🔒 Protected (403) | 7 | Bot-blocking — NOT broken |
-| ⏱ Slow (timeout) | 3 | Timed out — NOT broken |
+| 🔒 Protected (403) | 8 | Bot-blocking — NOT broken |
+| ⏱ Slow (timeout) | 2 | Timed out — NOT broken |
 | ❌ Broken (404) | 1 | URL needs updating — REAL problem |
 | ⚠️ Content warnings | 1 | Deal content may have changed |
-| **Duration** | 22.3s | Total verification time |
+| **Duration** | 20.6s | Total verification time |
 
 
 > ✅ No content warnings — all rewards pages look healthy
@@ -69,7 +69,7 @@
 | kfc | 🔒 (protected) | 403 | (bot-blocked) |
 | popeyes | ✅ (meta) | 200 | (JS-rendered) |
 | sonic | ✅ | 200 | happy_hour, signup_bonus, app_deal, rewards_program |
-| panda-express | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
+| panda-express | 🔒 (protected) | 403 | (bot-blocked) |
 | wingstop | ✅ (meta) | 200 | birthday, app_deal, rewards_program |
 | jersey-mikes | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 | raising-canes | 🔒 (protected) | 403 | (bot-blocked) |
@@ -86,7 +86,7 @@
 | olive-garden | ❌ (404) | 404 | (JS-rendered) |
 | red-lobster | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 | baskin-robbins | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
-| cold-stone-creamery | ⏱ (slow) | timeout | (JS-rendered) |
+| cold-stone-creamery | ✅ | 200 | birthday, signup_bonus, rewards_program |
 | dairy-queen | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 | taco-bell | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 
