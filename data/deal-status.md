@@ -1,7 +1,7 @@
 # FreebieMe Deal Status
 
-**Date:** 2026-07-12
-**Run at:** 2026-07-12T10:36:30.564Z
+**Date:** 2026-07-13
+**Run at:** 2026-07-13T12:08:51.903Z
 
 ---
 
@@ -32,13 +32,13 @@
 
 | Classification | Count | Meaning |
 |----------------|-------|---------|
-| ✅ Fully verified | 17 | Keywords found in static HTML |
+| ✅ Fully verified | 16 | Keywords found in static HTML |
 | ✅ Meta-verified | 6 | JS-rendered — meta/URL confirms program |
 | 🔒 Protected (403) | 8 | Bot-blocking — NOT broken |
-| ⏱ Slow (timeout) | 2 | Timed out — NOT broken |
+| ⏱ Slow (timeout) | 3 | Timed out — NOT broken |
 | ❌ Broken (404) | 1 | URL needs updating — REAL problem |
 | ⚠️ Content warnings | 1 | Deal content may have changed |
-| **Duration** | 20.4s | Total verification time |
+| **Duration** | 22.4s | Total verification time |
 
 
 > ✅ No content warnings — all rewards pages look healthy
@@ -86,7 +86,7 @@
 | olive-garden | ❌ (404) | 404 | (JS-rendered) |
 | red-lobster | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 | baskin-robbins | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
-| cold-stone-creamery | ✅ | 200 | birthday, signup_bonus, rewards_program |
+| cold-stone-creamery | ⏱ (slow) | timeout | (JS-rendered) |
 | dairy-queen | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 | taco-bell | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 
