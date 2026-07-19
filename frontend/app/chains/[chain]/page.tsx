@@ -83,57 +83,84 @@ export default async function ChainPage({ params }: PageProps) {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(offers) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
-      <main className="max-w-3xl mx-auto px-4 py-8">
-        <nav className="text-xs text-gray-500 mb-3">
-          <Link href="/" className="hover:underline">Home</Link>
-          {' › '}
-          <Link href="/chains" className="hover:underline">Chains</Link>
-          {' › '}
-          <span>{c.name}</span>
-        </nav>
-        <h1 className="text-3xl font-bold mb-1">{c.name} Free Food Deals</h1>
-        <p className="text-gray-600 mb-6 text-sm">
-          {deals.length} offer{deals.length === 1 ? '' : 's'} · {locationCount.toLocaleString()} tracked locations · {c.cuisine.join(', ')}
-        </p>
+      <main className="min-h-screen bg-[#FAF7F2]">
+        <header className="border-b border-stone-100">
+          <div className="max-w-3xl mx-auto px-5 py-4">
+            <nav className="text-xs text-stone-400 flex items-center gap-1.5">
+              <Link href="/" className="hover:text-stone-700 transition-colors">FreebieMe</Link>
+              <span className="text-stone-300">›</span>
+              <Link href="/chains" className="hover:text-stone-700 transition-colors">Chains</Link>
+              <span className="text-stone-300">›</span>
+              <span className="text-stone-700 font-medium">{c.name}</span>
+            </nav>
+          </div>
+        </header>
 
-        <ul className="space-y-3">
-          {deals.map(d => {
-            const bucket = confidenceBucket(d.confidence_score);
-            return (
-              <li key={d.deal_id} className="bg-white border border-gray-200 rounded-lg p-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex-1">
-                    <div className="text-xs uppercase tracking-wide text-gray-500 mb-1">
-                      {DEAL_TYPE_LABELS[d.deal_type] || d.deal_type}
-                    </div>
-                    <h2 className="text-lg font-semibold">{d.title}</h2>
-                    <p className="text-sm text-gray-600 mt-1">{d.description}</p>
+        <div className="max-w-3xl mx-auto px-5 py-10">
+          <h1 className="text-3xl sm:text-4xl font-semibold text-stone-900 tracking-tight mb-2">
+            {c.name}
+          </h1>
+          <p className="text-stone-500 text-sm mb-8">
+            {deals.length} offer{deals.length === 1 ? '' : 's'} · {locationCount.toLocaleString()} locations · {c.cuisine.join(', ')}
+          </p>
+
+          <ul className="space-y-3">
+            {deals.map(d => {
+              const bucket = confidenceBucket(d.confidence_score);
+              const trustDot =
+                bucket === 'verified' ? 'bg-emerald-500' : bucket === 'likely' ? 'bg-amber-400' : 'bg-stone-300';
+              return (
+                <li key={d.deal_id} className="bg-white border border-stone-100 rounded-2xl p-6 hover:border-stone-200 transition-colors">
+                  <div className="text-[11px] font-medium text-stone-400 uppercase tracking-[0.16em] mb-3">
+                    {DEAL_TYPE_LABELS[d.deal_type] || d.deal_type}
                   </div>
-                  <span className={`text-[10px] px-2 py-1 rounded border whitespace-nowrap ${
-                    bucket === 'verified' ? 'bg-green-50 text-green-700 border-green-200' :
-                    bucket === 'likely' ? 'bg-amber-50 text-amber-700 border-amber-200' :
-                    'bg-gray-50 text-gray-600 border-gray-200'
-                  }`}>
-                    {bucket === 'verified' ? '✓ Verified' : bucket === 'likely' ? '~ Likely' : '? Unverified'}
-                  </span>
-                </div>
-                <div className="flex flex-wrap items-center gap-3 mt-3 text-xs text-gray-500">
-                  {d.recurrence && <span>↻ {d.recurrence}</span>}
-                  {d.last_verified_at && <span>checked {freshnessLabel(d.last_verified_at)}</span>}
-                  {d.valid_until && (
-                    <span className="text-orange-600 font-medium">
-                      expires {new Date(d.valid_until).toLocaleDateString()}
-                    </span>
+                  <h2 className="text-xl font-semibold text-stone-900 tracking-tight leading-snug mb-1">
+                    {d.title}
+                  </h2>
+                  {d.description && d.description !== d.title && (
+                    <p className="text-sm text-stone-500 mt-1 leading-relaxed">{d.description}</p>
                   )}
-                  <a href={d.source_url} target="_blank" rel="noopener noreferrer"
-                     className="ml-auto text-blue-600 hover:underline font-medium">
-                    Get deal →
-                  </a>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
+                  <div className="flex items-center gap-4 mt-4">
+                    <a
+                      href={d.source_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 bg-stone-900 hover:bg-stone-800 text-white text-sm font-medium px-4 py-2 rounded-xl transition-colors"
+                    >
+                      Get it →
+                    </a>
+                    <div className="flex flex-wrap items-center gap-3 text-[11px] text-stone-400 flex-1 min-w-0">
+                      <span className="inline-flex items-center gap-1.5">
+                        <span className={`w-1.5 h-1.5 rounded-full ${trustDot}`} />
+                        {bucket === 'verified' ? 'Verified' : bucket === 'likely' ? 'Likely' : 'Unverified'}
+                      </span>
+                      {d.last_verified_at && (
+                        <>
+                          <span className="text-stone-200">·</span>
+                          <span>checked {freshnessLabel(d.last_verified_at)}</span>
+                        </>
+                      )}
+                      {d.recurrence && (
+                        <>
+                          <span className="text-stone-200">·</span>
+                          <span>{d.recurrence}</span>
+                        </>
+                      )}
+                      {d.valid_until && (
+                        <>
+                          <span className="text-stone-200">·</span>
+                          <span className="text-orange-600 font-medium">
+                            ends {new Date(d.valid_until).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       </main>
     </>
   );

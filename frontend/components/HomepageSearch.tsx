@@ -34,7 +34,6 @@ function findNearestCity(lat: number, lng: number, cities: CityConfig[]): CityCo
 function matchFoodCategory(query: string): string | null {
   const q = query.trim().toLowerCase();
   if (FOOD_CATEGORY_ALIASES[q]) return FOOD_CATEGORY_ALIASES[q];
-  // Partial match
   for (const [alias, cat] of Object.entries(FOOD_CATEGORY_ALIASES)) {
     if (q.includes(alias) || alias.includes(q)) return cat;
   }
@@ -85,32 +84,28 @@ export default function HomepageSearch({ cities }: HomepageSearchProps) {
     e.preventDefault();
     if (!query.trim()) return;
 
-    // 1. Check if it's a food category
     const foodCat = matchFoodCategory(query);
     if (foodCat) {
       if (nearestCity) {
         router.push(`/deals/${nearestCity.slug}/${foodCat}`);
         return;
       }
-      // No saved location — navigate to a search with the food category (use first city)
       router.push(`/deals/${cities[0]?.slug}/${foodCat}`);
       return;
     }
 
-    // 2. Check if it matches a city name directly
     const cityMatch = matchCity(query, cities);
     if (cityMatch) {
       router.push(`/deals/${cityMatch.slug}`);
       return;
     }
 
-    // 3. Geocode the query to find nearest city
     setStatus('loading');
-    setStatusMsg('Searching...');
+    setStatusMsg('Searching…');
     const geo = await geocodeQuery(query.trim());
     if (!geo) {
       setStatus('error');
-      setStatusMsg(`Could not find "${query}". Try a ZIP code, city name, or food type like "burgers".`);
+      setStatusMsg(`Could not find "${query}". Try a ZIP, city name, or food type like "burgers".`);
       return;
     }
 
@@ -122,10 +117,7 @@ export default function HomepageSearch({ cities }: HomepageSearchProps) {
   };
 
   const detectGPS = () => {
-    if (!navigator.geolocation) {
-      setGpsStatus('error');
-      return;
-    }
+    if (!navigator.geolocation) { setGpsStatus('error'); return; }
     setGpsStatus('detecting');
     navigator.geolocation.getCurrentPosition(
       (pos) => {
@@ -143,92 +135,67 @@ export default function HomepageSearch({ cities }: HomepageSearchProps) {
   };
 
   return (
-    <div className="space-y-5">
-      {/* Main search bar */}
+    <div className="space-y-4">
       <form onSubmit={handleSearch} className="relative">
         <input
           type="text"
           value={query}
           onChange={(e) => { setQuery(e.target.value); setStatus('idle'); }}
-          placeholder="What are you craving? (burgers, pizza, wings...)"
-          className="w-full px-5 py-4 text-base border-2 border-gray-200 rounded-2xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 shadow-sm placeholder-gray-400"
+          placeholder="Burgers, pizza, ZIP or city…"
+          className="w-full pl-5 pr-32 py-3.5 text-base bg-white border border-stone-200 rounded-2xl focus:outline-none focus:border-stone-400 focus:ring-2 focus:ring-stone-200 placeholder:text-stone-400"
         />
         <button
           type="submit"
           disabled={status === 'loading'}
-          className="absolute right-2 top-2 bottom-2 bg-blue-600 text-white px-5 rounded-xl font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 text-sm"
+          className="absolute right-1.5 top-1.5 bottom-1.5 bg-stone-900 hover:bg-stone-800 text-white px-5 rounded-xl font-medium transition-colors disabled:opacity-50 text-sm"
         >
-          {status === 'loading' ? '...' : 'Find Deals →'}
+          {status === 'loading' ? '…' : 'Search'}
         </button>
       </form>
 
       {status === 'error' && (
-        <p className="text-red-500 text-sm text-center">{statusMsg}</p>
+        <p className="text-orange-600 text-xs">{statusMsg}</p>
       )}
 
-      {/* Food category quick pills */}
-      <div>
-        <p className="text-xs text-gray-400 mb-2 text-center font-medium uppercase tracking-wide">Quick browse by food type</p>
-        <div className="flex flex-wrap justify-center gap-2">
-          {TOP_FOOD_CATEGORIES.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => navigateToCategory(cat)}
-              className="px-4 py-2 rounded-full text-sm font-medium bg-white border border-gray-200 text-gray-700 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700 transition-colors shadow-sm"
-            >
-              {FOOD_CATEGORY_LABELS[cat] || cat}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* GPS / Location buttons */}
-      <div className="flex items-center gap-2">
-        <div className="flex-1 h-px bg-gray-200" />
-        <span className="text-xs text-gray-400 whitespace-nowrap">or find by location</span>
-        <div className="flex-1 h-px bg-gray-200" />
-      </div>
-
-      <div className="flex flex-col sm:flex-row gap-3 justify-center">
-        {savedLocation && nearestCity ? (
+      <div className="flex flex-wrap gap-1.5">
+        {TOP_FOOD_CATEGORIES.slice(0, 8).map((cat) => (
           <button
-            onClick={() => router.push(`/deals/${nearestCity.slug}`)}
-            className="flex-1 sm:flex-none py-2.5 px-4 bg-green-50 border border-green-200 rounded-xl text-sm text-green-800 font-medium hover:bg-green-100 transition-colors flex items-center justify-center gap-2"
+            key={cat}
+            onClick={() => navigateToCategory(cat)}
+            className="px-3 py-1.5 rounded-full text-xs font-medium bg-stone-50 hover:bg-stone-100 text-stone-700 border border-stone-100 transition-colors"
           >
-            📍 Continue near {nearestCity.name}
+            {FOOD_CATEGORY_LABELS[cat] || cat}
           </button>
-        ) : null}
+        ))}
+      </div>
 
-        {gpsStatus === 'idle' && (
+      {(savedLocation && nearestCity) || gpsStatus !== 'idle' ? (
+        <div className="pt-2 border-t border-stone-100">
+          {savedLocation && nearestCity && (
+            <button
+              onClick={() => router.push(`/deals/${nearestCity.slug}`)}
+              className="text-xs text-stone-600 hover:text-stone-900 transition-colors"
+            >
+              Continue near {nearestCity.name} →
+            </button>
+          )}
+          {gpsStatus === 'detecting' && (
+            <div className="text-xs text-stone-500">Detecting location…</div>
+          )}
+          {gpsStatus === 'error' && (
+            <p className="text-xs text-stone-500">Location unavailable — try search or pick a city below.</p>
+          )}
+        </div>
+      ) : (
+        <div className="pt-2 border-t border-stone-100">
           <button
             onClick={detectGPS}
-            className="flex-1 sm:flex-none py-2.5 px-4 bg-blue-50 border border-blue-200 rounded-xl text-sm text-blue-700 font-medium hover:bg-blue-100 transition-colors flex items-center justify-center gap-2"
+            className="text-xs text-stone-500 hover:text-stone-900 transition-colors"
           >
-            📍 Detect my location automatically
+            Or use my location →
           </button>
-        )}
-        {gpsStatus === 'detecting' && (
-          <div className="flex items-center gap-2 justify-center text-blue-600 text-sm py-2.5">
-            <div className="animate-spin w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full" />
-            <span>Detecting location...</span>
-          </div>
-        )}
-        {gpsStatus === 'found' && (
-          <div className="text-green-600 text-sm text-center py-2.5 flex items-center gap-1 justify-center">
-            <span>✅ Loading deals near you...</span>
-          </div>
-        )}
-        {gpsStatus === 'error' && (
-          <p className="text-gray-500 text-sm text-center py-2.5">Location unavailable — search above or browse cities below</p>
-        )}
-      </div>
-
-      {/* Browse all cities hint */}
-      <div className="text-center">
-        <a href="#cities" className="text-xs text-gray-400 hover:text-blue-600 transition-colors">
-          No location? Browse all cities ↓
-        </a>
-      </div>
+        </div>
+      )}
     </div>
   );
 }

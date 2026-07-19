@@ -133,9 +133,8 @@ export default function DealList({ deals, filters, userLat, userLng, updatedAt, 
       : null;
 
     return (
-      <div className="text-center py-12 text-gray-500">
-        <p className="text-4xl mb-3">🍽️</p>
-        <p className="font-medium text-gray-700">
+      <div className="text-center py-16 text-stone-500">
+        <p className="font-medium text-stone-800 text-lg">
           {filters.savedOnly
             ? 'No saved deals in this city'
             : foodCategoryLabel
@@ -143,31 +142,31 @@ export default function DealList({ deals, filters, userLat, userLng, updatedAt, 
             : 'No deals match your filters'}
         </p>
         {filters.savedOnly ? (
-          <p className="text-sm mt-2 text-gray-500">Star deals to save them — then find them here</p>
+          <p className="text-sm mt-2 text-stone-500">Star deals to save them — then find them here.</p>
         ) : foodCategoryLabel && citySlug ? (
-          <div className="mt-3 text-sm text-gray-500 space-y-2">
+          <div className="mt-4 text-sm text-stone-500 space-y-3">
             <p>This category may not have coverage in {cityName || 'this city'} yet.</p>
             <Link
               href={`/deals/${citySlug}`}
-              className="inline-block mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-stone-900 hover:bg-stone-800 text-white rounded-full text-sm font-medium transition-colors"
             >
               Browse all deals in {cityName} →
             </Link>
           </div>
         ) : hints.length > 0 ? (
-          <div className="mt-3 text-sm text-gray-500 max-w-xs mx-auto">
+          <div className="mt-4 text-sm text-stone-500 max-w-xs mx-auto">
             <p className="mb-2">Try:</p>
             <ul className="text-left space-y-1 inline-block">
               {hints.map((hint, i) => (
                 <li key={i} className="flex items-start gap-1.5">
-                  <span className="text-blue-400 mt-0.5">→</span>
+                  <span className="text-stone-300 mt-0.5">→</span>
                   <span>{hint.charAt(0).toUpperCase() + hint.slice(1)}</span>
                 </li>
               ))}
             </ul>
           </div>
         ) : (
-          <p className="text-sm mt-1">Try adjusting your filters or search terms</p>
+          <p className="text-sm mt-1">Try adjusting your filters or search terms.</p>
         )}
       </div>
     );
@@ -175,13 +174,15 @@ export default function DealList({ deals, filters, userLat, userLng, updatedAt, 
 
   return (
     <div>
-      <p className="text-sm text-gray-500 mb-3">
-        Showing <span className="font-medium text-gray-700">{Math.min(visibleCount, filteredCount)}</span>{' '}
-        of <span className="font-medium text-gray-700">{filteredCount}</span> deal{filteredCount !== 1 ? 's' : ''}{' '}
-        <span className="text-gray-400">({totalLocations.toLocaleString()} total locations)</span>
-        {hasLocation ? ' · sorted by distance' : ' · sorted by confidence'}
+      <p className="text-xs text-stone-400 mb-4">
+        Showing <span className="font-medium text-stone-700">{Math.min(visibleCount, filteredCount)}</span>{' '}
+        of <span className="font-medium text-stone-700">{filteredCount}</span> deal{filteredCount !== 1 ? 's' : ''}
+        <span className="text-stone-300"> · </span>
+        <span>{totalLocations.toLocaleString()} locations</span>
+        <span className="text-stone-300"> · </span>
+        {hasLocation ? 'sorted by distance' : 'sorted by confidence'}
       </p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-4">
         {visibleGroups.map((group) => (
           <DealGroupCard
             key={group.group_id}
@@ -193,14 +194,13 @@ export default function DealList({ deals, filters, userLat, userLng, updatedAt, 
           />
         ))}
       </div>
-      {/* 5B: Load more button */}
       {hasMore && (
-        <div className="mt-6 text-center">
+        <div className="mt-8 text-center">
           <button
             onClick={() => setVisibleCount(prev => prev + LOAD_MORE_COUNT)}
-            className="px-6 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-colors shadow-sm"
+            className="px-6 py-2.5 bg-white border border-stone-200 rounded-full text-sm font-medium text-stone-700 hover:border-stone-300 transition-colors"
           >
-            Show more deals ({displayed.length - visibleCount} remaining)
+            Show {Math.min(LOAD_MORE_COUNT, displayed.length - visibleCount)} more
           </button>
         </div>
       )}

@@ -1,38 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { DealGroup, DEAL_TYPE_LABELS, DEAL_TYPE_COLORS, distanceMiles } from '../lib/types';
+import { DealGroup, DEAL_TYPE_LABELS, distanceMiles } from '../lib/types';
 import { toggleSavedDeal, isDealSaved } from '../lib/savedDeals';
 
-const DEAL_TYPE_BORDER: Record<string, string> = {
-  birthday: 'border-l-pink-400',
-  signup_bonus: 'border-l-purple-400',
-  app_deal: 'border-l-blue-400',
-  bogo: 'border-l-orange-400',
-  happy_hour: 'border-l-yellow-400',
-  rewards_program: 'border-l-green-400',
-  freebie: 'border-l-emerald-400',
-  discount: 'border-l-red-400',
-  other: 'border-l-gray-300',
-};
-
-const VALUE_SUMMARY_COLORS: Record<string, string> = {
-  birthday: 'text-pink-700',
-  signup_bonus: 'text-purple-700',
-  app_deal: 'text-blue-700',
-  happy_hour: 'text-amber-700',
-  rewards_program: 'text-green-700',
-  freebie: 'text-emerald-700',
-  bogo: 'text-orange-700',
-  discount: 'text-red-700',
-};
-
-// Claim type display config — answers the #1 hangry-user question instantly
-const CLAIM_TYPE_CONFIG: Record<string, { label: string; className: string }> = {
-  instant:          { label: '⚡ Use right now',    className: 'bg-green-100 text-green-800' },
-  same_day_setup:   { label: '📲 ~10 min setup',    className: 'bg-yellow-100 text-yellow-800' },
-  advance_required: { label: '📅 Setup in advance', className: 'bg-orange-100 text-orange-800' },
-  birthday_only:    { label: '🎂 Birthday month',   className: 'bg-pink-100 text-pink-800' },
+const CLAIM_LABEL: Record<string, string> = {
+  instant: 'Use right now',
+  same_day_setup: 'Set up in minutes',
+  advance_required: 'Plan ahead',
+  birthday_only: 'Birthday only',
 };
 
 function formatHHTime(timeStr: string): string {
@@ -42,42 +18,30 @@ function formatHHTime(timeStr: string): string {
   return m === 0 ? `${hour} ${period}` : `${hour}:${m.toString().padStart(2, '0')} ${period}`;
 }
 
-// Robust happy hour day parser — handles all known and future day string patterns
 function isHappyHourActiveToday(dayStr: string): boolean {
-  const todayIdx = new Date().getDay(); // 0=Sun, 1=Mon...6=Sat
+  const todayIdx = new Date().getDay();
   const s = dayStr.toLowerCase().trim();
 
   if (s.includes('every day') || s.includes('daily')) return true;
   if (s.includes('weekdays') || s.includes('weekday')) return todayIdx >= 1 && todayIdx <= 5;
   if (s.includes('weekends') || s.includes('weekend')) return todayIdx === 0 || todayIdx === 6;
-  // Seasonal/select = unknown schedule → show as possibly active (don't hide)
   if (s.includes('select') || s.includes('seasonal')) return true;
 
-  const DAY_IDX: Record<string, number> = {
-    sun: 0, mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6,
-  };
-
-  // Handle ranges like "Mon–Fri", "Mon-Fri", "Fri–Sun"
-  const rangeMatch = s.match(/([a-z]{3})[\s\u2013\-]+([a-z]{3})/);
+  const DAY_IDX: Record<string, number> = { sun: 0, mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6 };
+  const rangeMatch = s.match(/([a-z]{3})[\s–\-]+([a-z]{3})/);
   if (rangeMatch) {
     const startDay = DAY_IDX[rangeMatch[1].slice(0, 3)];
     const endDay = DAY_IDX[rangeMatch[2].slice(0, 3)];
     if (startDay !== undefined && endDay !== undefined) {
-      if (startDay <= endDay) {
-        return todayIdx >= startDay && todayIdx <= endDay;
-      } else {
-        // Wraps (e.g. Fri–Sun covers Fri=5, Sat=6, Sun=0)
-        return todayIdx >= startDay || todayIdx <= endDay;
-      }
+      return startDay <= endDay
+        ? todayIdx >= startDay && todayIdx <= endDay
+        : todayIdx >= startDay || todayIdx <= endDay;
     }
   }
-
-  // Single named day (e.g. "Friday", "Fri")
   for (const [name, idx] of Object.entries(DAY_IDX)) {
     if (s.startsWith(name)) return todayIdx === idx;
   }
-
-  return true; // Unknown pattern → assume valid to avoid hiding real deals
+  return true;
 }
 
 interface DealGroupCardProps {
@@ -92,12 +56,6 @@ function formatDist(d: number): string {
   return d < 0.1 ? '< 0.1 mi' : `${d.toFixed(1)} mi`;
 }
 
-function getDistBadgeClass(d: number): string {
-  if (d <= 2) return 'bg-green-100 text-green-700';
-  if (d <= 8) return 'bg-yellow-100 text-yellow-700';
-  return 'bg-gray-100 text-gray-500';
-}
-
 export default function DealGroupCard({ group, userLat, userLng, cityName, updatedAt }: DealGroupCardProps) {
   const [showLocations, setShowLocations] = useState(false);
   const [showSteps, setShowSteps] = useState(false);
@@ -105,18 +63,15 @@ export default function DealGroupCard({ group, userLat, userLng, cityName, updat
   const [copied, setCopied] = useState(false);
   const [shared, setShared] = useState(false);
 
-  // Happy hour live status
   const [hhStatus, setHhStatus] = useState<'active' | 'upcoming' | 'closed' | null>(null);
   const [hhCountdown, setHhCountdown] = useState<string>('');
 
-  // Use the first location's deal_id as the "group save" key
   const primaryDealId = group.locations[0]?.deal_id || group.group_id;
 
   useEffect(() => {
     setSaved(isDealSaved(primaryDealId));
   }, [primaryDealId]);
 
-  // Time-aware happy hour status (updates every minute)
   useEffect(() => {
     if (!group.happy_hour_start || !group.happy_hour_end) return;
 
@@ -125,8 +80,6 @@ export default function DealGroupCard({ group, userLat, userLng, cityName, updat
       const [startH, startM] = group.happy_hour_start!.split(':').map(Number);
       const [endH, endM] = group.happy_hour_end!.split(':').map(Number);
       const dayStr = group.happy_hour_days || '';
-
-      // Check if today is a valid day using robust parser
       const validToday = isHappyHourActiveToday(dayStr);
 
       if (!validToday) {
@@ -159,12 +112,6 @@ export default function DealGroupCard({ group, userLat, userLng, cityName, updat
     return () => clearInterval(timer);
   }, [group.happy_hour_start, group.happy_hour_end, group.happy_hour_days]);
 
-  const typeLabel = DEAL_TYPE_LABELS[group.deal_type] || DEAL_TYPE_LABELS.other;
-  const typeColor = DEAL_TYPE_COLORS[group.deal_type] || DEAL_TYPE_COLORS.other;
-  const typeBorder = DEAL_TYPE_BORDER[group.deal_type] || DEAL_TYPE_BORDER.other;
-  const claimConfig = group.claim_type ? CLAIM_TYPE_CONFIG[group.claim_type] : null;
-
-  // "New This Month" badge — show if updatedAt is in the current calendar month
   const isNewThisMonth = (() => {
     if (!updatedAt) return false;
     const updated = new Date(updatedAt);
@@ -174,7 +121,6 @@ export default function DealGroupCard({ group, userLat, userLng, cityName, updat
 
   const hasLocation = !!(userLat && userLng);
 
-  // Sort locations by distance if we have user location
   const sortedLocations = hasLocation
     ? [...group.locations].sort((a, b) => {
         const da = distanceMiles(userLat!, userLng!, a.lat, a.lng);
@@ -183,20 +129,16 @@ export default function DealGroupCard({ group, userLat, userLng, cityName, updat
       })
     : group.locations;
 
-  const handleToggleSave = () => {
-    const nowSaved = toggleSavedDeal(primaryDealId);
-    setSaved(nowSaved);
-  };
+  const handleToggleSave = () => setSaved(toggleSavedDeal(primaryDealId));
 
   const handleCopyCode = async (code: string) => {
     try {
       await navigator.clipboard.writeText(code);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch { /* ignore */ }
+    } catch {}
   };
 
-  // Social sharing
   const handleShare = async () => {
     const text = `${group.title} at ${group.location_name} — claim it free at FreebieMe`;
     const url = typeof window !== 'undefined' ? window.location.href : 'https://freebieme.vercel.app';
@@ -205,249 +147,185 @@ export default function DealGroupCard({ group, userLat, userLng, cityName, updat
         await navigator.share({ title: group.title, text, url });
         setShared(true);
         setTimeout(() => setShared(false), 2000);
-      } catch { /* ignore cancel */ }
+      } catch {}
     } else {
       try {
         await navigator.clipboard.writeText(`${text} ${url}`);
         setShared(true);
         setTimeout(() => setShared(false), 2000);
-      } catch { /* ignore */ }
+      } catch {}
     }
   };
 
-  return (
-    <div className={`bg-white rounded-xl shadow-sm border border-gray-100 border-l-4 ${typeBorder} p-4 hover:shadow-md transition-shadow duration-200 flex flex-col`}>
+  const headline = group.value_summary || group.title;
+  const hasSubtitle = group.title && group.title !== headline;
+  const hasSteps = group.claim_steps && group.claim_steps.length > 0;
 
-      {/* Header: Chain name + deal type badge + claim type badge + save + share */}
-      <div className="flex items-start justify-between gap-2 mb-2">
-        <div className="flex-1 min-w-0">
-          <span className="font-bold text-gray-900 text-base leading-tight block">
-            {group.location_name}
-          </span>
-          <div className="flex flex-wrap items-center gap-1.5 mt-1">
-            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${typeColor}`}>
-              {typeLabel}
-            </span>
-            {isNewThisMonth && (
-              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-sky-100 text-sky-700">
-                🆕 New
-              </span>
-            )}
-            {claimConfig && (
-              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${claimConfig.className}`}>
-                {claimConfig.label}
-              </span>
-            )}
-          </div>
+  const tags: string[] = [];
+  if (group.requires_app) tags.push('App');
+  else if (group.requires_signup) tags.push('Sign up');
+  if (group.requires_purchase) tags.push('With purchase');
+  if (group.claim_type && CLAIM_LABEL[group.claim_type]) tags.push(CLAIM_LABEL[group.claim_type]);
+  if (DEAL_TYPE_LABELS[group.deal_type]) tags.push(DEAL_TYPE_LABELS[group.deal_type]);
+  if (isNewThisMonth) tags.push('New');
+
+  return (
+    <article className="bg-white rounded-2xl border border-stone-100 hover:border-stone-200 transition-colors p-6 flex flex-col">
+      <div className="flex items-center justify-between mb-4">
+        <div className="text-[11px] font-semibold text-stone-900 uppercase tracking-[0.16em]">
+          {group.location_name}
         </div>
-        {/* Action buttons */}
-        <div className="flex items-center gap-1 flex-shrink-0">
+        <div className="flex items-center gap-3 text-xs text-stone-400">
+          {hasLocation && group.nearestDistance !== null && (
+            <span className="font-medium text-stone-500">{formatDist(group.nearestDistance)}</span>
+          )}
+          {!hasLocation && (
+            <span className="text-stone-400">
+              {group.locations.length} loc{group.locations.length !== 1 ? 's' : ''}
+            </span>
+          )}
           <button
             onClick={handleShare}
-            title="Share this deal"
-            className="text-sm text-gray-300 hover:text-blue-500 transition-colors p-0.5"
+            title="Share"
+            className="text-stone-400 hover:text-stone-700 transition-colors"
+            aria-label="Share"
           >
-            {shared ? '✅' : '🔗'}
+            {shared ? '✓' : '↗'}
           </button>
           <button
             onClick={handleToggleSave}
-            title={saved ? 'Remove bookmark' : 'Save deal'}
-            className={`text-xl transition-colors ${saved ? 'text-yellow-500' : 'text-gray-200 hover:text-yellow-400'}`}
+            title={saved ? 'Saved' : 'Save'}
+            className={`text-base transition-colors ${saved ? 'text-amber-500' : 'text-stone-300 hover:text-stone-500'}`}
+            aria-label={saved ? 'Remove from saved' : 'Save'}
           >
             {saved ? '★' : '☆'}
           </button>
         </div>
       </div>
 
-      {/* Value summary — the most important line: what you actually get */}
-      {group.value_summary && (
-        <div className={`text-base font-bold mb-0.5 leading-tight ${VALUE_SUMMARY_COLORS[group.deal_type] || 'text-gray-900'}`}>
-          {group.value_summary}
-        </div>
+      <h3 className="text-[22px] sm:text-2xl font-semibold text-stone-900 leading-[1.15] tracking-tight mb-1">
+        {headline}
+      </h3>
+      {hasSubtitle && (
+        <p className="text-sm text-stone-500 leading-relaxed mb-4 line-clamp-2">{group.title}</p>
       )}
+      {!hasSubtitle && <div className="mb-5" />}
 
-      {/* Deal title — secondary context, shown only if different from value_summary */}
-      {group.title && group.title !== group.value_summary && (
-        <p className="text-xs text-gray-500 mb-1.5 leading-relaxed line-clamp-2">
-          {group.title}
-        </p>
-      )}
-
-      {/* Discount badges (only when no free item) */}
-      {!group.free_item && (group.discount_percent || group.discount_amount) && (
-        <div className="flex flex-wrap gap-1.5 mb-2">
-          {group.discount_percent && (
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700">
-              {group.discount_percent}% off
-            </span>
-          )}
-          {group.discount_amount && !group.discount_percent && (
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700">
-              ${group.discount_amount} off
-            </span>
-          )}
-        </div>
-      )}
-
-      {/* Happy hour live status banner */}
       {hhStatus && (
-        <div className="mb-2">
-          <div className={`rounded-lg px-3 py-1.5 text-xs font-medium ${
-            hhStatus === 'active'   ? 'bg-green-50 text-green-800 border border-green-200' :
-            hhStatus === 'upcoming' ? 'bg-yellow-50 text-yellow-800 border border-yellow-200' :
-                                      'bg-gray-50 text-gray-500 border border-gray-200'
+        <div className="mb-4">
+          <div className={`rounded-xl px-3 py-2 text-xs font-medium border ${
+            hhStatus === 'active'   ? 'bg-emerald-50 text-emerald-800 border-emerald-100' :
+            hhStatus === 'upcoming' ? 'bg-amber-50 text-amber-800 border-amber-100' :
+                                      'bg-stone-50 text-stone-500 border-stone-100'
           }`}>
-            {hhStatus === 'active'   && `🟢 Happy Hour is ON now · ${hhCountdown}`}
-            {hhStatus === 'upcoming' && `🟡 ${hhCountdown}`}
-            {hhStatus === 'closed'   && `⚫ Happy hour is over for today · ${hhCountdown}`}
+            {hhStatus === 'active'   && `On now · ${hhCountdown}`}
+            {hhStatus === 'upcoming' && hhCountdown}
+            {hhStatus === 'closed'   && `Closed · ${hhCountdown}`}
           </div>
-          {/* Timezone disclaimer — only when active or upcoming */}
-          {(hhStatus === 'active' || hhStatus === 'upcoming') && (
-            <p className="text-xs text-gray-400 mt-0.5 pl-1">⏰ Times are local to each restaurant</p>
-          )}
         </div>
       )}
 
-      {/* Birthday advance warning — the most important trust signal */}
       {group.deal_type === 'birthday' && (
-        <div className="bg-orange-50 border border-orange-200 rounded-lg px-3 py-2 mb-2">
-          <p className="text-xs text-orange-800 font-medium">
-            ⚠️ Register before your birthday month — you can&apos;t sign up and claim same day
+        <div className="bg-orange-50 border border-orange-100 rounded-xl px-3 py-2 mb-4">
+          <p className="text-xs text-orange-800">
+            Register <strong>before</strong> your birthday month — you can&rsquo;t sign up and claim same day.
           </p>
         </div>
       )}
 
-      {/* Purchase requirement warning */}
-      {group.requires_purchase && group.deal_type !== 'rewards_program' && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-2">
-          <p className="text-xs text-amber-800">💳 Requires a purchase to redeem</p>
-        </div>
-      )}
-
-      {/* Compact requirements summary */}
-      <div className="text-xs text-gray-400 mb-2 flex flex-wrap gap-x-2">
-        <span>{group.requires_app ? '📱 App required' : '🌐 No app needed'}</span>
-        <span>·</span>
-        <span>{group.requires_signup ? '✍️ Free signup' : '👋 Walk-in'}</span>
-        {group.requires_purchase && (
-          <>
-            <span>·</span>
-            <span>💳 With purchase</span>
-          </>
-        )}
-      </div>
-
-      {/* How to Claim expandable section */}
-      {group.claim_steps && group.claim_steps.length > 0 && (
-        <div className="mb-2">
-          <button
-            onClick={() => setShowSteps(!showSteps)}
-            className="text-xs text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1"
-          >
-            {showSteps ? '▲' : '▼'} How to claim
-          </button>
-          {showSteps && (
-            <ol className="mt-2 space-y-1 pl-4">
-              {group.claim_steps.map((step, i) => (
-                <li key={i} className="text-xs text-gray-600 list-decimal leading-relaxed">
-                  {step}
-                </li>
-              ))}
-            </ol>
-          )}
-        </div>
-      )}
-
-      {/* Coupon code */}
       {group.coupon_code && (
-        <div className="flex items-center gap-2 mb-2">
-          <code className="bg-yellow-50 border border-yellow-200 text-yellow-800 text-xs px-2 py-1 rounded font-mono font-bold flex-1 truncate">
+        <div className="flex items-center gap-2 mb-4">
+          <code className="flex-1 bg-amber-50 border border-amber-200 text-amber-800 text-xs px-3 py-2 rounded-lg font-mono font-medium truncate">
             {group.coupon_code}
           </code>
           <button
             onClick={() => handleCopyCode(group.coupon_code!)}
-            className="text-xs text-blue-600 hover:text-blue-800 whitespace-nowrap font-medium px-2 py-1 rounded hover:bg-blue-50 transition-colors"
+            className="text-xs font-medium text-stone-600 hover:text-stone-900 px-3 py-2 rounded-lg border border-stone-200 hover:border-stone-300 transition-colors"
           >
-            {copied ? '✅ Copied!' : '📋 Copy'}
+            {copied ? 'Copied' : 'Copy'}
           </button>
         </div>
       )}
 
-      {/* Location info */}
-      <div className="mt-auto">
-        {hasLocation && group.nearestDistance !== null ? (
-          <div className="mb-2">
-            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold mr-2 ${getDistBadgeClass(group.nearestDistance)}`}>
-              📍 {formatDist(group.nearestDistance)}
-            </span>
-            {group.nearestLocation?.address && (
-              <span className="text-xs text-gray-400 truncate">{group.nearestLocation.address}</span>
-            )}
-          </div>
+      <a
+        href={group.source_url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center justify-center gap-2 bg-stone-900 hover:bg-stone-800 text-white text-sm font-medium py-3 rounded-xl transition-colors"
+      >
+        Get it
+        <span aria-hidden>→</span>
+      </a>
+
+      {(hasSteps || group.locations.length > 1) && (
+        <div className="mt-4 flex flex-wrap gap-x-5 gap-y-1.5 text-xs">
+          {hasSteps && (
+            <button
+              onClick={() => setShowSteps(s => !s)}
+              className="font-medium text-stone-500 hover:text-stone-900 transition-colors"
+            >
+              How to claim {showSteps ? '↑' : '↓'}
+            </button>
+          )}
+          {group.locations.length > 1 && (
+            <button
+              onClick={() => setShowLocations(s => !s)}
+              className="font-medium text-stone-500 hover:text-stone-900 transition-colors"
+            >
+              {showLocations ? 'Hide' : 'Show'} {group.locations.length} locations {showLocations ? '↑' : '↓'}
+            </button>
+          )}
+        </div>
+      )}
+
+      {showSteps && hasSteps && (
+        <ol className="mt-3 text-sm text-stone-600 space-y-1.5 pl-5 list-decimal marker:text-stone-300">
+          {group.claim_steps.map((s, i) => <li key={i}>{s}</li>)}
+        </ol>
+      )}
+
+      {showLocations && (
+        <div className="mt-3 border border-stone-100 rounded-xl overflow-hidden max-h-48 overflow-y-auto">
+          {sortedLocations.map((loc, i) => {
+            const dist = hasLocation ? distanceMiles(userLat!, userLng!, loc.lat, loc.lng) : null;
+            return (
+              <div
+                key={loc.deal_id}
+                className={`flex items-center justify-between px-3 py-2 text-xs ${i % 2 === 0 ? 'bg-stone-50/60' : 'bg-white'}`}
+              >
+                <span className="text-stone-600 truncate flex-1 mr-2">{loc.address || 'Address not available'}</span>
+                {dist !== null && (
+                  <span className="flex-shrink-0 text-stone-500 font-medium">{formatDist(dist)}</span>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      <div className="mt-5 pt-4 border-t border-stone-50 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-stone-400">
+        {hasLocation && group.nearestLocation?.address ? (
+          <span className="text-stone-500 truncate max-w-[60%]">{group.nearestLocation.address}</span>
         ) : (
-          <div className="mb-2">
-            <span className="text-xs text-gray-500">
-              📍 {group.locations.length} location{group.locations.length !== 1 ? 's' : ''}{cityName ? ` in ${cityName}` : ''}
-            </span>
-          </div>
+          !hasLocation && cityName && <span>{group.locations.length} location{group.locations.length !== 1 ? 's' : ''} in {cityName}</span>
         )}
-
-        {/* Expand/collapse locations */}
-        {group.locations.length > 1 && (
-          <button
-            onClick={() => setShowLocations(!showLocations)}
-            className="w-full text-left text-xs text-blue-600 hover:text-blue-800 font-medium mb-2 flex items-center gap-1"
-          >
-            {showLocations ? '▲' : '▼'} {showLocations ? 'Hide' : 'Show all'} {group.locations.length} locations
-            {hasLocation && <span className="text-gray-400 font-normal">· sorted by distance</span>}
-          </button>
-        )}
-
-        {/* Location list (expanded) */}
-        {showLocations && (
-          <div className="border border-gray-100 rounded-lg overflow-hidden mb-2 max-h-48 overflow-y-auto">
-            {sortedLocations.map((loc, i) => {
-              const dist = hasLocation ? distanceMiles(userLat!, userLng!, loc.lat, loc.lng) : null;
-              return (
-                <div key={loc.deal_id} className={`flex items-center justify-between px-2.5 py-1.5 text-xs ${i % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}>
-                  <span className="text-gray-600 truncate flex-1 mr-2">{loc.address || 'Address not available'}</span>
-                  {dist !== null && (
-                    <span className={`flex-shrink-0 px-1.5 py-0.5 rounded-full text-xs font-medium ${getDistBadgeClass(dist)}`}>
-                      {formatDist(dist)}
-                    </span>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        )}
+        {tags.map((t, i) => (
+          <span key={t + i} className="inline-flex items-center">
+            {(hasLocation || cityName || i > 0) && <span className="text-stone-200 mr-3">·</span>}
+            <span>{t}</span>
+          </span>
+        ))}
       </div>
 
-      {/* Footer: sourced date + report + CTA */}
-      <div className="flex items-center justify-between pt-2 border-t border-gray-50 mt-auto">
-        <div className="text-xs text-gray-400">
-          <span title="When we last collected deal data from official sources">
-            Sourced {updatedAt ? new Date(updatedAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'recently'}
-          </span>
-          {' · '}
-          <a
-            href={`mailto:deals@freebieme.com?subject=Expired deal: ${encodeURIComponent(group.location_name + ' - ' + group.title)}&body=This deal appears to be expired or incorrect.%0A%0AChain: ${encodeURIComponent(group.location_name)}%0ADeal: ${encodeURIComponent(group.title)}%0APage: ${typeof window !== 'undefined' ? window.location.href : ''}`}
-            className="hover:text-red-500 transition-colors"
-            onClick={(e) => e.stopPropagation()}
-          >
-            ⚑ Report
-          </a>
-        </div>
+      <div className="mt-3 flex items-center justify-between text-[10px] text-stone-300">
+        <span>Sourced {updatedAt ? new Date(updatedAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'recently'}</span>
         <a
-          href={group.source_url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-xs text-white bg-blue-600 hover:bg-blue-700 font-medium px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
-          onClick={(e) => e.stopPropagation()}
+          href={`mailto:deals@freebieme.com?subject=Expired deal: ${encodeURIComponent(group.location_name + ' - ' + group.title)}`}
+          className="hover:text-stone-500 transition-colors"
         >
-          Get deal →
+          Report
         </a>
       </div>
-    </div>
+    </article>
   );
 }

@@ -12,7 +12,7 @@ export default function NearMePreview() {
     try {
       const saved = sessionStorage.getItem('freebieme_location');
       if (!saved) return;
-      const { lat, lng, label } = JSON.parse(saved);
+      const { lat, lng } = JSON.parse(saved);
       const cities = citiesData as CityConfig[];
       let nearest = cities[0];
       let minDist = Infinity;
@@ -20,8 +20,6 @@ export default function NearMePreview() {
         const d = distanceMiles(lat, lng, city.center.lat, city.center.lng);
         if (d < minDist) { minDist = d; nearest = city; }
       }
-      // suppress unused variable warning
-      void label;
       setNearCity(nearest);
     } catch {}
   }, []);
@@ -29,14 +27,14 @@ export default function NearMePreview() {
   if (!nearCity) return null;
 
   return (
-    <div className="mb-4 bg-green-50 border border-green-200 rounded-xl px-4 py-3 flex items-center justify-between gap-3">
+    <div className="mb-4 bg-white border border-stone-200 rounded-2xl px-4 py-3 flex items-center justify-between gap-3">
       <div>
-        <span className="text-sm text-green-800 font-medium">📍 Near {nearCity.name}</span>
-        <span className="text-xs text-green-600 ml-2">from your last visit</span>
+        <span className="text-sm text-stone-900 font-medium">Near {nearCity.name}</span>
+        <span className="text-xs text-stone-400 ml-2">from your last visit</span>
       </div>
       <Link
         href="/near-me"
-        className="text-xs font-semibold text-white bg-green-600 hover:bg-green-700 px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
+        className="text-xs font-medium text-stone-900 hover:text-stone-600 transition-colors whitespace-nowrap"
       >
         See deals →
       </Link>
