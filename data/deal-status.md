@@ -1,7 +1,7 @@
 # FreebieMe Deal Status
 
-**Date:** 2026-08-04
-**Run at:** 2026-08-04T11:25:39.937Z
+**Date:** 2026-08-05
+**Run at:** 2026-08-05T11:22:57.402Z
 
 ---
 
@@ -32,8 +32,8 @@
 
 | Classification | Count | Meaning |
 |----------------|-------|---------|
-| ✅ Fully verified | 16 | Keywords found in static HTML |
-| ✅ Meta-verified | 6 | JS-rendered — meta/URL confirms program |
+| ✅ Fully verified | 15 | Keywords found in static HTML |
+| ✅ Meta-verified | 7 | JS-rendered — meta/URL confirms program |
 | 🔒 Protected (403) | 8 | Bot-blocking — NOT broken |
 | ⏱ Slow (timeout) | 2 | Timed out — NOT broken |
 | ❌ Broken (404) | 2 | URL needs updating — REAL problem |
@@ -76,7 +76,7 @@
 | raising-canes | 🔒 (protected) | 403 | (bot-blocked) |
 | whataburger | ✅ (meta) | 200 | signup_bonus, app_deal |
 | jack-in-the-box | ✅ | 200 | signup_bonus, app_deal, rewards_program |
-| del-taco | ✅ | 200 | birthday, signup_bonus, bogo, app_deal, rewards_program |
+| del-taco | ✅ (meta) | 200 | signup_bonus, app_deal |
 | shake-shack | 🔒 (protected) | 403 | (bot-blocked) |
 | waffle-house | 🔒 (protected) | 403 | (bot-blocked) |
 | ihop | 🔒 (protected) | 403 | (bot-blocked) |
