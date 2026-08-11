@@ -1,7 +1,7 @@
 # FreebieMe Deal Status
 
-**Date:** 2026-08-10
-**Run at:** 2026-08-10T10:18:23.850Z
+**Date:** 2026-08-11
+**Run at:** 2026-08-11T10:02:08.681Z
 
 ---
 
@@ -33,12 +33,12 @@
 | Classification | Count | Meaning |
 |----------------|-------|---------|
 | ✅ Fully verified | 15 | Keywords found in static HTML |
-| ✅ Meta-verified | 7 | JS-rendered — meta/URL confirms program |
+| ✅ Meta-verified | 6 | JS-rendered — meta/URL confirms program |
 | 🔒 Protected (403) | 8 | Bot-blocking — NOT broken |
-| ⏱ Slow (timeout) | 2 | Timed out — NOT broken |
+| ⏱ Slow (timeout) | 3 | Timed out — NOT broken |
 | ❌ Broken (404) | 2 | URL needs updating — REAL problem |
 | ⚠️ Content warnings | 2 | Deal content may have changed |
-| **Duration** | 21.0s | Total verification time |
+| **Duration** | 20.8s | Total verification time |
 
 
 > ✅ No content warnings — all rewards pages look healthy
@@ -56,7 +56,7 @@
 
 | Chain | Status | HTTP | Verified Deals |
 |-------|--------|------|----------------|
-| mcdonalds | ✅ (meta) | 200 | signup_bonus, app_deal, rewards_program |
+| mcdonalds | ⏱ (slow) | timeout | (JS-rendered) |
 | chipotle | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 | starbucks | ✅ | 200 | birthday, signup_bonus, app_deal, happy_hour, rewards_program |
 | subway | ⏱ (slow) | timeout | (JS-rendered) |
