@@ -1,13 +1,5 @@
 [
   {
-    "date": "2026-07-22",
-    "deals_added": [],
-    "deals_removed": [],
-    "deals_changed": [],
-    "total_after": 78487,
-    "prev_total": 78487
-  },
-  {
     "date": "2026-07-23",
     "deals_added": [],
     "deals_removed": [],
@@ -233,6 +225,14 @@
   },
   {
     "date": "2026-08-20",
+    "deals_added": [],
+    "deals_removed": [],
+    "deals_changed": [],
+    "total_after": 78487,
+    "prev_total": 78487
+  },
+  {
+    "date": "2026-08-21",
     "deals_added": [],
     "deals_removed": [],
     "deals_changed": [],
