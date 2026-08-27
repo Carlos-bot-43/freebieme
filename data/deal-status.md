@@ -1,7 +1,7 @@
 # FreebieMe Deal Status
 
-**Date:** 2026-08-26
-**Run at:** 2026-08-26T09:43:54.856Z
+**Date:** 2026-08-27
+**Run at:** 2026-08-27T19:40:57.001Z
 
 ---
 
@@ -32,13 +32,13 @@
 
 | Classification | Count | Meaning |
 |----------------|-------|---------|
-| ✅ Fully verified | 15 | Keywords found in static HTML |
+| ✅ Fully verified | 16 | Keywords found in static HTML |
 | ✅ Meta-verified | 6 | JS-rendered — meta/URL confirms program |
 | 🔒 Protected (403) | 8 | Bot-blocking — NOT broken |
 | ⏱ Slow (timeout) | 3 | Timed out — NOT broken |
-| ❌ Broken (404) | 2 | URL needs updating — REAL problem |
-| ⚠️ Content warnings | 2 | Deal content may have changed |
-| **Duration** | 20.8s | Total verification time |
+| ❌ Broken (404) | 1 | URL needs updating — REAL problem |
+| ⚠️ Content warnings | 1 | Deal content may have changed |
+| **Duration** | 20.6s | Total verification time |
 
 
 > ✅ No content warnings — all rewards pages look healthy
@@ -47,7 +47,6 @@
 
 | Chain | URL |
 |-------|-----|
-| dunkin | https://www.dunkindonuts.com/en/dd-perks |
 | olive-garden | https://www.olivegarden.com/specials/eclub |
 
 ---
@@ -60,7 +59,7 @@
 | chipotle | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 | starbucks | ✅ | 200 | birthday, signup_bonus, app_deal, happy_hour, rewards_program |
 | subway | ⏱ (slow) | timeout | (JS-rendered) |
-| dunkin | ❌ (404) | 404 | (JS-rendered) |
+| dunkin | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 | chick-fil-a | ✅ | 200 | birthday, signup_bonus, rewards_program |
 | burger-king | ✅ (meta) | 200 | app_deal |
 | wendys | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
