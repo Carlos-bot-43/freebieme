@@ -1,7 +1,7 @@
 # FreebieMe Deal Status
 
-**Date:** 2026-09-09
-**Run at:** 2026-09-09T13:32:47.399Z
+**Date:** 2026-09-10
+**Run at:** 2026-09-10T13:23:21.593Z
 
 ---
 
@@ -38,7 +38,7 @@
 | ⏱ Slow (timeout) | 3 | Timed out — NOT broken |
 | ❌ Broken (404) | 1 | URL needs updating — REAL problem |
 | ⚠️ Content warnings | 1 | Deal content may have changed |
-| **Duration** | 20.7s | Total verification time |
+| **Duration** | 20.6s | Total verification time |
 
 
 > ✅ No content warnings — all rewards pages look healthy
