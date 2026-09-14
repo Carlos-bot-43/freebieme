@@ -1,7 +1,7 @@
 # FreebieMe Deal Status
 
-**Date:** 2026-09-13
-**Run at:** 2026-09-13T13:43:10.825Z
+**Date:** 2026-09-14
+**Run at:** 2026-09-14T15:45:20.834Z
 
 ---
 
@@ -32,8 +32,8 @@
 
 | Classification | Count | Meaning |
 |----------------|-------|---------|
-| ✅ Fully verified | 16 | Keywords found in static HTML |
-| ✅ Meta-verified | 6 | JS-rendered — meta/URL confirms program |
+| ✅ Fully verified | 15 | Keywords found in static HTML |
+| ✅ Meta-verified | 7 | JS-rendered — meta/URL confirms program |
 | 🔒 Protected (403) | 8 | Bot-blocking — NOT broken |
 | ⏱ Slow (timeout) | 3 | Timed out — NOT broken |
 | ❌ Broken (404) | 1 | URL needs updating — REAL problem |
@@ -68,7 +68,7 @@
 | papa-johns | ✅ (meta) | 200 | app_deal |
 | kfc | 🔒 (protected) | 403 | (bot-blocked) |
 | popeyes | ✅ (meta) | 200 | (JS-rendered) |
-| sonic | ✅ | 200 | happy_hour, signup_bonus, app_deal, rewards_program |
+| sonic | ✅ (meta) | 200 | signup_bonus, app_deal, rewards_program |
 | panda-express | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 | wingstop | ✅ (meta) | 200 | birthday, app_deal, rewards_program |
 | jersey-mikes | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
