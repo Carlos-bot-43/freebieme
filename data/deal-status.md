@@ -1,7 +1,7 @@
 # FreebieMe Deal Status
 
-**Date:** 2026-09-26
-**Run at:** 2026-09-26T13:40:02.415Z
+**Date:** 2026-09-27
+**Run at:** 2026-09-27T14:36:28.895Z
 
 ---
 
@@ -32,13 +32,13 @@
 
 | Classification | Count | Meaning |
 |----------------|-------|---------|
-| ✅ Fully verified | 15 | Keywords found in static HTML |
+| ✅ Fully verified | 14 | Keywords found in static HTML |
 | ✅ Meta-verified | 7 | JS-rendered — meta/URL confirms program |
-| 🔒 Protected (403) | 9 | Bot-blocking — NOT broken |
+| 🔒 Protected (403) | 10 | Bot-blocking — NOT broken |
 | ⏱ Slow (timeout) | 2 | Timed out — NOT broken |
 | ❌ Broken (404) | 1 | URL needs updating — REAL problem |
 | ⚠️ Content warnings | 1 | Deal content may have changed |
-| **Duration** | 20.6s | Total verification time |
+| **Duration** | 20.8s | Total verification time |
 
 
 > ✅ No content warnings — all rewards pages look healthy
@@ -69,7 +69,7 @@
 | kfc | 🔒 (protected) | 403 | (bot-blocked) |
 | popeyes | ✅ (meta) | 200 | (JS-rendered) |
 | sonic | ✅ (meta) | 200 | signup_bonus, app_deal, rewards_program |
-| panda-express | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
+| panda-express | 🔒 (protected) | 403 | (bot-blocked) |
 | wingstop | ✅ (meta) | 200 | birthday, app_deal, rewards_program |
 | jersey-mikes | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 | raising-canes | 🔒 (protected) | 403 | (bot-blocked) |
