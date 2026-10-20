@@ -1,7 +1,7 @@
 # FreebieMe Deal Status
 
-**Date:** 2026-10-19
-**Run at:** 2026-10-19T16:17:33.249Z
+**Date:** 2026-10-20
+**Run at:** 2026-10-20T14:10:37.740Z
 
 ---
 
@@ -32,13 +32,13 @@
 
 | Classification | Count | Meaning |
 |----------------|-------|---------|
-| ✅ Fully verified | 14 | Keywords found in static HTML |
+| ✅ Fully verified | 15 | Keywords found in static HTML |
 | ✅ Meta-verified | 7 | JS-rendered — meta/URL confirms program |
-| 🔒 Protected (403) | 10 | Bot-blocking — NOT broken |
+| 🔒 Protected (403) | 9 | Bot-blocking — NOT broken |
 | ⏱ Slow (timeout) | 2 | Timed out — NOT broken |
 | ❌ Broken (404) | 1 | URL needs updating — REAL problem |
 | ⚠️ Content warnings | 1 | Deal content may have changed |
-| **Duration** | 20.3s | Total verification time |
+| **Duration** | 20.5s | Total verification time |
 
 
 > ✅ No content warnings — all rewards pages look healthy
@@ -61,7 +61,7 @@
 | subway | ⏱ (slow) | timeout | (JS-rendered) |
 | dunkin | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 | chick-fil-a | ✅ | 200 | birthday, signup_bonus, rewards_program |
-| burger-king | ✅ (meta) | 200 | app_deal |
+| burger-king | ✅ (meta) | 200 | signup_bonus, app_deal |
 | wendys | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 | pizza-hut | ⏱ (slow) | timeout | (JS-rendered) |
 | dominos | ✅ | 200 | signup_bonus, app_deal, rewards_program |
@@ -69,7 +69,7 @@
 | kfc | 🔒 (protected) | 403 | (bot-blocked) |
 | popeyes | ✅ (meta) | 200 | (JS-rendered) |
 | sonic | ✅ (meta) | 200 | signup_bonus, app_deal, rewards_program |
-| panda-express | 🔒 (protected) | 403 | (bot-blocked) |
+| panda-express | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 | wingstop | ✅ (meta) | 200 | birthday, app_deal, rewards_program |
 | jersey-mikes | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 | raising-canes | 🔒 (protected) | 403 | (bot-blocked) |
