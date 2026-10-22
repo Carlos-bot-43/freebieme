@@ -1,7 +1,7 @@
 # FreebieMe Deal Status
 
-**Date:** 2026-10-21
-**Run at:** 2026-10-21T14:23:37.840Z
+**Date:** 2026-10-22
+**Run at:** 2026-10-22T14:25:02.376Z
 
 ---
 
@@ -32,22 +32,17 @@
 
 | Classification | Count | Meaning |
 |----------------|-------|---------|
-| ✅ Fully verified | 14 | Keywords found in static HTML |
-| ✅ Meta-verified | 7 | JS-rendered — meta/URL confirms program |
+| ✅ Fully verified | 15 | Keywords found in static HTML |
+| ✅ Meta-verified | 6 | JS-rendered — meta/URL confirms program |
 | 🔒 Protected (403) | 10 | Bot-blocking — NOT broken |
-| ⏱ Slow (timeout) | 2 | Timed out — NOT broken |
-| ❌ Broken (404) | 1 | URL needs updating — REAL problem |
-| ⚠️ Content warnings | 1 | Deal content may have changed |
-| **Duration** | 20.7s | Total verification time |
+| ⏱ Slow (timeout) | 3 | Timed out — NOT broken |
+| ❌ Broken (404) | 0 | URL needs updating — REAL problem |
+| ⚠️ Content warnings | 0 | Deal content may have changed |
+| **Duration** | 22.8s | Total verification time |
 
 
 > ✅ No content warnings — all rewards pages look healthy
 
-### ⚠️ Broken URLs (404) — Need Fixing
-
-| Chain | URL |
-|-------|-----|
-| olive-garden | https://www.olivegarden.com/specials/eclub |
 
 ---
 
@@ -68,7 +63,7 @@
 | papa-johns | ✅ (meta) | 200 | app_deal |
 | kfc | 🔒 (protected) | 403 | (bot-blocked) |
 | popeyes | ✅ (meta) | 200 | (JS-rendered) |
-| sonic | ✅ (meta) | 200 | signup_bonus, app_deal, rewards_program |
+| sonic | ✅ | 200 | happy_hour, signup_bonus, app_deal, rewards_program |
 | panda-express | 🔒 (protected) | 403 | (bot-blocked) |
 | wingstop | ✅ (meta) | 200 | birthday, app_deal, rewards_program |
 | jersey-mikes | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
@@ -83,7 +78,7 @@
 | applebees | 🔒 (protected) | 403 | (bot-blocked) |
 | chilis | ✅ | 200 | happy_hour, signup_bonus, rewards_program |
 | panera | 🔒 (protected) | 403 | (bot-blocked) |
-| olive-garden | ❌ (404) | 404 | (JS-rendered) |
+| olive-garden | ⏱ (slow) | timeout | (JS-rendered) |
 | red-lobster | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 | baskin-robbins | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 | cold-stone-creamery | ✅ | 200 | birthday, signup_bonus, rewards_program |
