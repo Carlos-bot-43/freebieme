@@ -1,7 +1,7 @@
 # FreebieMe Deal Status
 
-**Date:** 2026-11-17
-**Run at:** 2026-11-17T18:16:47.614Z
+**Date:** 2026-11-18
+**Run at:** 2026-11-18T17:52:40.805Z
 
 ---
 
@@ -38,7 +38,7 @@
 | ⏱ Slow (timeout) | 2 | Timed out — NOT broken |
 | ❌ Broken (404) | 1 | URL needs updating — REAL problem |
 | ⚠️ Content warnings | 1 | Deal content may have changed |
-| **Duration** | 20.4s | Total verification time |
+| **Duration** | 20.6s | Total verification time |
 
 
 > ✅ No content warnings — all rewards pages look healthy
@@ -73,7 +73,7 @@
 | wingstop | ✅ (meta) | 200 | birthday, app_deal, rewards_program |
 | jersey-mikes | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 | raising-canes | 🔒 (protected) | 403 | (bot-blocked) |
-| whataburger | ✅ (meta) | 200 | signup_bonus, app_deal |
+| whataburger | ✅ (meta) | timeout | (JS-rendered) |
 | jack-in-the-box | ✅ | 200 | signup_bonus, app_deal, rewards_program |
 | del-taco | ✅ (meta) | 200 | signup_bonus, app_deal |
 | shake-shack | 🔒 (protected) | 403 | (bot-blocked) |
