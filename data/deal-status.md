@@ -1,7 +1,7 @@
 # FreebieMe Deal Status
 
-**Date:** 2026-11-24
-**Run at:** 2026-11-24T20:00:59.958Z
+**Date:** 2026-11-25
+**Run at:** 2026-11-25T19:00:57.001Z
 
 ---
 
@@ -32,13 +32,13 @@
 
 | Classification | Count | Meaning |
 |----------------|-------|---------|
-| ✅ Fully verified | 13 | Keywords found in static HTML |
+| ✅ Fully verified | 14 | Keywords found in static HTML |
 | ✅ Meta-verified | 6 | JS-rendered — meta/URL confirms program |
-| 🔒 Protected (403) | 12 | Bot-blocking — NOT broken |
+| 🔒 Protected (403) | 11 | Bot-blocking — NOT broken |
 | ⏱ Slow (timeout) | 2 | Timed out — NOT broken |
 | ❌ Broken (404) | 0 | URL needs updating — REAL problem |
 | ⚠️ Content warnings | 1 | Deal content may have changed |
-| **Duration** | 20.3s | Total verification time |
+| **Duration** | 20.1s | Total verification time |
 
 
 ### Content Warnings
@@ -77,7 +77,7 @@
 | del-taco | ✅ (meta) | 200 | signup_bonus, app_deal |
 | shake-shack | 🔒 (protected) | 403 | (bot-blocked) |
 | waffle-house | 🔒 (protected) | 403 | (bot-blocked) |
-| ihop | 🔒 (protected) | 403 | (bot-blocked) |
+| ihop | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 | dennys | 🔒 (protected) | 403 | (bot-blocked) |
 | applebees | 🔒 (protected) | 403 | (bot-blocked) |
 | chilis | ✅ | 200 | happy_hour, signup_bonus, rewards_program |
