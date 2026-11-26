@@ -1,7 +1,7 @@
 # FreebieMe Deal Status
 
-**Date:** 2026-11-25
-**Run at:** 2026-11-25T19:00:57.001Z
+**Date:** 2026-11-26
+**Run at:** 2026-11-26T18:52:56.608Z
 
 ---
 
@@ -32,21 +32,22 @@
 
 | Classification | Count | Meaning |
 |----------------|-------|---------|
-| ✅ Fully verified | 14 | Keywords found in static HTML |
+| ✅ Fully verified | 15 | Keywords found in static HTML |
 | ✅ Meta-verified | 6 | JS-rendered — meta/URL confirms program |
-| 🔒 Protected (403) | 11 | Bot-blocking — NOT broken |
+| 🔒 Protected (403) | 10 | Bot-blocking — NOT broken |
 | ⏱ Slow (timeout) | 2 | Timed out — NOT broken |
-| ❌ Broken (404) | 0 | URL needs updating — REAL problem |
+| ❌ Broken (404) | 1 | URL needs updating — REAL problem |
 | ⚠️ Content warnings | 1 | Deal content may have changed |
-| **Duration** | 20.1s | Total verification time |
+| **Duration** | 20.5s | Total verification time |
 
 
-### Content Warnings
+> ✅ No content warnings — all rewards pages look healthy
 
-| Chain | Warning |
-|-------|---------|
-| red-lobster | Keywords not found for: birthday, app_deal — deal may have changed |
+### ⚠️ Broken URLs (404) — Need Fixing
 
+| Chain | URL |
+|-------|-----|
+| olive-garden | https://www.olivegarden.com/specials/eclub |
 
 ---
 
@@ -77,16 +78,16 @@
 | del-taco | ✅ (meta) | 200 | signup_bonus, app_deal |
 | shake-shack | 🔒 (protected) | 403 | (bot-blocked) |
 | waffle-house | 🔒 (protected) | 403 | (bot-blocked) |
-| ihop | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
+| ihop | 🔒 (protected) | 403 | (bot-blocked) |
 | dennys | 🔒 (protected) | 403 | (bot-blocked) |
 | applebees | 🔒 (protected) | 403 | (bot-blocked) |
 | chilis | ✅ | 200 | happy_hour, signup_bonus, rewards_program |
 | panera | 🔒 (protected) | 403 | (bot-blocked) |
-| olive-garden | 🔒 (protected) | 403 | (bot-blocked) |
-| red-lobster | ⚠️ | 200 | signup_bonus, rewards_program |
+| olive-garden | ❌ (404) | 404 | (JS-rendered) |
+| red-lobster | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 | baskin-robbins | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 | cold-stone-creamery | ✅ | 200 | birthday, signup_bonus, rewards_program |
-| dairy-queen | 🔒 (protected) | 403 | (bot-blocked) |
+| dairy-queen | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 | taco-bell | ✅ | 200 | birthday, signup_bonus, app_deal, rewards_program |
 
 ---
